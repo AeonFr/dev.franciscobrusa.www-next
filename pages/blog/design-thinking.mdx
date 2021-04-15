@@ -1,0 +1,68 @@
+export const metadata = {
+  title: "Dos métodos del Design Thinking",
+  date: "2017-09-08T21:08:26+02:00",
+  lang: "es"
+}
+
+import BlogPostLayout from "../../components/BlogPostLayout"
+export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+
+export const doubleDiamondImage = "/blog/design-thinking/double-diamond-model.svg"
+export const doubleDiamondImageDark = "/blog/design-thinking/double-diamond-model-dark.svg"
+
+# Dos métodos del Design Thinking
+
+El _Design Thinking_ se puede entender como una filosofía de diseño o un _framework_ (estructura), que agrupa métodos de diseño y herramientas de investigación en diseño. Permite obtener soluciones novedosas incluso cuando desde el primer momento no se sabe bien cuál es el problema a resolver, es decir, este método permite resolver problemas que aún no han sido descubiertos y crear productos para necesidades que hasta entonces no se habían considerado.
+
+El <abbr>DT</abbr> primero investiga al público del producto o servicio y busca las causas primeras de sus problemas o necesidades, el último _por qué_ en la cadena de <span className="nowrap">causa-consecuencia</span>. Antes de concentrarse en una solución, busca la mayor cantidad de alternativas posibles para compararlas. Esta filosofía sostiene que no existe una única solución correcta ante un problema de diseño, sólo existen soluciones que resuelven mejor o peor el problema, comparadas con las demás.
+
+Principalmente se derivan dos **métodos** del _Design Thinking_: el diseño centrado en el usuario (_<span className="nowrap">Human-Centered</span> Design_, o <abbr>HCD</abbr>, por sus siglas en inglés) y el modelo de doble diamante <span className="nowrap">divergente-convergente</span>[^1].
+
+## Human-Centered Design
+
+El proceso de <abbr>HCD</abbr> se puede resumir en cuatro pasos:
+
+<div
+  className="p2 mb2 tc break-inside-avoid break-before-avoid"
+  style={{ lineHeight: 1 }}
+>
+  <p>Observación</p>
+  <p>⇩</p>
+  <p>Generación de Ideas</p>
+  <p>⇩</p>
+  <p>Prototipado</p>
+  <p>⇩</p>
+  <p>Testeo</p>
+  <p>⇩</p>
+  <p>Iterar: volver a la Observación y repetir el ciclo.</p>
+</div>
+
+## Modelo de Doble Diamante
+
+Estos cuatro pasos en realidad cumplen dos funciones: encontrar el problema (correcto), y encontrar la solución (correcta). Este proceso se puede graficar como dos diamantes en donde se convergen y divergen alternativas del problema y de la solución.
+
+<picture>
+  <source
+    srcset={doubleDiamondImageDark}
+    media="(prefers-color-scheme: dark)"
+  />
+  <img src={doubleDiamondImage} />
+</picture>
+
+> **El Modelo de Diseño de Doble-Diamante.** Empieza con una idea, y a través de la investigación en diseño inicial, se expande el pensamiento para explorar los problemas estructurales subyacentes. Sólo entonces es tiempo de converger en el problema real. Similarmente, se usan técnicas de investigación en diseño [*Design Research*] para explorar una amplia variedad de soluciones antes de converger en una específica.[^2]
+
+En el libro _Designpedia_ estas cuatro fases de convergencia-divergencia se mencionan y explayan con los verbos:
+
+1. Mapear
+2. Explorar
+3. Construir
+4. Testear[^3]
+
+A pesar de que el doble diamante permite entender visualmente el proceso del _Design Thinking_, puede causar la impresión errónea de que éste es un método lineal y se llega a un resultado concreto. En cambio, el proceso es más bien circular, iterativo. Incluso se lo llegó a describir como un espiral que se expande, representando que en cada nueva iteración se puede expandir el conocimiento del problema y llegar a una solución más cercana a la deseada.
+
+A lo largo de cada una de estas etapas, el diseñador puede valerse de diversas herramientas como son: observación directa, entrevistas a usuarios, estudios de mercado, definición de tipos de usuarios (_Personas_), <abbr title="Fortalezas, Oportunidades, Debilidades, Amenazas">FODA</abbr> (también conocido como <abbr>DAFO</abbr>), _Journey Maps_, _Moodboards_, entre otros. La herramienta adecuada depende de cada caso, se llegaron a recopilar más de 80[^4] pero esto no significa que para cada proyecto sea necesario usarlas a todas. Las mismas herramientas también se suelen aplicar de forma distinta dependiendo el diseñador o el grupo de diseñadores, el proyecto y su alcance, entre otras cosas.
+
+[^1]: _The Design of Everyday Things (revised & expanded edition)_, Don Norman, edit. Basic Books, 2013, pág. 220.
+[^2]: _Idem_ arriba.
+[^3]: _Designpedia, 80 herramientas para construir tus ideas_, _Thinkers Co._, edit. Lid, Noviembre 2015, pág. 28.
+[^4]: _Idem_ arriba.

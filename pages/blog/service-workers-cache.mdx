@@ -1,0 +1,229 @@
+export const metadata = {
+  title: "The Service Workers Cache API and the Fetch Event",
+  date: "2021-01-15T18:06:23.400Z"
+}
+
+import BlogPostLayout from "../../components/BlogPostLayout"
+export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+
+export const serviceWorker = "/blog/service-workers-cache/service-worker.svg"
+
+<img src={serviceWorker} alt=""/>
+
+## The Service Workers Cache API and the Fetch Event
+
+A Service Worker is a script that runs in a different environment than the browser, running only once per domain instead of once per tab. It does not executes again if the page refreshes and it's not loaded with a script tag like this: `<script src="">`; instead it's loaded with some javascript code like this: `navigator.serviceWorker.register("/serviceWorker.js")`
+
+One of the most powerful features of Service Workers is the [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) in conjunction with the [Fetch Event](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent). With them you have the ability to **intercept any outbound network request** and **modify, store, and retrieve from cache the response**.
+
+<div style={{ fontSize: "1rem", borderTop: "1px dotted" }}>
+
+By **any outbound network request** I mean literally **any** one of them. It doesn't matter if the browser tries to fetch a resource from another domain, or if the browser is offline.
+It doesn't matter either if you're trying to fetch via GET or POST and weather you're receiving a script, an image or an html document.
+
+When intercepting a request, you're allowed to modify it's response. You can choose to actually make a real request and then store the response in cache, or you can retrieve a previous version of that request from cache. It's also possible (although maybe not recommended) to modify the contents, headers or status code of the response.
+
+</div>
+
+<div style={{ fontSize: "1rem", borderTop: "1px dashed var(--accent)" }}/>
+
+### The Cache API (WindowOrWorkerGlobalScope.caches)
+
+This caching mechanism works as a collection of request/response keys.
+
+Most examples of using the [WindowOrWorkerGlobalScope.caches](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/caches) out there explain how to cache and then serve assets from Service Workers.
+
+Here's a thorough one example from [github](https://github.com/edineibauer/uebConfig/blob/05f403101016936f2ce83192da2bd465a6817da2/public/installTemplates/service-worker.js) (showing only relevant parts). Don't worry if it feels a little overwhelming right now, later on we will go back to some more familiar code and explain step by step how everything works.
+
+```js
+function returnNoNetwork() {
+  return caches.open("core-v" + VERSION).then(cache => {
+    return cache.match(HOME + "post")
+  })
+}
+
+self.addEventListener("fetch", function (e) {
+  let fonts = new RegExp("^assetsPublic/fonts/", "i")
+  let images = new RegExp("^assetsPublic/img/", "i")
+  let viewJs = new RegExp("^assetsPublic/view/", "i")
+  let core = new RegExp("^assetsPublic/", "i")
+  let linkExterno = new RegExp("^https*://", "i")
+
+  if (linkExterno.test(url)) {
+    e.respondWith(fetch(e.request))
+  } else if (core.test(url)) {
+    let cacheName = viewJs.test(url)
+      ? "viewUserJs"
+      : fonts.test(url)
+      ? "fonts"
+      : images.test(url)
+      ? "images"
+      : "core"
+    e.respondWith(
+      caches.open(cacheName + "-v" + VERSION).then(cache => {
+        return cache.match(url).then(response => {
+          return (
+            response ||
+            fetch(e.request)
+              .then(networkResponse => {
+                if (
+                  networkResponse &&
+                  networkResponse.status === 200 &&
+                  networkResponse.type === "basic"
+                ) {
+                  cache.put(url, networkResponse.clone())
+                  return networkResponse
+                }
+                return returnNoNetwork()
+              })
+              .catch(() => {
+                return returnNoNetwork()
+              })
+          )
+        })
+      })
+    )
+  }
+})
+```
+
+You will notice that most examples focus on how to use the Cache API (`caches.open()`) in Service Workers, but you can use it in a good old script tag just as well.
+
+To understand the Cache API, we will first start by some example code that can work both in the browser and inside a service worker, using the fetch function.
+
+But first, let's talk about the Request Class. The Request class works very well with the fetch function, because they have identical signatures.
+
+```js
+new Request("/test", options)
+fetch("/test", options)
+```
+
+The fetch function can be called using a Request object.
+
+```js
+const request = new Request("/test", options)
+fetch(request)
+```
+
+Additionally, we can add entries to the cache using request and response objects...
+
+```js
+fetch(request).then(response => {
+  cache.put(request, response)
+})
+```
+
+We can later retrieve this entry from the cache by matching our cache entry agains a similar Request object.
+
+```js
+cache.match(request).then(response => {
+  // ...
+})
+```
+
+Using caches we don't have to worry about correctly serializing the request object before caching it.
+
+Having seen all these examples, you'll notice by now that in order to take advantage of the very powerfull Cache API, you don't need to use a Service Worker. It can be used alongside the fetch function, which is supported in the Browser Environment.
+
+Here's a functional replacement to the `fetch` function that works both inside the browser and in a Service Worker. It will return results in what --in Workbox _parlage_-- it's called a "Cache First" strategy.
+
+```js
+// Use this function just like fetch()
+// it will return results from cache if they're available
+const fetchUsingCacheFirstStrategy = async (...opts) => {
+  // the request constructor has exactly the same
+  // signature as the fetch function
+  const request = new Request(...opts)
+
+  // attempt at retrieving response from cache
+  const cache = await caches.open(CACHE_NAME)
+  const cachedResponse = await cache.match(request)
+
+  if (cachedResponse) {
+    console.log(`retrieving response from cache`)
+    return cachedResponse
+  }
+
+  // no response stored in cache.
+  // perform the request
+  console.log(`starting request`)
+  const response = await fetch(request)
+
+  if (response.ok) {
+    console.log(`saving response to cache`)
+    cache.put(request, response)
+  }
+
+  return response
+}
+```
+
+Here's some example usage:
+
+```js
+const CACHE_NAME = "test"
+
+// call first time
+fetchUsingCacheFirstStrategy("/")
+// starting request
+// saving response to cache
+
+// call a second time
+fetchUsingCacheFirstStrategy("/")
+// retrieving response from cache
+```
+
+Of course this example does not consider cache invalidation, so it's not a production-ready code.
+
+What's powerful about Service Workers is that they can listen to a FetchEvent type of event via `self.addEventListener("fetch")`. Unlike the fetchUsingCacheFirstStrategy function stated above, with this event you can not only use cache strategies for XHR requests made via JavaScript; it's also possible to use cache strategies for requests that the browser emits when fetching scripts, stylesheets, images, or any other kind of request.
+
+The fetch event triggers on **any** request made by the browser, not just those made using `fetch()`. This event will fire when calling XMLHttpRequest and with requests triggered by some HTML tags such as img, link and svg.
+
+When listening to the fetch event, **the actual request is intercepted**, meaning no request is made until we explicitly do so. This means we can prevent the request to get executed if we want to.
+
+This simple code adds a header to any outbound request made by our web app.
+
+```js
+self.addEventListener("fetch", e => {
+  // extend original request to add new header
+  const request = new Request(e.request, {
+    headers: new Headers({ "X-My-Custom-Header": "Zeke are cool" }),
+  })
+
+  e.respondWith(fetch(request))
+})
+```
+
+Of course we can use this in convination with the cache API to return responses from cache using a CacheFirst strategy, as descrived above.
+
+In this example, we return all images using a Cache first strategy
+
+```js
+const CACHE_NAME = process.env.GIT_SHA
+
+self.addEventListener("fetch", async event => {
+  if (isRequestingImage(event.request)) {
+    return fetchUsingCacheFirstStrategy(event.request)
+  }
+})
+
+function isRequestingImage(request) {
+  return /image\/[^,]+$/i.test(request.headers.get("Accept"))
+}
+```
+
+## Conclusion
+
+It's possible to use the Cache API both in a browser and in a service worker, but only in a service worker you can take advantage of this API to determine how images and other non-XHR requests are handled.
+
+This means it's possible to start using the Cache API only in the browser to handle certain API calls, and integrate it in a service worker only when the need of caching non-API calls (or offering offline support) arises.
+
+<div style={{ fontSize: "1rem", borderTop: "1px dotted" }}>
+
+The MDM documentation is always a great resource. You can read info about the APIs covered in this article here:
+[FetchEvent API](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent)
+(for Workers),
+[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and
+[Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache).
+
+</div>

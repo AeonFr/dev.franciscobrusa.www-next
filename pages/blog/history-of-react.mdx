@@ -1,0 +1,355 @@
+export const metadata = {
+  date: "2020-02-05T23:18:09Z",
+  title: "History of React and Modern JS Frameworks"
+}
+
+import BlogPostLayout from "../../components/BlogPostLayout"
+export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+
+import Counter from "../../components/blog/history-of-react/Counter"
+
+export const timeline = "/blog/history-of-react/timeline.svg"
+export const fiberTreeDiagram = "/blog/history-of-react/fiber-tree-diagram.png"
+export const oopVsReact = "/blog/history-of-react/OOP-obj-vs-react-component.svg"
+export const rh1 = "/blog/history-of-react/rh1.png"
+export const rh7 = "/blog/history-of-react/rh7.png"
+
+# History of React and Modern JS Frameworks
+
+A lot of the apps that we use everyday already existed back in 2008, but they didn’t look like they do today.
+
+Facebook, Twitter, Paypal… These apps were already in the market, but they were websites that felt a lot more static than today. Mobile apps and responsive design hadn’t taken off and users didn’t had the high expectations they have today.
+
+<img
+  src={timeline}
+  alt="Timeline of events highlighting: 2007, First iPhone - 2008, some screenshots of Facebook and Twitter - 2010, Instagram released"
+/>
+
+A lot have changed since. This is a story about how new programming paradigms allowed new kind of web experiences. It’s a story about React, Angular, Ember, Vue and many others.
+
+## From 2008 to the present
+
+2008 is approximately the time the precursor of the Ember framework started being developed, according to Wikipedia. It’s also the year after the release of the first iPhone.
+
+We could say that around this time users began having **higher expectations** regarding websites. Native apps such as the ones in the iPhone provided a much better experience and the web needed to catch up.
+
+On the other side, the emergence of new browsers like Chrome, Safari and Firefox –that started gaining market over Internet Explorer–, meant a **new wave of innovation** was starting for the web, first with the standarization of JavaScript and then with [evergreen browsers](https://www.techopedia.com/definition/31094/evergreen-browser).
+
+Around this time, the development effort of developers at Ember.js, Google (Angular) and Facebook (React) started pulling towards a new direction that would enable to build modern apps with web technologies.
+
+This three frameworks (Ember, Angular and React) were created between late 2008 and 2013. This frameworks have in common a philosophy that can be summarized with this extract retrieved from the [2013’s article “What is AngularJS?” (from the AngularJS docs)](https://docs.angularjs.org/guide/introduction):
+
+> AngularJS is built on the belief that declarative programming should be used to create user interfaces and connect software components, while imperative programming is better suited to defining an application's business logic.
+
+Also around this time, a technical innovation allowed to popularize this ideas and make them fit nicely with the existing web technology of the DOM. Facebook’s engineers and Ember.js engineers, approximately at the same time, invented the _virtual DOM_ algorithm \[quotation needed\].
+
+<figure>
+  <img src={fiberTreeDiagram}/>
+  <figcaption>
+
+Diagram of how the virtual DOM algorithm works, as taken from the article [Build your own React](https://pomb.us/build-your-own-react/) by [Rodrigo Pombo](https://twitter.com/pomber)
+
+  </figcaption>
+</figure>
+
+### Controversies
+
+When Ember.js first came along, it faced a lot of resistance. People were not necessarily against making websites feel like native apps. But it was too much of a change: the best practice so far was to avoid using JavaScript whenever possible, a language that was still considered unstable and “hacky”.
+
+React also faced some controversy and backslash for it’s use of JSX, which was considered a breach in the “separation of concerns” principle, which a lot of people believe produces good code.
+
+> HTML is mainly used for organization of webpage content, CSS is used for definition of content presentation style, and JS defines how the content interacts and behaves with the user.
+>
+> – [Wikipedia, “Separation of concerns”](https://en.wikipedia.org/wiki/Separation_of_concerns#HTML,_CSS,_JavaScript)
+
+**Modern controversies.** The latest controversy relates to the use of “CSS-in-JS”, or the encapsulation of the CSS styles used by a _JS component_ within the component itself, through the use of JS.
+
+A lot of the adopters of these technologies believe the separation of HTML, JS and CSS is a “false abstraction”, since any modern web app can’t really work without any of these components.
+
+### Widespread adoption
+
+Today, React is so ubiquotous, you probably use it every single day, whether you know it or not.
+
+We are using in websites, and, thanks to things like React Native and webviews, also in some native apps. Here’s a list of some of those apps:
+
+- Facebook (Web & App)
+- Instagram (Web & some parts of the App)
+- Whatsapp (Web)
+- Twitter (Web)
+- Spotify (Web)
+- Slack: Web & App (since their app is a “webview”)
+- Netflix: Web & App (hibrid)
+- React is now bundled into Windows 10, and many apps like the calendar or some parts of the Office suite are loading React components.
+
+**The question to ask here is... How come React’s adoption was so quick and widespread?**
+
+In this part of the article, we will analize three of the principles React adopts at it’s core and how they allow for better apps. _Disclaimer: It might get a little technical._
+
+## Three principles behind React
+
+React solves common issues developers face coding UIs, and does so in three ways:
+
+- Encapsulated components
+- Top-down data flow
+- Declarative rendering
+
+_List taken from_ [_this blog post_](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html) _on the React Blog_
+
+We will be examining each one of this items in detail.
+
+### Encapsulated components
+
+Barbara Liskov invented **abstract data types** in 1974, changing the software world forever[^1](https://medium.com/a-computer-of-ones-own/barbara-liskov-inventor-of-abstract-data-types-9f8908fdcf86).
+
+The concept of _modularization_ is so ubiquitous nowadays for programmers, is hard to imagine someone had to define it.
+
+Barbara Liskov undestood that the API, the contract that the module offers, should not deppend on the implementation details of such program. A programmer should be able to refactor the implementation of a module without changing it’s API.
+
+> “What we desire from an abstraction is a mechanism which permits the expression of relevant details and the suppression of irrelevant details.”
+> — Programming With Abstract Data Types, Barvara Liskov
+
+Liskov’s research concluded in a programming language that is precursor of modern OOP languages.
+
+> “You could define abstract types with it, and then create instances of those objects. It had information hiding as a way to make programs easier to prove correct. It provided strong type checking, and many other techniques, that are so widespread today, that almost seem too basic to be talking about them.”[^1](https://medium.com/a-computer-of-ones-own/barbara-liskov-inventor-of-abstract-data-types-9f8908fdcf86)
+
+**Components are Abstract Data Types.**
+
+In React you write your UI as a series of components, that are like the “lego bricks” of your application.
+
+There wasn’t any abstraction before that allowed the proper **encapsulation** of a piece of HTML, JS and CSS within a web application.
+
+And the same way the adoption of modules changed the way we write applications, I think the adoption of components will forever change the way we write front-end applications.
+
+Just like with a traditional web module, the consumers of the components don’t need to understand how the component work, they only need to understand the API: the **properties** and **events** the component accepts. (We will dive into props and events soon).
+
+<img
+  src={oopVsReact}
+  alt="OOP object compared with a React component. The interface are public methods and properties in an OOP object, and they're props and events in a react component. The implementation are the private properties and methods in the OOP object, and the State and functions in the React component."
+/>
+
+The maintainer of the component can change the way **the implementation** works (HTML, JS or CSS), and as long as **the interface** (props and events) doesn’t change, all users can instantly update that component to the latest version without breaking changes in their apps.
+
+In the “old world” of libraries like Bootstrap, you would _marry_ with certain HTML structure, provided by such library, and also with certain classnames and `data-` attributes. These can’t be changed by the library maintainers without introducing breaking changes, which means the library will update less often and have more deprecated code.
+
+This also means you don’t fully own your code: you can’t change the classnames provided by such libraries like Bootstrap, because they might break the JS. This might mean, for example, that your BEM classname convention will not be fully implemented in your codebase. Since each JS library you have will use it's own conventions, you oftentimes end up with some monstrous collage of attributes and classnames of different origins and styles.
+
+### Top-down data flow
+
+The concept of top-down data flow refers to the way the components are organized in an app and communicate between each other.
+
+Let’s look at this React component (written in JSX):
+
+```jsx
+import Select from "./Select.js"
+
+let select = <Select />
+```
+
+This component behaves like a regular HTML5 select input.
+
+Notice that we don’t need to know how the component itself is implemented, we just need to know what it does and how to achieve it (through it’s properties and events).
+
+So, let's say that, to use this component, we need to pass a list of options as HTML tags.
+
+```jsx
+let select = (
+  <Select>
+    <option value="1">First option</option>
+  </Select>
+)
+```
+
+Since we’re writting our app in JavaScript, it would make more sense to populate the options using an array…
+
+```jsx
+var options = [
+  { value: 1, title: "First option" },
+  // …
+]
+
+var select = <Select options={options} />
+```
+
+What we just did is _we passed a **property**_ to our component.
+
+Properties can be objects, arrays, booleans, functions, classes, or any other JS data type.
+
+As long as the component supports a property we can use it. That’s the _public API_ of the component, or, as Liskov defined it, _the contract_ we agree upon by using that component.
+
+Now let’s say we want to know when the selected option changes to execute some logic. Assuming the component supports it, we would pass an `onChange` property that’s actually a function:
+
+```jsx
+let myFunction = event => {
+  /* do something */
+}
+
+var select = <Select options={options} onChange={myFunction} />
+```
+
+This property that’s actually a function, is what in React is called an **event**. This allows the _child_ component to comunicate back to the _parent_ component what is happening inside.
+
+**This is top-down data flow in action**: components pass **properties** to their **childrens**, and send **events** to their **parents**.
+
+The effect is an **application architecture** that follows the [dependency-inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle) (the letter “D” in “SOLID”).
+
+Any given component only _depends_ on their children components to work, but not on any of the parent components that might include it.
+
+This ultimately guarantees a component can be **reused** in more contexts, and that changes inside a component most likely won’t introduce bugs in it’s parents.
+
+### Declarative rendering
+
+Declarative rendering, also known as _state-driven UIs_ or _pure UIs_, is the way in which components are writen in React.
+
+Let’s think of a program that has a simple counter and a button to increment it.
+
+Using an _imperative_ paradigm, we can articulate the program we want to write as: “every time the button is clicked, the counter increments”.
+
+Whereas using a _declarative_ paradigm, we could say: “this number shows the ammount of times the button was clicked”.
+
+Components are _declarative_ because we don’t write what steps are needed to perform an action. Instead, we _declare_ what the system should look like, and let it figure out the steps to get there.
+
+**Why might an imperative UI became a problem?** There’s an excelent explanation of why this causes a problem in the [“Metaphysics and JavaScript” presentation by Rich Harris](https://docs.google.com/presentation/d/1PUvpXMBEDS45rd0wHu6tF3j_8wmGC6cOLtOw2hzU-mw/edit#slide=id.p) (the creator of Svelte).
+
+> Let’s say you want to build an app with six possible states — a, b, c, d, e and f. If you’re building a state driven app then that means you have to write six different views — it’s that simple.
+>
+> <img src={rh1} style={{ backgroundColor: "white" }} />
+>
+> In the old event-driven world, it wasn’t like that. As well as worrying about creating the views corresponding to those states, you had to consider the transitions between states — from a to b, a to c, a to d and so on — but also from b back to a, from b to c… until you end up with a combinatorial explosion of code paths. Now imagine we added a seventh state, or an eighth… and if your app only has 8 possible states then I envy you.
+>
+> <img src={rh7} style={{ backgroundColor: "white" }} />
+
+_(It’s worth mentioning that this presentation by Rich Harris was actually a critique to React's implementation of declarative rendering, but that’s a topic we won't cover in this article. Do_ [_view the presentation_](https://docs.google.com/presentation/d/1PUvpXMBEDS45rd0wHu6tF3j_8wmGC6cOLtOw2hzU-mw/edit#slide=id.p) _if you're interested!)_.
+
+**Example**
+
+Let’s look at declarative rendering in action. This is the code for a fully functional React component.
+
+```jsx
+import React, { useState } from "react"
+
+export default function Counter() {
+  let [count, setCount] = useState(0)
+
+  return (
+    <div>
+      Counter was clicked {count} time{count !== 1 ? "s" : null}
+      <br />
+      <button onClick={() => setCount(count + 1)}>Increment 1</button>
+    </div>
+  )
+}
+```
+
+<Counter />
+
+**Step by step**
+
+We are importing the React library and exporting a `Counter` function. This function is our component.
+
+Using a React feature called `state`, we declare a `count` variable that will contain our value for the counter, and a `setCount` function that will mutate the value of `count`.
+
+After that, we _declare_ how our component looks like in the `return` statement of the function. In here, we show the value of `count` and add a callback to the button’s click event that will increment this value.
+
+Calling the `setCount` function will make the text update “automatically”, our component will re-render, and the text will update accordingly.
+
+**Adding an input**
+
+Now let’s say we want to add an input that shows and sets the value of count. We need to actually add the `<input/>` element and some logic that makes it show the value of `count` and update it when the input’s value changes. This looks like this:
+
+```jsx{11-16}
+import React, { useState } from "react"
+
+export default function Counter() {
+  let [count, setCount] = useState(0)
+
+  return (
+    <div>
+      Counter was clicked {count} time{count !== 1 ? "s" : null}
+      <br />
+      <button onClick={() => setCount(count + 1)}>Increment 1</button>
+      <br />
+      <input
+        type="number"
+        value={count}
+        onChange={event => setCount(event.target.value)}
+      />
+    </div>
+  )
+}
+```
+
+<Counter withInput />
+
+This already works as expected: _clicking the button now updates both the text and the input’s value, and changing the input now updates the text_.
+
+In the old jQuery world, adding this input would also have involved changing the behaviour of the `onClick` event for the button! Why? Because we will have to describe to the button that, when clicked, it should also update the value of the input to reflect the new value of `count`.
+
+This adds an extra dimensionality to how we write UIs: we don’t only need to declare the components, we also need to be aware of how they can change over time, and how those changes affect other components.
+
+Or, as Rich Harris described it, we don’t only need to describe “a” and “b”, we also need to describe the transitions from “a” to “b”, and from “b” back to “a”. (And what if we wanted to add “c”, “d”, “e” and “f”!?).
+
+<img src={rh7} style={{ backgroundColor: "white" }} />
+
+### The three principles combined together
+
+The three advantages of React, **declarative rendering**, **top-down data flow** and **encapsulated components** means we can write code that’s easier to reason about, mantain and reuse.
+
+Our “counter” component from the example above can be used to illustrate all of these principles.
+
+Thanks to **component encapsulation**, we can call our `Counter` component multiple times and each one will keep it’s own unique value for `count`.
+
+```jsx
+export default function CounterList() {
+  return (
+    <div>
+      <Counter />
+      <hr />
+      <Counter />
+    </div>
+  )
+}
+```
+
+<Counter withInput />
+<br />
+<Counter withInput />
+
+Thanks to **top-down data flow**, we can pass a property to our counters to, for example, configure the initial value for `count`.
+
+```jsx
+export default function CounterList() {
+  return (
+    <div>
+      <Counter />
+      <hr />
+      <Counter initialValue={10} />
+    </div>
+  )
+}
+```
+
+<Counter withInput />
+<br />
+<Counter withInput initialValue={10} />
+
+(I won’t explain here how to make the `Counter` component read the `initialValue` prop).
+
+And thanks to **declarative rendering**, we can add as many inputs, buttons or texts to show and edit the content of `Counter` without changing the code for the existing inputs/buttons/texts.
+
+## Conclusions
+
+**These advantages that React provides (declarative rendering, top-down data flow and encapsulated components) are the reason it’s so widly adopted nowadays.**
+
+They’re crucial for developers to reliably make scalable and modern applications that look and feel like native apps.
+
+**Just like it’s** [**hard to imagine how code was written before “abstract data types” were invented**](https://www.youtube.com/watch?v=_jTc1BTFdIo) **by Liskov**, it might soon be difficult to imagine how we used to write frontend code without tools like React, Vue or Svelte.
+
+**React did not only influenced how we write apps, it also influenced how we design them.** The ideas behind react are perfectly aligned with concepts like “Atomic Design”. Apps are designed as a series of components, like **lego briks** that are meant to be matched to create all kind of screens.
+
+React actually **influenced a change in design tools** themselves. Tools like Sketch and Figma reflect upon this paradigm shift with features like “symbols”. Meanwhile, there’s a bunch of new, promising design tools that output React code, ready to use in real applications.
+
+**The web wouldn’t be where it is today without JS frameworks.** It’s well known the developers of the Google Chrome browser regularly invited the developers of React to talk about and search solutions to some performance issues and make optimizations. This is only an example of how React influenced directly the development of new technologies and web standards.
+
+It’s also worth mentioning that things like Progressive Web Apps and websites that function offline, and even things like native apps running on Electron or other “webview” technologies all signal that **the web, today, is mature enough to compete with Native Web Apps**. In fact, it’s trying to replace them.
+
+These frameworks are not only essential tools for the modern front-end developer, their presence signals the evolution of the web itself.

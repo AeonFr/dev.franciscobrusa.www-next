@@ -1,65 +1,67 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import Link from "next/link";
+import Layout from "../components/Layout";
+import indexStyles from "../styles/Index.module.css";
+
+const posts = [
+  {
+    slug: "service-workers-cache",
+    title: "The Service Workers Cache API and the Fetch Event",
+    excerpt:
+      "A Service Worker is a script that runs in a different environment than the browser, running only once per domain instead of once per tab...",
+  },
+  {
+    slug: "on-writing-documentation",
+    title: "On writing documentation",
+    excerpt:
+      "Writing documentation is relatively easy, but writing maintainable and useful documentation not so much.",
+  },
+  {
+    slug: "setting-up-visual-studio-code-to-work-with-php",
+    title: "Setting up Visual Studio Code to work with PHP",
+  },
+  {
+    slug: "history-of-react",
+    title: "History of React and Modern JS Frameworks",
+    excerpt:
+      "A lot of the apps that we use everyday already existed back in 2008, but they didn’t look like they do today.",
+  },
+  {
+    slug: "arquitectura-de-la-informacion-en-el-desarrollo-web",
+    title: "Arquitectura de la Información en el Desarrollo Web",
+    excerpt:
+      "La Arquitectura de la Información (IA, por sus siglas en inglés) es una actividad encargada de diseñar cómo las cosas que nos rodean se convierten en información.",
+  },
+  {
+    slug: "design-thinking",
+    title: "Dos métodos del Design Thinking",
+    excerpt:
+      "El Design Thinking se puede entender como una filosofía de diseño o un framework (estructura), que agrupa métodos de diseño y herramientas de investigación en diseño.",
+  },
+];
 
 export default function Home() {
   return (
-    <div className={styles.container}>
+    <Layout>
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Francisco Brusa's Blog</title>
+        <link rel="canonical" href="https://franciscobrusa.dev" />
+        <meta property="og:url" content="https://franciscobrusa.dev" />
+        <meta property="og:site_name" content="Francisco Brusa's Blog" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="Francisco Brusa's Blog" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+      <ul className={indexStyles["Home"]}>
+        {posts.map((post) => (
+          <li key={post.slug} className={indexStyles["Home-post-block"]}>
+            <Link href={`/blog/${post.slug}`}>
+              <a className={indexStyles["Home-link"]}>{post.title}</a>
+            </Link>
+            <p className={indexStyles["Home-excerpt"]}>{post.excerpt}</p>
+          </li>
+        ))}
+      </ul>
+    </Layout>
+  );
 }

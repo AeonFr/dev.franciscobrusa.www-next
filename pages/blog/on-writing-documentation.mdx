@@ -1,0 +1,87 @@
+export const metadata = {
+  title: "On writing documentation",
+  date: "2020-08-05T20:36"
+}
+
+import BlogPostLayout from "../../components/BlogPostLayout"
+export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+
+export const separatorStyles = { borderTop: "8px groove var(--accent)" };
+export const highlightedContentStyles = { fontSize: '1.25em', fontWeight: 'light' };
+
+# On writing documentation
+
+Writing documentation is relatively easy, but writing maintainable and useful documentation not so much.
+
+<div style={separatorStyles} />
+
+## Maintainable documentation
+
+Documentation is **maintainable** when it doesn't need to change every time trivial details of the code change.
+
+Just like **good tests**, your documentation should not be **coupled with internal details of the implementation**.
+
+For very specific explanations of internal parts of the system, [use comments wisely](/blog/on-writing-comments/).
+
+For complex APIs, try to rely on tools to automatically generate documentation. Statically typed languages such as TypeScript
+can go a long way in helping achieve that perfectly documented codebase ideal.
+
+<div style={highlightedContentStyles}>
+
+Accept you might not be able to keep every single detail of your program documented, and choose wisely what to document.
+
+</div>
+
+<div style={separatorStyles} />
+
+## Useful documentation
+
+Just like comments, documentation should not try to explain how the code works.
+Clean coders understand this principle: _"Document the why, not the how"_.
+
+Just like this comment doesn't add any value:
+
+```js
+// add 1 to sum
+sum++;
+```
+
+Neither does this documentation:
+
+```md
+# Email module
+
+The "email" module contains the following files:
+
+- controllers/ -> here are all the controllers located
+- views/ -> here we have all the views
+- ...
+```
+
+<div style={highlightedContentStyles}>
+
+Use documentation to explain the architectural patterns, design choices, infrastructure constrains, user flows, etc.
+
+</div>
+
+<div style={separatorStyles} />
+
+## Use pseudocode, recipes and examples
+
+When the concepts are hard to convey only with words, nothing better than an example.
+
+If you don't want to keep your documentation coupled with a specific version of your API, use pseudocode. Otherwise, if you know your API won't change or you're willing to update the documentation if it does, add code recipes.
+
+Aim to provide a better starting point for a consumer of the API, but don't try to explain all possible use cases (because we would fall again in a documentation that's more like an "itemized description of the API").
+
+Remember the objective of your documentation is to make your software usable by other people. It's often best not to assume that your users have knowledge of the topic that's being covered (otherwise they probably wouldn't be needing to reach out for the documentation anyways).
+
+<div style={separatorStyles} />
+
+## In conclusion
+
+- Automate away the job of maintaining API docs with static languages and automatic documentation generators.
+- Once the low-level API is documented automatically, focus your effort on writing about architecture decisions and general philosophies.
+- If you want to go the extra mile and explain in thoughtful detail some parts of the API, use recipes, pseudocode and/or examples.
+- If possible, assume the user knows nothing.
+

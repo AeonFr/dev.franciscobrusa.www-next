@@ -1,0 +1,80 @@
+export const metadata = {
+  title: "Setting up Visual Studio Code to work with PHP",
+  date: "2020-03-31T21:53:19Z"
+}
+
+import BlogPostLayout from "../../components/BlogPostLayout"
+export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+
+# Setting up Visual Studio Code to work with PHP
+
+VS code is a tool mostly used by front-end developers. It’s highly optimized to work with JavaScript and TypeScript, featuring smart autocompletion, auto-imports, refactors, and other goodies.
+
+Although no match to IDEs like PHPStorm, Visual Studio Code can be customized to have better support when working PHP.
+
+## The most important thing you can do
+
+The most important thing to do if you want to work with PHP in VS code is to **disable the default language server** and install [PHP Intelephense].
+
+This is literally 90% of the job and it’s super easy.
+
+1. Within Visual Studio Code, go to the “Extensions” tab and search PHP.
+2. Uninstall [PHP IntelliSense] (it will be installed by default)
+3. Install [PHP Intelephense].
+
+[php intellisense]: https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-intellisense
+[php intelephense]: https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client
+
+Note: I'm not being payed by intelephense to write this!
+
+You will want to disable the default PHP suggestions integrated into VS code. To acheive this, add this line to your user settings:
+
+```
+"php.suggest.basic": false,
+```
+
+(To open your settings, open the console with Cmd+Shift+P and search the key “Preferences: Open user settings (JSON)”)
+
+After changing this, your PHP code will start behaving a little big “smarter”.
+
+**If you’re done this, you have it. 90% of the functions you wanted from PHPStorm are already in VS code.**
+
+Here are some of those features you now have:
+
+- Highlight syntax, type errors and other static analysis tools
+- Autodetect installed libraries and bring them in suggestions based on your composer.json
+- Detect unused imports, unused private functions or unused variables.
+- Automatically creates phpdoc annotations with configurable format, and reads them when writting method or function calls.
+
+## Some other extensions you might want to install
+
+Here are some other extensions that might be handy to cover that missing 10% of features that are not bundled with Intelephense.
+
+1. [PHP Dockblocker] enhances the capabilities of Intelephense regarding the creation of phpdoc type comments.
+2. [PHP Namespace Resolver] Allows to automatically import a class using Ctrl+Opt+I and automatically expand the class (a.k.a.: import it inline, to get `\Path\To\Class`) using Ctrl+Opt+E. If there are name conflicts, a prompt shows all the options.
+3. [laravel-blade] is an extension to highlight syntax in Blade files. [Laravel goto view] allows to cmd+click in @import()s and other blade tags.
+
+[laravel-blade]: https://marketplace.visualstudio.com/items?itemName=cjhowe7.laravel-blade
+[laravel goto view]: https://marketplace.visualstudio.com/items?itemName=codingyu.laravel-goto-view
+[php dockblocker]: https://marketplace.visualstudio.com/items?itemName=neilbrayfield.php-docblocker
+[php namespace resolver]: https://marketplace.visualstudio.com/items?itemName=MehediDracula.php-namespace-resolver
+
+## Extensions for speficic tasks
+
+There are a lot of extensions to add some little extra functionalities you might need. Like [this extension](https://marketplace.visualstudio.com/items?itemName=afmicc.GetterAndSetterGenerator) to add getter and setter methods, and [this one](https://marketplace.visualstudio.com/items?itemName=MehediDracula.php-constructor) or [this one](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property) to generate constructor properties.
+
+## Third party integrations
+
+Integrations with [Docker] and various SQL database flavours are also available as plug-ins. A personal favourite is [GitLens], that complements the Git support of the editor with some cool, advanced functions (at the expense of a little performance loss).
+
+[gitlens]: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens
+[docker]: https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker
+
+## Conclusion
+
+There are a lot more extensions in the market and a million more posts that curate them, so I will leave this one kinda open and just drop a link to the [VS code marketplace] for you to take a look 😉.
+
+[vs code marketplace]: https://marketplace.visualstudio.com/
+
+VS code is not an IDE, but a code editor. Yet, by using extensions we can make it look and behave kind of like an IDE.
+It’s no match against PHPStorm in it’s advanced features, but it can provide the most used features with some simple customizations.

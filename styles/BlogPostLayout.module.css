@@ -1,0 +1,37 @@
+.Post-article {
+  font-size: 1.125rem;
+}
+
+.Post-article h1,
+.Post-article h2,
+.Post-article h3,
+.Post-article h4 {
+  line-height: 1.2;
+}
+
+.Post-article p,
+.Post-article li {
+  line-height: 1.675;
+}
+
+.Post-article img,
+.Post-article svg {
+  max-width: 100%;
+}
+
+.Post-article a {
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.Post-article blockquote {
+  margin: 0;
+  padding-left: 2rem;
+  padding-right: calc(2rem + 2px);
+}
+
+@media screen and (min-width: 768px) {
+  .Post-article {
+    font-size: 1.25rem;
+  }
+}

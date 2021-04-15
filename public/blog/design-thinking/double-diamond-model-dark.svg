@@ -1,0 +1,58 @@
+<svg
+  width="100%"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="-20 -30 220 140"
+  style="break-inside-avoid break-before-avoid"
+  fill="#c6d4df"
+>
+  <text font-size="8" x="50" y="-10" text-anchor="middle" style="bolder">
+    Encontrar el Problema
+  </text>
+  <text font-size="8" x="150" y="-10" text-anchor="middle" style="bolder">
+    Encontrar la Solución
+  </text>
+  <path
+    d="M 0 40 L 50 0 L 100 40 L 150 0 L 200 40 L 150 80 L 100 40 L 50 80 L 0 40"
+    stroke="white"
+    fill="transparent"
+  />
+  <text
+    font-size="7"
+    x="-40"
+    y="-7.5"
+    transform="rotate(-90)"
+    text-anchor="middle"
+  >
+    Alternativas
+  </text>
+  <path
+    d="M -2.5 0 L -2.5 80"
+    fill="transparent"
+    strokeWidth="0.5"
+    stroke="grey"
+  />
+  <path
+    d="M -5 75 L -2.5 80 L 0 75"
+    fill="transparent"
+    stroke-width="0.5"
+    stroke="grey"
+  />
+  <path
+    d="M -5 5 L -2.5 0 L 0 5"
+    fill="transparent"
+    stroke-width="0.5"
+    stroke="grey"
+  />
+  <text font-size="7" x="25" y="100" text-anchor="middle">
+    Convergencia
+  </text>
+  <text font-size="7" x="75" y="100" text-anchor="middle">
+    Divergencia
+  </text>
+  <text font-size="7" x="125" y="100" text-anchor="middle">
+    Convergencia
+  </text>
+  <text font-size="7" x="175" y="100" text-anchor="middle">
+    Divergencia
+  </text>
+</svg>

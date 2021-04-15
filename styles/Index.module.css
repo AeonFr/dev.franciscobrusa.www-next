@@ -1,0 +1,24 @@
+.Home {
+  padding: 0;
+  list-style: none;
+}
+
+.Home-post-block {
+  margin: 1rem 0;
+  list-style: none;
+  padding: 0;
+}
+
+.Home-link {
+  color: inherit;
+  font-size: 1.25rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+  line-height: 1.2;
+}
+.Home-excerpt {
+  font-size: 0.875rem;
+  line-height: 1.2;
+  margin-top: 0.5rem;
+  margin-bottom: 0rem;
+}

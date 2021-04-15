@@ -1,0 +1,149 @@
+export const metadata = {
+  title: "Arquitectura de la Información en el Desarrollo Web",
+  date: "2018-05-01T13:38:00+02:00",
+  language: "es",
+};
+
+import BlogPostLayout from "../../components/BlogPostLayout"
+export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+
+export const jerarquia = "/blog/arquitectura-de-la-informacion-en-el-desarrollo-web/jerarquia.jpg"
+export const jerarquiasAnidadas = "/blog/arquitectura-de-la-informacion-en-el-desarrollo-web/jerarquias-anidadas.jpg"
+export const heterarquia = "/blog/arquitectura-de-la-informacion-en-el-desarrollo-web/heterarquia.jpg"
+export const heterarquiasEnNetflix = "/blog/arquitectura-de-la-informacion-en-el-desarrollo-web/heterarquias-en-netflix.jpg"
+export const folksonomyQuora = "/blog/arquitectura-de-la-informacion-en-el-desarrollo-web/folksonomy-quora.jpg"
+
+# Arquitectura de la Información en el Desarrollo Web
+
+La Arquitectura de la Información (IA, por sus siglas en inglés) es una actividad encargada de diseñar cómo las cosas que nos rodean se convierten en _información_.
+
+# Diferencia entre información y contenidos
+
+_Contenido_ —en el contexto de la IA—, es un término específico para hablar de _las cosas que están siendo organizadas o secuenciadas_ ([Abby Covert, “How to make sense of any mess”, glosario](http://www.howtomakesenseofanymess.com/term/noun/content/)).
+
+Los contenidos pueden ser fotografías, vídeos o textos, o hasta artículos formados por la combinación de todos estos elementos. Pueden ser los productos dentro de una tienda o dentro de una plataforma de comercio electrónico. Pueden ser fichas dentro de un archivador, o fotografías de un álbum de fotos, o hasta las distintas películas que hay en un videoclub.
+
+Mientras que los contenidos son cosas objetivas, la información es subjetiva, y por lo tanto está formada por la _interpretación_ que hace una persona a partir de la organización o secuencia del conjunto de cosas ([Abby Covert, “How to make sense of any mess”, cap.1 pg.13](http://www.howtomakesenseofanymess.com/chapter/1/page/13/whats-information/)).
+
+Veamos un ejemplo propuesto por Abby Covert en el ya citado libro. Pensemos en una estantería de un supermercado donde hay un espacio vacío en el lugar de una mermelada.
+
+La ausencia del producto puede _interpretarse_ por una persona como que se agotó porque estaba muy barato, pero otra persona puede _interpretar_ que se agotó porque el producto es muy popular.
+
+El contenido es el espacio en sí: la estantería, las otras mermeladas, las etiquetas del precio. La información es _lo que cada persona cree como verdadero_ ante el espacio vacío en la estantería. Es interesante cómo, a menudo, la ausencia de contenido (un producto que no se encuentra en el estante) puede ser _tan informativa_ como la presencia del mismo.
+
+# Taxonomías
+
+Las _taxonomías_ son clasificaciones de contenido. Sistemas creados para organizar y estructurar las cosas. Y hablamos del sentido amplio de la palabra cosa. Hasta los conocimientos pueden estar taxonomizados, por ejemplo, las distintas especies de animales se clasifican en _reinos_: cada reino es una taxonomía jerárquica.
+
+## Jerarquías
+
+La jerarquía es una forma de crear taxonomías.
+
+Las _taxonomías jerárquicas_ son aquellas donde se forma un árbol, y cada cosa forma parte de una “rama”. Por ejemplo, al administrar fichas dentro de un archivo, cada ficha puede situarse en una carpeta, y cada carpeta en un estante, por lo tanto sería físicamente imposible poner una misma ficha en dos carpetas distintas.
+
+<img
+  src={jerarquia}
+  alt="La relación de jerarquía representada como fichas en una carpeta"
+/>
+
+Aunque las interfaces digitales no cuenten con los mismos límites físicos, las _jerarquías_ suelen ser muy usadas para crear estructuras que permitan organizar altos volúmenes de contenido. De esta forma, en la mayoría de los sitios web de _e-commerce_, como E-Bay, se suelen encontrar taxonomías _dentro de_ otras taxonomías (o _anidadas a_ otras taxonomías), que a su vez están anidadas a otras taxonomías, y así sucesivamente. Para explicar esto, nada mejor que un ejemplo, extraído de MercadoLibre (plataforma Latinoamericana de comercio electrónico): un “casco integral para motos y cuatriciclos” está anidado en varios niveles desde la categoría de mayor nivel: “Accesorios para Vehículos”.
+
+<img
+  src={jerarquiasAnidadas}
+  alt="Ejemplo de jerarquías anidadas en la página de un producto"
+/>
+
+## Heterarquías
+
+Las _taxonomías heterárquicas_, por el contrario, son aquellas donde cada cosa puede estar asociada a varias _taxonomías_, a tantas como sea posible.
+
+Una forma fácil de clasificar objetos en heterarquías es poner etiquetas: tanto en la web (los _hashtags_, que mencionaremos en más profundidad más adelante), como en los productos que compramos en el supermercado; es posible aplicar más de una etiqueta a una misma cosa. En el caso de los paquetes donde se trasladan y almacenan productos, existen criterios estandarizados en una serie de símbolos que determinan cómo deben ser manipulados, que se podrían considerar como heterarquías: un mismo producto puede ser “frágil” y “de envase reciclable” a la vez, e incluso puede tener más símbolos, comúnmente hasta 4.
+
+<img
+  src={heterarquia}
+  alt="Ejemplo de eterarquía: criterios para la manipulación y transporte de paquetería (sistema de símbolos)"
+/>
+
+> Los símbolos que acompañan los paquetes de productos (reciclable, frágil, sensible a la humedad, etc.) pueden encontrarse por separado o combinados: son taxonomías heterárquicas.
+
+La flexibilidad de esta arquitectura es una de las razones por las cuales es cada vez más usada. Si bien las jerarquías son necesarias en el mundo físico para ordenar cosas, en el mundo digital una misma cosa puede encontrarse _linkeada_ en varios sitios: la limitación física ya no es un impedimento.
+
+La plataforma de streaming Netflix utiliza casi enteramente heterarquías para ordenar los programas. Las heterarquías que se pueden ver en la vista de “detalles” de un programa son: “Elenco”, y “Géneros”, y los adjetivos que lo describen (“Este programa es...”).
+
+<img
+  src={heterarquiasEnNetflix}
+  alt="Ejemplo de jerarquías de un programa de Netflix."
+/>
+
+Las taxonomías en Netflix son heterárquicas porque un mismo contenido (programa) puede estar simultáneamente en varias taxonomías.
+
+## Folcsonomía
+
+Finalmente se da también el caso de las _folcsonomías_, término que surge de la mezcla de las palabras "folclore" y "taxonomía". Consisten en **taxonomías creadas por usuarios de forma colaborativa**. Por cuestiones de simplicidad, las folcsonomías son, casi siempre, heterárquicas.
+
+Un buen ejemplo son los #hashtags con que se etiqueta el contenido en las redes sociales.
+
+Las folcsonomías, en otros casos, son agregadas por el consumidor del contenido, no por su creador.
+
+En Quora, plataforma de preguntas y respuestas, las preguntas se agrupan en temas que cualquiera puede editar. No es necesario ser el autor de la pregunta para agregar o modificar los temas existentes.
+
+<a
+  href="https://www.quora.com/What-are-the-differences-between-folksonomy-and-taxonomy"
+  target="_blank"
+  rel="noreferrer"
+>
+  <img
+    src={folksonomyQuora}
+    alt="Pregunta en Quora: (traducido del inglés) ¿Cuál es la diferencia entre folksonomía y taxonomía?"
+  />
+</a>
+
+Otro ejemplo de folcsonomía es el sistema de "pinneo" de Pinterest, donde es posible clasificar cualquier contenido de la web en distintos tableros.
+
+Las folcsonomías son muy útiles cuando nos enfrentamos a grandes audiencias y a grandes volúmenes de contenido. Los usuarios pasan a ser los responsables de que el contenido sea fácil de navegar. La colaboración de muchos usuarios suele devenir en taxonomías bastante acertadas y que nos permiten ver cómo clasifica el contenido "el común de las personas".
+
+**Consejo**: cuando no te decidas en cómo llamar a una taxonomía dentro de algún proyecto que hagas (ya sea un sitio web, una revista, o lo que sea), prueba ver de qué forma ha sido clasificado anteriormente. También podría resultarte útil la web [Linguee](https://www.linguee.es): un diccionario que permite ver en qué contextos se ha usado anteriormente una palabra, basado en una búsqueda en artículos académicos, documentos legales, y similares.
+
+# ¿En qué se relacionan la Arquitectura de la Información con el Desarrollo Web?
+
+Siempre que exista contenido, y sobretodo si existe en grandes volúmenes, también existirá la necesidad de organizarlo y _navegar_ por el mismo. La _navegabilidad_ de una web está definida por la correcta estructuración de su contenido.
+
+La forma en que el contenido se organiza en un sitio, usualmente, está determinada por el _Content Management System (CMS)_ o Sistema de Gestión de Contenidos que se utilice. Comúnmente los sitios web simples o blogs utilizan WordPress o Joomla, las tiendas virtuales utilizan WooCommerce o Prestashop, etc. Hay otros CMS específicos para cada tipo de contenido "estandarizado".
+
+## Consejos
+
+Si eres desarrollador web, de software, diseñador, programador, etc., tal vez te resulten útiles estos consejos para empezar a incorporar los conceptos de la IA en tu proceso.
+
+> Una buena IA es importante porque permite que los usuarios naveguen por tu sitio con mayor facilidad, descubran más contenido, y previene que se frustren al navegar por el mismo.
+
+## Define la IA, luego el CMS
+
+Definir una arquitectura de la información de un sitio es algo que debe hacerse _antes_ de elegir el CMS, en una etapa muy temprana del proyecto. Para el usuario, esto determinará cómo podrá navegar por el sitio, y en cierta medida la facilidad con la que encuentre (o no) el contenido.
+
+Al día de hoy la mayoría de los CMS brindan modelos estandarizados para crear contenido, por lo tanto si creas un blog, e-commerce, catálogo de biblioteca, etc., muy probablemente se tratará de adaptar tu IA levemente a las herramientas ya hechas: no es necesario inventar nada desde cero si ya existe una herramienta para eso.
+
+Pero el hecho de que exista la posibilidad de poner datos según un modelo estandarizado, ¡no significa que _nos veamos obligados_ a seguir ese modelo! Por ejemplo: los blogs pequeños no necesitan tener ordenadas las entradas en categorías, mucho menos etiquetas. Muchas veces se nos ofrecen más opciones de las que son necesarias, y esto puede resultar en un sitio con demasiada complejidad, que puede ser agobiante para el usuario.
+
+Afortunadamente, cada vez hay más CMS que permiten que el usuario personalice los tipos de datos que quiere llenar para cada contenido: tal es el caso de los _headless CMS_. Por el momento este tipo de gestores de contenido sólo atraen a usuarios con un perfil más bien técnico, y generalmente hay que escribir código para hacer que funcionen.
+
+Para proyectos pequeños, programas como Dreamweaver (o su sucesor, Adobe Muse), permitirán mantener tipos de contenido personalizado en estructuras no estandarizadas, sin necesidad de saber programar ni de escribir código. Este tipo de programas no son óptimos para altos volúmenes de contenido, pero permiten mucha flexibilidad para sitios estáticos con pocas páginas.
+
+## Mantenlo simple.
+
+Una arquitectura de la información muy simple puede llegar a limitar las posibilidades de que una web o aplicación crezca en el futuro, pero una muy compleja consumirá mayor presupuesto y tiempo. Aconsejo mantener una arquitectura simple, pero donde quede abierta la posibilidad de modificarla y expandirla en el futuro.
+
+> La arquitectura de la información debe ser lo más simple posible para que el usuario tenga menos dificultad en navegar por tu web. Esto se resume en mayor taza de conversión en sitios donde encontrar la información es crítico (por ejemplo: sitios de e-commerce)
+
+## Visualiza
+
+Ayúdate de herramientas y métodos existentes para visualizar la arquitectura de la información:
+
+- Mapas mentales
+- Líneas de tiempo
+- Diagramas de flujo
+- Diagramas de Venn
+- Esquemas
+
+# Lectura recomendada
+
+- <http://www.howtomakesenseofanymess.com/> - Libro en inglés donde Abby Covert nos enseña, con lenguaje simple y ejemplos claros, el 123 de la arquitectura de la información.
