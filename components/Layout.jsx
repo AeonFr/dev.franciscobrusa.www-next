@@ -1,13 +1,10 @@
 import Link from "next/link";
 // import "./font.css";
 import layoutClasses from "../styles/Layout.module.css";
-import ColorSchemePicker from "./layout/ColorSchemePicker";
-import { useColorScheme } from "../hooks/useColorScheme";
 
 export default Layout;
 
 function Layout({ children }) {
-  const [scheme, setScheme] = useColorScheme();
   return (
     <div className={layoutClasses["App"]}>
       <header className={layoutClasses["App-header"]}>
@@ -21,11 +18,6 @@ function Layout({ children }) {
           </a>
         </Link>
 
-        <ColorSchemePicker
-          scheme={scheme}
-          handleSchemeChange={(ev) => setScheme(ev.target.value)}
-          className={layoutClasses["App-color-picker"]}
-        />
       </header>
 
       <main className={layoutClasses["App-content"]}>{children}</main>

@@ -22,15 +22,6 @@
   text-decoration: none;
 }
 
-.App-color-picker {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding-top: 1rem;
-  padding-right: 1rem;
-  font-size: 1.5rem;
-}
-
 .App-content {
   max-width: 50rem;
   padding: 1rem;
@@ -50,4 +41,3 @@
     display: none;
   }
 }
-
