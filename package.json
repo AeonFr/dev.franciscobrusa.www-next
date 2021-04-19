@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next export"
+    "build": "next build && next export",
+    "prettier": "prettier ./ --write"
   },
   "dependencies": {
     "@mdx-js/loader": "^1.6.22",

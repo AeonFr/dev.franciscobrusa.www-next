@@ -17,7 +17,6 @@ function Layout({ children }) {
             Francisco Brusa
           </a>
         </Link>
-
       </header>
 
       <main className={layoutClasses["App-content"]}>{children}</main>

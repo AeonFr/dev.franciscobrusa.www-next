@@ -1,14 +1,16 @@
 export const metadata = {
   title: "The Service Workers Cache API and the Fetch Event",
-  date: "2021-01-15T18:06:23.400Z"
-}
+  date: "2021-01-15T18:06:23.400Z",
+};
 
-import BlogPostLayout from "../../components/BlogPostLayout"
-export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+import BlogPostLayout from "../../components/BlogPostLayout";
+export default ({ children }) => (
+  <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+);
 
-export const serviceWorker = "/blog/service-workers-cache/service-worker.svg"
+export const serviceWorker = "/blog/service-workers-cache/service-worker.svg";
 
-<img src={serviceWorker} alt=""/>
+<img src={serviceWorker} alt="" />
 
 ## The Service Workers Cache API and the Fetch Event
 
@@ -25,7 +27,7 @@ When intercepting a request, you're allowed to modify it's response. You can cho
 
 </div>
 
-<div style={{ fontSize: "1rem", borderTop: "1px dashed var(--accent)" }}/>
+<div style={{ fontSize: "1rem", borderTop: "1px dashed var(--accent)" }} />
 
 ### The Cache API (WindowOrWorkerGlobalScope.caches)
 
@@ -37,20 +39,20 @@ Here's a thorough one example from [github](https://github.com/edineibauer/uebCo
 
 ```js
 function returnNoNetwork() {
-  return caches.open("core-v" + VERSION).then(cache => {
-    return cache.match(HOME + "post")
-  })
+  return caches.open("core-v" + VERSION).then((cache) => {
+    return cache.match(HOME + "post");
+  });
 }
 
 self.addEventListener("fetch", function (e) {
-  let fonts = new RegExp("^assetsPublic/fonts/", "i")
-  let images = new RegExp("^assetsPublic/img/", "i")
-  let viewJs = new RegExp("^assetsPublic/view/", "i")
-  let core = new RegExp("^assetsPublic/", "i")
-  let linkExterno = new RegExp("^https*://", "i")
+  let fonts = new RegExp("^assetsPublic/fonts/", "i");
+  let images = new RegExp("^assetsPublic/img/", "i");
+  let viewJs = new RegExp("^assetsPublic/view/", "i");
+  let core = new RegExp("^assetsPublic/", "i");
+  let linkExterno = new RegExp("^https*://", "i");
 
   if (linkExterno.test(url)) {
-    e.respondWith(fetch(e.request))
+    e.respondWith(fetch(e.request));
   } else if (core.test(url)) {
     let cacheName = viewJs.test(url)
       ? "viewUserJs"
@@ -58,33 +60,33 @@ self.addEventListener("fetch", function (e) {
       ? "fonts"
       : images.test(url)
       ? "images"
-      : "core"
+      : "core";
     e.respondWith(
-      caches.open(cacheName + "-v" + VERSION).then(cache => {
-        return cache.match(url).then(response => {
+      caches.open(cacheName + "-v" + VERSION).then((cache) => {
+        return cache.match(url).then((response) => {
           return (
             response ||
             fetch(e.request)
-              .then(networkResponse => {
+              .then((networkResponse) => {
                 if (
                   networkResponse &&
                   networkResponse.status === 200 &&
                   networkResponse.type === "basic"
                 ) {
-                  cache.put(url, networkResponse.clone())
-                  return networkResponse
+                  cache.put(url, networkResponse.clone());
+                  return networkResponse;
                 }
-                return returnNoNetwork()
+                return returnNoNetwork();
               })
               .catch(() => {
-                return returnNoNetwork()
+                return returnNoNetwork();
               })
-          )
-        })
+          );
+        });
       })
-    )
+    );
   }
-})
+});
 ```
 
 You will notice that most examples focus on how to use the Cache API (`caches.open()`) in Service Workers, but you can use it in a good old script tag just as well.
@@ -94,31 +96,31 @@ To understand the Cache API, we will first start by some example code that can w
 But first, let's talk about the Request Class. The Request class works very well with the fetch function, because they have identical signatures.
 
 ```js
-new Request("/test", options)
-fetch("/test", options)
+new Request("/test", options);
+fetch("/test", options);
 ```
 
 The fetch function can be called using a Request object.
 
 ```js
-const request = new Request("/test", options)
-fetch(request)
+const request = new Request("/test", options);
+fetch(request);
 ```
 
 Additionally, we can add entries to the cache using request and response objects...
 
 ```js
-fetch(request).then(response => {
-  cache.put(request, response)
-})
+fetch(request).then((response) => {
+  cache.put(request, response);
+});
 ```
 
 We can later retrieve this entry from the cache by matching our cache entry agains a similar Request object.
 
 ```js
-cache.match(request).then(response => {
+cache.match(request).then((response) => {
   // ...
-})
+});
 ```
 
 Using caches we don't have to worry about correctly serializing the request object before caching it.
@@ -133,43 +135,43 @@ Here's a functional replacement to the `fetch` function that works both inside t
 const fetchUsingCacheFirstStrategy = async (...opts) => {
   // the request constructor has exactly the same
   // signature as the fetch function
-  const request = new Request(...opts)
+  const request = new Request(...opts);
 
   // attempt at retrieving response from cache
-  const cache = await caches.open(CACHE_NAME)
-  const cachedResponse = await cache.match(request)
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request);
 
   if (cachedResponse) {
-    console.log(`retrieving response from cache`)
-    return cachedResponse
+    console.log(`retrieving response from cache`);
+    return cachedResponse;
   }
 
   // no response stored in cache.
   // perform the request
-  console.log(`starting request`)
-  const response = await fetch(request)
+  console.log(`starting request`);
+  const response = await fetch(request);
 
   if (response.ok) {
-    console.log(`saving response to cache`)
-    cache.put(request, response)
+    console.log(`saving response to cache`);
+    cache.put(request, response);
   }
 
-  return response
-}
+  return response;
+};
 ```
 
 Here's some example usage:
 
 ```js
-const CACHE_NAME = "test"
+const CACHE_NAME = "test";
 
 // call first time
-fetchUsingCacheFirstStrategy("/")
+fetchUsingCacheFirstStrategy("/");
 // starting request
 // saving response to cache
 
 // call a second time
-fetchUsingCacheFirstStrategy("/")
+fetchUsingCacheFirstStrategy("/");
 // retrieving response from cache
 ```
 
@@ -184,14 +186,14 @@ When listening to the fetch event, **the actual request is intercepted**, meanin
 This simple code adds a header to any outbound request made by our web app.
 
 ```js
-self.addEventListener("fetch", e => {
+self.addEventListener("fetch", (e) => {
   // extend original request to add new header
   const request = new Request(e.request, {
     headers: new Headers({ "X-My-Custom-Header": "Zeke are cool" }),
-  })
+  });
 
-  e.respondWith(fetch(request))
-})
+  e.respondWith(fetch(request));
+});
 ```
 
 Of course we can use this in convination with the cache API to return responses from cache using a CacheFirst strategy, as descrived above.
@@ -199,16 +201,16 @@ Of course we can use this in convination with the cache API to return responses 
 In this example, we return all images using a Cache first strategy
 
 ```js
-const CACHE_NAME = process.env.GIT_SHA
+const CACHE_NAME = process.env.GIT_SHA;
 
-self.addEventListener("fetch", async event => {
+self.addEventListener("fetch", async (event) => {
   if (isRequestingImage(event.request)) {
-    return fetchUsingCacheFirstStrategy(event.request)
+    return fetchUsingCacheFirstStrategy(event.request);
   }
-})
+});
 
 function isRequestingImage(request) {
-  return /image\/[^,]+$/i.test(request.headers.get("Accept"))
+  return /image\/[^,]+$/i.test(request.headers.get("Accept"));
 }
 ```
 

@@ -1,18 +1,21 @@
 export const metadata = {
   date: "2020-02-05T23:18:09Z",
-  title: "History of React and Modern JS Frameworks"
-}
+  title: "History of React and Modern JS Frameworks",
+};
 
-import BlogPostLayout from "../../components/BlogPostLayout"
-export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+import BlogPostLayout from "../../components/BlogPostLayout";
+export default ({ children }) => (
+  <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+);
 
-import Counter from "../../components/blog/history-of-react/Counter"
+import Counter from "../../components/blog/history-of-react/Counter";
 
-export const timeline = "/blog/history-of-react/timeline.svg"
-export const fiberTreeDiagram = "/blog/history-of-react/fiber-tree-diagram.png"
-export const oopVsReact = "/blog/history-of-react/OOP-obj-vs-react-component.svg"
-export const rh1 = "/blog/history-of-react/rh1.png"
-export const rh7 = "/blog/history-of-react/rh7.png"
+export const timeline = "/blog/history-of-react/timeline.svg";
+export const fiberTreeDiagram = "/blog/history-of-react/fiber-tree-diagram.png";
+export const oopVsReact =
+  "/blog/history-of-react/OOP-obj-vs-react-component.svg";
+export const rh1 = "/blog/history-of-react/rh1.png";
+export const rh7 = "/blog/history-of-react/rh7.png";
 
 # History of React and Modern JS Frameworks
 
@@ -140,9 +143,9 @@ The concept of top-down data flow refers to the way the components are organized
 Let’s look at this React component (written in JSX):
 
 ```jsx
-import Select from "./Select.js"
+import Select from "./Select.js";
 
-let select = <Select />
+let select = <Select />;
 ```
 
 This component behaves like a regular HTML5 select input.
@@ -156,7 +159,7 @@ let select = (
   <Select>
     <option value="1">First option</option>
   </Select>
-)
+);
 ```
 
 Since we’re writting our app in JavaScript, it would make more sense to populate the options using an array…
@@ -165,9 +168,9 @@ Since we’re writting our app in JavaScript, it would make more sense to popula
 var options = [
   { value: 1, title: "First option" },
   // …
-]
+];
 
-var select = <Select options={options} />
+var select = <Select options={options} />;
 ```
 
 What we just did is _we passed a **property**_ to our component.
@@ -179,11 +182,11 @@ As long as the component supports a property we can use it. That’s the _public
 Now let’s say we want to know when the selected option changes to execute some logic. Assuming the component supports it, we would pass an `onChange` property that’s actually a function:
 
 ```jsx
-let myFunction = event => {
+let myFunction = (event) => {
   /* do something */
-}
+};
 
-var select = <Select options={options} onChange={myFunction} />
+var select = <Select options={options} onChange={myFunction} />;
 ```
 
 This property that’s actually a function, is what in React is called an **event**. This allows the _child_ component to comunicate back to the _parent_ component what is happening inside.
@@ -225,10 +228,10 @@ _(It’s worth mentioning that this presentation by Rich Harris was actually a c
 Let’s look at declarative rendering in action. This is the code for a fully functional React component.
 
 ```jsx
-import React, { useState } from "react"
+import React, { useState } from "react";
 
 export default function Counter() {
-  let [count, setCount] = useState(0)
+  let [count, setCount] = useState(0);
 
   return (
     <div>
@@ -236,7 +239,7 @@ export default function Counter() {
       <br />
       <button onClick={() => setCount(count + 1)}>Increment 1</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -257,10 +260,10 @@ Calling the `setCount` function will make the text update “automatically”, o
 Now let’s say we want to add an input that shows and sets the value of count. We need to actually add the `<input/>` element and some logic that makes it show the value of `count` and update it when the input’s value changes. This looks like this:
 
 ```jsx{11-16}
-import React, { useState } from "react"
+import React, { useState } from "react";
 
 export default function Counter() {
-  let [count, setCount] = useState(0)
+  let [count, setCount] = useState(0);
 
   return (
     <div>
@@ -271,10 +274,10 @@ export default function Counter() {
       <input
         type="number"
         value={count}
-        onChange={event => setCount(event.target.value)}
+        onChange={(event) => setCount(event.target.value)}
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -306,7 +309,7 @@ export default function CounterList() {
       <hr />
       <Counter />
     </div>
-  )
+  );
 }
 ```
 
@@ -324,7 +327,7 @@ export default function CounterList() {
       <hr />
       <Counter initialValue={10} />
     </div>
-  )
+  );
 }
 ```
 

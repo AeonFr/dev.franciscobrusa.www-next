@@ -1,13 +1,18 @@
 export const metadata = {
   title: "On writing documentation",
-  date: "2020-08-05T20:36"
-}
+  date: "2020-08-05T20:36",
+};
 
-import BlogPostLayout from "../../components/BlogPostLayout"
-export default ({ children }) => <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+import BlogPostLayout from "../../components/BlogPostLayout";
+export default ({ children }) => (
+  <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+);
 
 export const separatorStyles = { borderTop: "8px groove var(--accent)" };
-export const highlightedContentStyles = { fontSize: '1.25em', fontWeight: 'light' };
+export const highlightedContentStyles = {
+  fontSize: "1.25em",
+  fontWeight: "light",
+};
 
 # On writing documentation
 
@@ -84,4 +89,3 @@ Remember the objective of your documentation is to make your software usable by 
 - Once the low-level API is documented automatically, focus your effort on writing about architecture decisions and general philosophies.
 - If you want to go the extra mile and explain in thoughtful detail some parts of the API, use recipes, pseudocode and/or examples.
 - If possible, assume the user knows nothing.
-
