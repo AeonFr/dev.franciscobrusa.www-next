@@ -1,4 +1,22 @@
-import Layout from "../../components/Layout";
-export default ({ children }) => <Layout>{children}</Layout>;
+import BlogCodeWalkthroughLayout from "../../components/BlogCodeWalkthroughLayout";
+export default (props) => <BlogCodeWalkthroughLayout {...props} />;
 
-# Hello, world
+# Composition API
+
+## Reusable **stateful logic** in VueJS
+
+---
+
+## UI as a function of state
+
+One of the core principles of React, Vue and other frameworks or libraries, is that the UI is simply the result of passing **state** through a function.
+
+<small>
+
+(you don't even need a framework to apply this concept)
+
+</small>
+
+```js
+UI = fn(state);
+```

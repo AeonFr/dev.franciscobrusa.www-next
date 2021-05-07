@@ -2,6 +2,7 @@ import Head from "next/head";
 import { Helmet } from "react-helmet";
 import { MDXProvider } from "@mdx-js/react";
 import Layout from "./Layout";
+import Container from "./Container";
 import CodeBlock from "./CodeBlock";
 import blogPostStyles from "../styles/BlogPostLayout.module.css";
 
@@ -32,13 +33,13 @@ export default function BlogPostLayout({ title, language, children }) {
         <title>{title}</title>
       </Head>
 
-      <div className={blogPostStyles["Post"]}>
+      <Container className={blogPostStyles["Post"]}>
         <MDXProvider components={components}>
           <article className={blogPostStyles["Post-article"]}>
             {children}
           </article>
         </MDXProvider>
-      </div>
+      </Container>
     </Layout>
   );
 }

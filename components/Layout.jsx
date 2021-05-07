@@ -7,7 +7,7 @@ export default Layout;
 function Layout({ children }) {
   return (
     <div className={layoutClasses["App"]}>
-      <header className={layoutClasses["App-header"]}>
+      <header className={layoutClasses["App-frame"]}>
         <Link href="/">
           <a
             className={
@@ -19,9 +19,9 @@ function Layout({ children }) {
         </Link>
       </header>
 
-      <main className={layoutClasses["App-content"]}>{children}</main>
+      <main>{children}</main>
 
-      <footer className={layoutClasses["App-footer"]}>
+      <footer className={layoutClasses["App-frame"]}>
         <a
           href="https://twitter.com/francanobr"
           target="_blank"

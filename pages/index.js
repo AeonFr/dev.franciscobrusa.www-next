@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import Layout from "../components/Layout";
+import Container from "../components/Container";
 import indexStyles from "../styles/Index.module.css";
 
 const posts = [
@@ -52,16 +53,18 @@ export default function Home() {
         <meta name="twitter:site" content="Francisco Brusa's Blog" />
       </Head>
 
-      <ul className={indexStyles["Home"]}>
-        {posts.map((post) => (
-          <li key={post.slug} className={indexStyles["Home-post-block"]}>
-            <Link href={`/blog/${post.slug}`}>
-              <a className={indexStyles["Home-link"]}>{post.title}</a>
-            </Link>
-            <p className={indexStyles["Home-excerpt"]}>{post.excerpt}</p>
-          </li>
-        ))}
-      </ul>
+      <Container>
+        <ul className={indexStyles["Home"]}>
+          {posts.map((post) => (
+            <li key={post.slug} className={indexStyles["Home-post-block"]}>
+              <Link href={`/blog/${post.slug}`}>
+                <a className={indexStyles["Home-link"]}>{post.title}</a>
+              </Link>
+              <p className={indexStyles["Home-excerpt"]}>{post.excerpt}</p>
+            </li>
+          ))}
+        </ul>
+      </Container>
     </Layout>
   );
 }
