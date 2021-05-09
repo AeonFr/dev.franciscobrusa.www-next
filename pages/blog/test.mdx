@@ -20,3 +20,89 @@ One of the core principles of React, Vue and other frameworks or libraries, is t
 ```js
 UI = fn(state);
 ```
+
+---
+
+## What is state?
+
+State is data that changes over time.
+
+In other words, a data stream.
+
+<img src="https://developers.redhat.com/blog/wp-content/uploads/2017/06/reactive-programming.png" alt=""/>
+
+<blockquote>
+
+"Reactive Programming is programming with asynchronous data streams."
+
+<small style={{ fontSize: '1rem' }}>
+  - <a href="https://developers.redhat.com/blog/2017/06/30/5-things-to-know-about-reactive-programming/">5 things to know about reactive programming</a>
+</small>
+
+</blockquote>
+
+---
+
+## What is stateful logic?
+
+Let's see by example. Here we have a vue component.
+
+```html
+<template>
+  <div>
+    Window width is: {{ windowWidth }}
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      windowWidth: window.innerWidth,
+    };
+  },
+}
+</script>
+```
+
+---
+
+Let's focus on the script part only.
+
+
+<!-- ```diff 7:13 -->
+<!-- ``` -->
+
+---
+
+We have a state that has the value of the window width. To make this more responsive, we should also add resize eevent handlers to our component.
+
+```html
+<template>
+  <div>
+    Window width is: {{ windowWidth }}
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      windowWidth: window.innerWidth,
+    };
+  },
+  mounted() {
+    window.addEventListener("resize", this.calculateWindowWidth);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.calculateWindowWidth);
+  },
+  methods: {
+    calculateWindowWidth() {
+      this.windowWidth = window.innerWidth;
+    },
+  },
+}
+</script>
+```
+

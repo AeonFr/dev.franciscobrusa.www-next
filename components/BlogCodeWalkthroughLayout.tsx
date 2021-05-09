@@ -1,7 +1,9 @@
 import React from "react";
 import { MDXProvider } from "@mdx-js/react";
+import { MiniEditor, MiniEditorWithState } from "@code-hike/mini-editor"
 import Layout from "./Layout";
 import Container from "./Container";
+import dynamic from "next/dynamic"
 
 const components = {};
 
@@ -13,7 +15,7 @@ export default function BlogCodeWalkthrough({ children }) {
       <div>
         <MDXProvider components={components}>
           {steps.map((childrenInStep, i) => (
-            <Step key={i}>{childrenInStep}</Step>
+            <Step key={i} allSteps={steps} stepIndex={i}>{childrenInStep}</Step>
           ))}
         </MDXProvider>
       </div>
@@ -45,11 +47,34 @@ function divideIntoSteps(children: React.ReactElement): React.ReactElement[] {
   return result;
 }
 
-function Step({ children }) {
+const Step = dynamic(Promise.resolve(({ children, allSteps, stepIndex }) => {
   const [restOfChildren, codeBlock] = extractCodeBlock(children);
 
   if (!codeBlock) {
     return <Container children={children} />;
+  }
+
+  const miniEditorProps = {
+    file: "Example.vue",
+    lang: codeBlock.props.children.props.className.replace(/^language-(\w+).*/, "$1"),
+    code: codeBlock.props.children.props.children,
+    style: {
+      height: 3 + codeBlock.props.children.props.children.split('\n').length * 1.5 + "rem"
+    }
+  };
+
+  if (typeof window === "undefined" || window.innerWidth < 1200) {
+    return <Container>
+      {restOfChildren}
+
+      <div style={{
+        position: "relative"
+        }}>
+        <MiniEditorWithState
+          {...miniEditorProps}
+        />
+      </div>
+    </Container>
   }
 
   return (
@@ -63,10 +88,14 @@ function Step({ children }) {
       }}
     >
       <div style={{ padding: "1rem" }}>{restOfChildren}</div>
-      <div style={{ padding: "1rem" }}>{codeBlock}</div>
+      <div style={{ padding: "1rem", position: "relative" }}>
+        <MiniEditorWithState
+          {...miniEditorProps}
+        />
+      </div>
     </div>
   );
-}
+}), {ssr: false});
 
 function extractCodeBlock(
   children: React.ReactChildren
