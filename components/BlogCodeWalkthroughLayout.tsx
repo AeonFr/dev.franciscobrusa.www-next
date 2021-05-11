@@ -1,20 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { MDXProvider } from "@mdx-js/react";
+import {
+  MiniEditorWithState,
+  StatefulEditorProps,
+} from "@code-hike/mini-editor";
+import { InView } from "react-intersection-observer";
 import Layout from "./Layout";
 import Container from "./Container";
+import dynamic from "next/dynamic";
 
 const components = {};
 
 export default function BlogCodeWalkthrough({ children }) {
-  const steps = divideIntoSteps(children);
+  const steps = divideIntoSteps(children).map(extractCodeBlock);
 
   return (
     <Layout>
       <div>
         <MDXProvider components={components}>
-          {steps.map((childrenInStep, i) => (
-            <Step key={i}>{childrenInStep}</Step>
-          ))}
+          {steps.map((step, i) => {
+            const { restOfChildren, codeBlock } = step;
+
+            if (!codeBlock) {
+              return <Container children={restOfChildren} key={i} />;
+            }
+
+            return <Step currentStep={i} steps={steps} key={i} />;
+          })}
         </MDXProvider>
       </div>
     </Layout>
@@ -26,7 +38,9 @@ export default function BlogCodeWalkthrough({ children }) {
  * each step being determined by an <hr/> (or three dashes in markdown ---)
  * that acts as a separator.
  */
-function divideIntoSteps(children: React.ReactElement): React.ReactElement[] {
+function divideIntoSteps(
+  children: React.ReactChildren
+): React.ReactElement[][] {
   const c = React.Children.toArray(children);
 
   let currentStep = 0;
@@ -45,40 +59,169 @@ function divideIntoSteps(children: React.ReactElement): React.ReactElement[] {
   return result;
 }
 
-function Step({ children }) {
-  const [restOfChildren, codeBlock] = extractCodeBlock(children);
+interface StepProps {
+  currentStep: number;
+  steps: ReturnType<typeof extractCodeBlock>[];
+}
 
-  if (!codeBlock) {
-    return <Container children={children} />;
-  }
+const Step = dynamic(
+  Promise.resolve(({ currentStep, steps }: StepProps) => {
+    const { restOfChildren, codeBlock } = steps[currentStep];
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "80rem",
-        margin: "0 auto",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-      }}
-    >
-      <div style={{ padding: "1rem" }}>{restOfChildren}</div>
-      <div style={{ padding: "1rem" }}>{codeBlock}</div>
-    </div>
-  );
+    const getEditorProps = (
+      codeBlock: React.ReactElement
+    ): StatefulEditorProps => {
+      return {
+        file: "Example.vue",
+        code: codeBlock.props.children.props.children,
+        lang: codeBlock.props.children.props.className.replace(
+          /^language-(\w+).*/,
+          "$1"
+        ),
+        style: {
+          height:
+            Math.max(
+              7,
+              codeBlock.props.children.props.children.split("\n").length * 1.5
+            ) + "rem",
+        },
+      };
+    };
+
+    const miniEditorProps: StatefulEditorProps = getEditorProps(codeBlock);
+
+    // for the desktop version
+    const [inViewStep, setInViewStep] = useState(0);
+    const [inViewSubstep, setInViewSubstep] = useState(0);
+
+    // mobile version: show every step one at a time
+    if (window.innerWidth < 1200) {
+      return (
+        <Container>
+          {restOfChildren}
+
+          <div
+            style={{
+              position: "relative",
+            }}
+          >
+            <MiniEditorWithState {...miniEditorProps} />
+          </div>
+        </Container>
+      );
+    }
+
+    // desktop version: show every step together with a sticky editor on the left,
+    // until theres a step without code
+
+    const isFirstStepWithCode =
+      steps[currentStep - 1] && !steps[currentStep - 1].codeBlock;
+
+    if (!isFirstStepWithCode) return null;
+
+    const subSteps = [];
+
+    let i = currentStep;
+    while (steps[i] && steps[i].codeBlock) {
+      subSteps.push(steps[i]);
+      i++;
+    }
+
+    const subStepsEditorProps = subSteps.map(({ codeBlock }) =>
+      getEditorProps(codeBlock)
+    );
+
+    return (
+      <InView
+        as="div"
+        onChange={(inView) => inView && setInViewStep(currentStep)}
+        style={{
+          width: "100%",
+          maxWidth: "80rem",
+          margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+        }}
+      >
+        {subSteps.map(({ codeBlock, restOfChildren }, i) => {
+          return (
+            <div
+              key={`${currentStep}-${i}`}
+              style={{
+                position: "relative",
+                minHeight: subStepsEditorProps[i].style.height,
+              }}
+            >
+              <InView
+                as="div"
+                onChange={(inView) => inView && setInViewSubstep(i)}
+                threshold={1}
+                style={{
+                  position: "absolute",
+                  top: "1rem",
+                  left: "-1rem",
+                  gridColumnStart: 1,
+                  height: "50%",
+                  maxHeight: "80vh",
+                  width: "2px",
+                  backgroundColor: "var(--accent)",
+                }}
+              />
+              {restOfChildren}
+            </div>
+          );
+        })}
+
+        <div
+          style={{
+            padding: "1rem",
+            position: "relative",
+            gridColumnStart: 2,
+            gridRowStart: 1,
+            gridRowEnd: subSteps.length + 1,
+          }}
+        >
+          <MiniEditorWithState
+            {...(inViewStep === currentStep
+              ? subStepsEditorProps[inViewSubstep]
+              : miniEditorProps)}
+            style={{
+              ...(inViewStep === currentStep
+                ? subStepsEditorProps[inViewSubstep]
+                : miniEditorProps
+              ).style,
+              position: "sticky",
+              top: "2rem",
+              maxHeight: "calc(100vh - 4rem)",
+              overflowY: "auto",
+            }}
+          />
+        </div>
+      </InView>
+    );
+  }),
+  { ssr: false }
+);
+
+interface StepWithExtractedCodeBlock {
+  restOfChildren: React.ReactElement[];
+  codeBlock: React.ReactElement;
 }
 
 function extractCodeBlock(
-  children: React.ReactChildren
-): [React.ReactElement[], React.ReactElement] {
+  children: React.ReactElement[]
+): StepWithExtractedCodeBlock {
   const c = React.Children.toArray(children);
 
-  let result: [React.ReactElement[], React.ReactElement] = [[], null];
+  let result: StepWithExtractedCodeBlock = {
+    restOfChildren: [],
+    codeBlock: null,
+  };
 
   c.forEach((child: React.ReactElement) => {
     if (child.props.mdxType === "pre") {
-      result[1] = child;
-    } else result[0].push(child);
+      result.codeBlock = child;
+    } else result.restOfChildren.push(child);
   });
 
   return result;
