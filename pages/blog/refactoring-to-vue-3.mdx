@@ -23,17 +23,25 @@ UI = fn(state);
 
 ---
 
-## What is state?
+State is data that changes over time. In other words, a **data stream**.
 
-State is data that changes over time.
-
-In other words, a data stream.
+Every time state changes, an update of the UI is scheduled. The resulting UI is the result of calling a function with the new state. (so, again, `UI = fn(state)`).
 
 ---
 
-## What is stateful logic?
+**Stateful logic** is all the logic that causes state updates. These are the rules that the state follows.
 
-Let's see by example. Here we have a vue component.
+For example, in the following image there's a representation of a state that changes every time something is retrieved from the server, which happens every time the user clicks on something. The stateful logic here would be the relation between the click event, the server, and the change in state.
+
+<img src="/blog/refactoring-to-vue-3/state-stream.svg" alt="" style={{backgroundColor: "#ffffff99"}}/>
+
+---
+
+## Stateful logic in Vue
+
+Let's see how we could represent some simple stateful logic in a VueJS component.
+
+We will start with a component that renders the current window width.
 
 ```html
 <template>
@@ -53,10 +61,9 @@ Let's see by example. Here we have a vue component.
 
 ---
 
-Let's focus on the script part only.
+Also, let's focus on the script part only.
 
-<!-- ```diff 7:13 -->
-<!-- ``` -->
+You might have noticed an error here. The value of the window width is calculated when the component is mounted, but it's not updated afterwards if the user resizes the browser.
 
 ```html 5:13
 <template>
@@ -76,7 +83,7 @@ Let's focus on the script part only.
 
 ---
 
-We have a state that has the value of the window width. To make this more responsive, we should also add resize event handlers to our component.
+To fix this component, we should add **resize** event handlers to our component.
 
 ```html 11:22
 <template>
