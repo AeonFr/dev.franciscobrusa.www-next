@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { MDXProvider } from "@mdx-js/react";
 import {
   MiniEditorWithState,
@@ -8,6 +8,7 @@ import { InView } from "react-intersection-observer";
 import Layout from "./Layout";
 import Container from "./Container";
 import dynamic from "next/dynamic";
+import blogPostStyles from "../styles/BlogPostLayout.module.css";
 
 const components = {};
 
@@ -22,7 +23,14 @@ export default function BlogCodeWalkthrough({ children }) {
             const { restOfChildren, codeBlock } = step;
 
             if (!codeBlock) {
-              return <Container children={restOfChildren} key={i} />;
+              return (
+                <Container key={i}>
+                  <div
+                    className={blogPostStyles["Post-article"]}
+                    children={restOfChildren}
+                  />
+                </Container>
+              );
             }
 
             return <Step currentStep={i} steps={steps} key={i} />;
@@ -74,6 +82,11 @@ const Step = dynamic(
       return {
         file: "Example.vue",
         code: codeBlock.props.children.props.children,
+        focus:
+          codeBlock.props.children.props.metastring?.replace(
+            /([^\d:,]*)/g,
+            ""
+          ) || undefined,
         lang: codeBlock.props.children.props.className.replace(
           /^language-(\w+).*/,
           "$1"
@@ -93,12 +106,29 @@ const Step = dynamic(
     // for the desktop version
     const [inViewStep, setInViewStep] = useState(0);
     const [inViewSubstep, setInViewSubstep] = useState(0);
+    const isFirstStepWithCode = useMemo(
+      () => steps[currentStep - 1] && !steps[currentStep - 1].codeBlock,
+      [steps, currentStep]
+    );
+    const subSteps = useMemo(() => {
+      let result = [];
+
+      let i = currentStep;
+      while (steps[i] && steps[i].codeBlock) {
+        result.push(steps[i]);
+        i++;
+      }
+      return result;
+    }, [steps, currentStep]);
+    const subStepsEditorProps = useMemo(() => {
+      return subSteps.map(({ codeBlock }) => getEditorProps(codeBlock));
+    }, [subSteps]);
 
     // mobile version: show every step one at a time
     if (window.innerWidth < 1200) {
       return (
-        <Container>
-          {restOfChildren}
+        <Container className={blogPostStyles["Post-article"]}>
+          <div>{restOfChildren}</div>
 
           <div
             style={{
@@ -114,89 +144,84 @@ const Step = dynamic(
     // desktop version: show every step together with a sticky editor on the left,
     // until theres a step without code
 
-    const isFirstStepWithCode =
-      steps[currentStep - 1] && !steps[currentStep - 1].codeBlock;
-
     if (!isFirstStepWithCode) return null;
-
-    const subSteps = [];
-
-    let i = currentStep;
-    while (steps[i] && steps[i].codeBlock) {
-      subSteps.push(steps[i]);
-      i++;
-    }
-
-    const subStepsEditorProps = subSteps.map(({ codeBlock }) =>
-      getEditorProps(codeBlock)
-    );
 
     return (
       <InView
         as="div"
         onChange={(inView) => inView && setInViewStep(currentStep)}
-        style={{
-          width: "100%",
-          maxWidth: "80rem",
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-        }}
       >
-        {subSteps.map(({ codeBlock, restOfChildren }, i) => {
-          return (
-            <div
-              key={`${currentStep}-${i}`}
-              style={{
-                position: "relative",
-                minHeight: subStepsEditorProps[i].style.height,
-              }}
-            >
-              <InView
-                as="div"
-                onChange={(inView) => inView && setInViewSubstep(i)}
-                threshold={1}
-                style={{
-                  position: "absolute",
-                  top: "1rem",
-                  left: "-1rem",
-                  gridColumnStart: 1,
-                  height: "50%",
-                  maxHeight: "80vh",
-                  width: "2px",
-                  backgroundColor: "var(--accent)",
-                }}
-              />
-              {restOfChildren}
-            </div>
-          );
-        })}
-
-        <div
+        <Container
           style={{
-            padding: "1rem",
-            position: "relative",
-            gridColumnStart: 2,
-            gridRowStart: 1,
-            gridRowEnd: subSteps.length + 1,
+            width: "100%",
+            maxWidth: "80rem",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
           }}
         >
-          <MiniEditorWithState
-            {...(inViewStep === currentStep
-              ? subStepsEditorProps[inViewSubstep]
-              : miniEditorProps)}
+          {subSteps.map(({ codeBlock, restOfChildren }, i) => {
+            return (
+              <div
+                key={`${currentStep}-${i}`}
+                className={blogPostStyles["Post-article"]}
+                style={{
+                  position: "relative",
+                  minHeight:
+                    subSteps[i + 1] !== undefined
+                      ? "100vh"
+                      : subStepsEditorProps[i].style.height,
+                }}
+              >
+                <InView
+                  as="div"
+                  onChange={(inView) => inView && setInViewSubstep(i)}
+                  threshold={1}
+                  style={{
+                    position: "absolute",
+                    top: "1rem",
+                    left: "-1rem",
+                    gridColumnStart: 1,
+                    height: "50%",
+                    maxHeight: "80vh",
+                    width: "2px",
+                    // for debugging:
+                    // backgroundColor: "var(--accent)",
+                  }}
+                  children={<span />}
+                />
+                {restOfChildren}
+              </div>
+            );
+          })}
+
+          <div
             style={{
-              ...(inViewStep === currentStep
-                ? subStepsEditorProps[inViewSubstep]
-                : miniEditorProps
-              ).style,
-              position: "sticky",
-              top: "2rem",
-              maxHeight: "calc(100vh - 4rem)",
-              overflowY: "auto",
+              padding: "0 2rem",
+              position: "relative",
+              gridColumnStart: 2,
+              gridRowStart: 1,
+              gridRowEnd: subSteps.length + 1,
             }}
-          />
-        </div>
+          >
+            <MiniEditorWithState
+              {...(inViewStep === currentStep
+                ? subStepsEditorProps[inViewSubstep]
+                : miniEditorProps)}
+              style={{
+                ...(inViewStep === currentStep
+                  ? subStepsEditorProps[inViewSubstep]
+                  : miniEditorProps
+                ).style,
+                position: subSteps.length > 1 ? "sticky" : "static",
+                top: `calc(50% - calc(${subStepsEditorProps[inViewSubstep].style.height} / 2))`,
+                maxHeight: "calc(100vh - 4rem)",
+                overflowY: "auto",
+                transition: "top .5s",
+              }}
+            />
+          </div>
+        </Container>
       </InView>
     );
   }),

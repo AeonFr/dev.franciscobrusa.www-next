@@ -33,7 +33,7 @@ export default function BlogPostLayout({ title, language, children }) {
         <title>{title}</title>
       </Head>
 
-      <Container className={blogPostStyles["Post"]}>
+      <Container>
         <MDXProvider components={components}>
           <article className={blogPostStyles["Post-article"]}>
             {children}
