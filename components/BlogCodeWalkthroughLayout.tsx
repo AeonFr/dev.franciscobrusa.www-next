@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MDXProvider } from "@mdx-js/react";
 import {
   MiniEditorWithState,
@@ -13,28 +13,77 @@ import blogPostStyles from "../styles/BlogPostLayout.module.css";
 const components = {};
 
 export default function BlogCodeWalkthrough({ children }) {
-  const steps = divideIntoSteps(children).map(extractCodeBlock);
+  const steps = useMemo(
+    () => divideIntoSteps(children).map(extractCodeBlock),
+    [children]
+  );
+  const [isInPresentationMode, setPresentationMode] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key == "p") {
+        event.preventDefault();
+
+        if (!isInPresentationMode) {
+          rootRef.current?.requestFullscreen();
+
+          // Some global fixes to make presentation mode look better. (TODO: make it revertable)
+          const $metaViewport = document.querySelector("meta[name='viewport']");
+          $metaViewport.setAttribute("content", "width=600");
+          if (window.innerWidth > 1000) {
+            document.documentElement.style.fontSize = "18px";
+          }
+        } else if (document.fullscreenElement) {
+          document.exitFullscreen();
+          window.location.reload();
+        }
+        setPresentationMode(!isInPresentationMode);
+      }
+
+      if (event.key == "ArrowRight" || event.key == "Right") {
+        if (currentSlide + 1 == steps.length) {
+          setPresentationMode(false);
+          setCurrentSlide(0);
+
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+            window.location.reload();
+          }
+        } else {
+          setCurrentSlide(currentSlide + 1);
+        }
+      }
+
+      if (
+        (event.key == "ArrowLeft" || event.key == "Left") &&
+        currentSlide - 1 !== -1
+      ) {
+        setCurrentSlide(currentSlide - 1);
+      }
+    };
+
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => window.removeEventListener("keyup", handleKeyUp);
+  }, [isInPresentationMode, currentSlide, steps]);
 
   return (
     <Layout>
-      <div>
+      <div ref={rootRef} style={{ backgroundColor: "var(--bg)" }}>
         <MDXProvider components={components}>
-          {steps.map((step, i) => {
-            const { restOfChildren, codeBlock } = step;
-
-            if (!codeBlock) {
-              return (
-                <Container key={i}>
-                  <div
-                    className={blogPostStyles["Post-article"]}
-                    children={restOfChildren}
-                  />
-                </Container>
-              );
-            }
-
-            return <Step currentStep={i} steps={steps} key={i} />;
-          })}
+          {!isInPresentationMode ? (
+            steps.map((step, i) => {
+              return <Step currentStep={i} steps={steps} key={i} />;
+            })
+          ) : (
+            <Step
+              currentStep={currentSlide}
+              steps={steps}
+              isInPresentationMode={true}
+            />
+          )}
         </MDXProvider>
       </div>
     </Layout>
@@ -70,10 +119,11 @@ function divideIntoSteps(
 interface StepProps {
   currentStep: number;
   steps: ReturnType<typeof extractCodeBlock>[];
+  isInPresentationMode?: bool;
 }
 
 const Step = dynamic(
-  Promise.resolve(({ currentStep, steps }: StepProps) => {
+  Promise.resolve(({ currentStep, steps, isInPresentationMode }: StepProps) => {
     const { restOfChildren, codeBlock } = steps[currentStep];
 
     const getEditorProps = (
@@ -101,13 +151,16 @@ const Step = dynamic(
       };
     };
 
-    const miniEditorProps: StatefulEditorProps = getEditorProps(codeBlock);
+    const miniEditorProps: StatefulEditorProps = useMemo(
+      () => (codeBlock ? getEditorProps(codeBlock) : null),
+      [codeBlock]
+    );
 
     // for the desktop version
     const [inViewStep, setInViewStep] = useState(0);
     const [inViewSubstep, setInViewSubstep] = useState(0);
     const isFirstStepWithCode = useMemo(
-      () => steps[currentStep - 1] && !steps[currentStep - 1].codeBlock,
+      () => steps[currentStep - 1] && !steps[currentStep - 1]?.codeBlock,
       [steps, currentStep]
     );
     const subSteps = useMemo(() => {
@@ -124,19 +177,47 @@ const Step = dynamic(
       return subSteps.map(({ codeBlock }) => getEditorProps(codeBlock));
     }, [subSteps]);
 
-    // mobile version: show every step one at a time
-    if (window.innerWidth < 1200) {
+    // mobile version, no codeblock version & presentation mode: show every step one at a time
+    if (isInPresentationMode || !codeBlock || window.innerWidth < 1200) {
       return (
-        <Container className={blogPostStyles["Post-article"]}>
-          <div>{restOfChildren}</div>
-
-          <div
-            style={{
-              position: "relative",
-            }}
-          >
-            <MiniEditorWithState {...miniEditorProps} />
-          </div>
+        <Container
+          className={blogPostStyles["Post-article"]}
+          style={
+            isInPresentationMode
+              ? {
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  right: 0,
+                  padding: "4rem",
+                  backgroundColor: "var(--bg)",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4rem",
+                }
+              : {}
+          }
+        >
+          {codeBlock ? (
+            <>
+              <div>{restOfChildren}</div>
+              <div
+                style={{
+                  position: "relative",
+                }}
+              >
+                <MiniEditorWithState {...miniEditorProps} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div>{extractImage(restOfChildren).restOfChildren}</div>
+              {extractImage(restOfChildren).image}
+            </>
+          )}
         </Container>
       );
     }
@@ -152,10 +233,11 @@ const Step = dynamic(
         onChange={(inView) => inView && setInViewStep(currentStep)}
       >
         <Container
+          className={blogPostStyles["Post-article"]}
           style={{
             width: "100%",
             maxWidth: "80rem",
-            margin: "0 auto",
+            margin: "2rem auto",
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
           }}
@@ -185,8 +267,6 @@ const Step = dynamic(
                     height: "50%",
                     maxHeight: "80vh",
                     width: "2px",
-                    // for debugging:
-                    // backgroundColor: "var(--accent)",
                   }}
                   children={<span />}
                 />
@@ -197,7 +277,7 @@ const Step = dynamic(
 
           <div
             style={{
-              padding: "0 2rem",
+              padding: "1rem 2rem",
               position: "relative",
               gridColumnStart: 2,
               gridRowStart: 1,
@@ -246,6 +326,28 @@ function extractCodeBlock(
   c.forEach((child: React.ReactElement) => {
     if (child.props.mdxType === "pre") {
       result.codeBlock = child;
+    } else result.restOfChildren.push(child);
+  });
+
+  return result;
+}
+
+interface StepWithExtractedImage {
+  restOfChildren: React.ReactElement[];
+  image: React.ReactElement;
+}
+
+function extractImage(children: React.ReactElement[]) {
+  const c = React.Children.toArray(children);
+
+  let result: StepWithExtractedImage = {
+    restOfChildren: [],
+    image: null,
+  };
+
+  c.forEach((child: React.ReactElement) => {
+    if (child.props.mdxType === "img") {
+      result.image = child;
     } else result.restOfChildren.push(child);
   });
 
