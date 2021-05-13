@@ -9,7 +9,7 @@ export default (props) => <BlogCodeWalkthroughLayout {...props} />;
 
 ## UI as a function of state
 
-One of the core principles of React, Vue and other frameworks or libraries, is that the UI is simply the result of passing **state** through a function.
+One of the core principles of React, Vue and other frameworks or libraries, is that the UI is a result of passing **state** through a function.
 
 <small>
 
@@ -17,21 +17,31 @@ One of the core principles of React, Vue and other frameworks or libraries, is t
 
 </small>
 
+So, what is **state**?
+
 ```js
 UI = fn(state);
 ```
 
 ---
 
-State is data that changes over time. In other words, a **data stream**.
-
-Every time state changes, an update of the UI is scheduled. The resulting UI is the result of calling a function with the new state. (so, again, `UI = fn(state)`).
-
----
+**State** is data that changes over time. In other words, a **data stream**.
 
 **Stateful logic** is all the logic that causes state updates. These are the rules that the state follows.
 
-For example, in the following image there's a representation of a state that changes every time something is retrieved from the server, which happens every time the user clicks on something. The stateful logic here would be the relation between the click event, the server, and the change in state.
+---
+
+## Example
+
+Let's think of a UI with a Button that retrieves data from the server and updates a list of items. This could be something like an email client or a newsfeed.
+
+### UI = fn(state)
+
+Every time the state changes, a function is called with the new state. The result of the function is the updated UI.
+
+### Stateful logic
+
+The stateful logic here would be the relation between the click event, the communication with the server, and the change in state.
 
 <img src="/blog/refactoring-to-vue-3/state-stream.svg" alt="" style={{backgroundColor: "#ffffff99"}}/>
 
@@ -61,11 +71,11 @@ We will start with a component that renders the current window width.
 
 ---
 
-Also, let's focus on the script part only.
+The value of the window width is calculated when the component is mounted, but it's not updated afterwards if the user resizes the browser.
 
-You might have noticed an error here. The value of the window width is calculated when the component is mounted, but it's not updated afterwards if the user resizes the browser.
+Let's fix that!
 
-```html 5:13
+```html 9
 <template>
   <div>Window width is: {{ windowWidth }}</div>
 </template>
@@ -83,9 +93,9 @@ You might have noticed an error here. The value of the window width is calculate
 
 ---
 
-To fix this component, we should add **resize** event handlers to our component.
+To fix this, we can add **resize** event handlers to our component.
 
-```html 11:22
+```html 11:28
 <template>
   <div>Window width is: {{ windowWidth }}</div>
 </template>
@@ -98,15 +108,117 @@ To fix this component, we should add **resize** event handlers to our component.
       };
     },
     mounted() {
-      window.addEventListener("resize", this.calculateWindowWidth);
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidth
+      );
     },
     beforeDestroy() {
-      window.removeEventListener("resize", this.calculateWindowWidth);
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidth
+      );
     },
     methods: {
       calculateWindowWidth() {
         this.windowWidth = window.innerWidth;
       },
+    },
+  };
+</script>
+```
+
+---
+
+It's a good practice to **throttle** the resize event, otherwise this component will update many times per second while the user is scrolling, and that might cause the experience to feel "laggy".
+
+We can add a throttled version of the `calculateWindowWidth`, and use it as the event listener function.
+
+```html 17, 23, 30:32
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+---
+
+By now our component has quite some **stateful logic**, even though it fulfills a very simple purpose.
+
+Unfortunately, without using the composition API, we **can't reuse** this logic in other components\*.
+
+<small style={{ opacity: 0.6 }}>
+
+\* Unless we use Mixins, <a href="https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html" target="_blank" referer="noindex nofollow">but they break some SOLID principles and go against good practices</a>.
+
+</small>
+
+Let's refactor this stateful logic into a **composition function** to make it reusable.
+
+```html
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
     },
   };
 </script>

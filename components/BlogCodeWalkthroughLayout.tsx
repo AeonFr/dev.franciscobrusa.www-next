@@ -145,7 +145,7 @@ const Step = dynamic(
           height:
             Math.max(
               7,
-              codeBlock.props.children.props.children.split("\n").length * 1.5
+              codeBlock.props.children.props.children.split("\n").length * 1.1
             ) + "rem",
         },
       };
