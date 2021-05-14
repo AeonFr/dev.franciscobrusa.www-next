@@ -17,7 +17,7 @@ One of the core principles of React, Vue and other frameworks or libraries, is t
 
 </small>
 
-So, what is **state**?
+But what is **state** exactly?
 
 ```js
 UI = fn(state);
@@ -25,25 +25,23 @@ UI = fn(state);
 
 ---
 
+<div style={{ fontSize: "1.5em" }}>
+
 **State** is data that changes over time. In other words, a **data stream**.
 
-**Stateful logic** is all the logic that causes state updates. These are the rules that the state follows.
+</div>
 
----
+<img src="/blog/refactoring-to-vue-3/state-stream.svg" alt="Visual representation of a data stream (described below)" style={{backgroundColor: "#ffffff"}}/>
 
-## Example
+For example, if we have a Button that retrieves data from the server and updates a list of items, the **state** would be the retrieved data.
 
-Let's think of a UI with a Button that retrieves data from the server and updates a list of items. This could be something like an email client or a newsfeed.
+Additionally, we can call **stateful logic** to the click interaction, the data fetching process, etc.
 
-### UI = fn(state)
+<div style={{ fontSize: "1.5em" }}>
 
-Every time the state changes, a function is called with the new state. The result of the function is the updated UI.
+**Stateful logic** is all the logic involved in mutating state.
 
-### Stateful logic
-
-The stateful logic here would be the relation between the click event, the communication with the server, and the change in state.
-
-<img src="/blog/refactoring-to-vue-3/state-stream.svg" alt="" style={{backgroundColor: "#ffffff99"}}/>
+</div>
 
 ---
 
@@ -51,7 +49,9 @@ The stateful logic here would be the relation between the click event, the commu
 
 Let's see how we could represent some simple stateful logic in a VueJS component.
 
-We will start with a component that renders the current window width.
+---
+
+We will start with a component that shows the current window width.
 
 ```html
 <template>
@@ -176,16 +176,6 @@ We can add a throttled version of the `calculateWindowWidth`, and use it as the 
 
 By now our component has quite some **stateful logic**, even though it fulfills a very simple purpose.
 
-Unfortunately, without using the composition API, we **can't reuse** this logic in other components\*.
-
-<small style={{ opacity: 0.6 }}>
-
-\* Unless we use Mixins, <a href="https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html" target="_blank" referer="noindex nofollow">but they break some SOLID principles and go against good practices</a>.
-
-</small>
-
-Let's refactor this stateful logic into a **composition function** to make it reusable.
-
 ```html
 <template>
   <div>Window width is: {{ windowWidth }}</div>
@@ -223,3 +213,15 @@ Let's refactor this stateful logic into a **composition function** to make it re
   };
 </script>
 ```
+
+To make this logic easily reusable, and to clean up our code, we can create a **composition function**.
+
+<div style={{ fontSize: "1.5em" }}>
+
+A **composition function** (known as a **hook** in React) is a way to encapsulate stateful logic so that it's reusable between components, or in other composition functions.
+
+</div>
+
+---
+
+Sounds confusing? Let's go step by step...
