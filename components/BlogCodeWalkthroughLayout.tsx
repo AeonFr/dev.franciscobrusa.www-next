@@ -14,7 +14,7 @@ const components = {};
 
 export default function BlogCodeWalkthrough({ children }) {
   const steps = useMemo(
-    () => divideIntoSteps(children).map(extractCodeBlock),
+    () => divideIntoSteps(children).map(parseStep),
     [children]
   );
   const [isInPresentationMode, setPresentationMode] = useState(false);
@@ -118,38 +118,13 @@ function divideIntoSteps(
 
 interface StepProps {
   currentStep: number;
-  steps: ReturnType<typeof extractCodeBlock>[];
+  steps: ReturnType<typeof parseStep>[];
   isInPresentationMode?: bool;
 }
 
 const Step = dynamic(
   Promise.resolve(({ currentStep, steps, isInPresentationMode }: StepProps) => {
-    const { restOfChildren, codeBlock } = steps[currentStep];
-
-    const getEditorProps = (
-      codeBlock: React.ReactElement
-    ): StatefulEditorProps => {
-      return {
-        file: "Example.vue",
-        code: codeBlock.props.children.props.children,
-        focus:
-          codeBlock.props.children.props.metastring?.replace(
-            /([^\d:,]*)/g,
-            ""
-          ) || undefined,
-        lang: codeBlock.props.children.props.className.replace(
-          /^language-(\w+).*/,
-          "$1"
-        ),
-        style: {
-          height:
-            Math.max(
-              7,
-              codeBlock.props.children.props.children.split("\n").length * 1.1
-            ) + "rem",
-        },
-      };
-    };
+    const { restOfChildren, codeBlock, image } = steps[currentStep];
 
     const miniEditorProps: StatefulEditorProps = useMemo(
       () => (codeBlock ? getEditorProps(codeBlock) : null),
@@ -177,47 +152,56 @@ const Step = dynamic(
       return subSteps.map(({ codeBlock }) => getEditorProps(codeBlock));
     }, [subSteps]);
 
+    // todo add resize handlers I guess
+    const [isMobile] = useState(
+      window.innerWidth < 1200 || window.innerHeight < 500
+    );
+
     // mobile version, no codeblock version & presentation mode: show every step one at a time
-    if (isInPresentationMode || !codeBlock || window.innerWidth < 1200) {
+    if (isInPresentationMode || !codeBlock || isMobile) {
       return (
-        <Container
-          className={blogPostStyles["Post-article"]}
-          style={
-            isInPresentationMode
-              ? {
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  right: 0,
-                  padding: "4rem",
-                  backgroundColor: "var(--bg)",
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "4rem",
-                }
-              : {}
-          }
-        >
-          {codeBlock ? (
-            <>
-              <div>{restOfChildren}</div>
-              <div
-                style={{
-                  position: "relative",
-                }}
-              >
-                <MiniEditorWithState {...miniEditorProps} />
-              </div>
-            </>
-          ) : (
-            <>
-              <div>{extractImage(restOfChildren).restOfChildren}</div>
-              {extractImage(restOfChildren).image}
-            </>
-          )}
+        <Container style={{ maxWidth: "100%" }}>
+          <div
+            className={blogPostStyles["Post-article"]}
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                !isMobile && (codeBlock || image) ? "1fr 1fr" : "1fr",
+              gap: "2rem",
+              padding: "2rem 0",
+              ...(isInPresentationMode
+                ? {
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    padding: "3rem",
+                    backgroundColor: "var(--bg)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }
+                : {}),
+            }}
+          >
+            {codeBlock ? (
+              <>
+                <div>{restOfChildren}</div>
+                <div
+                  style={{
+                    position: "relative",
+                  }}
+                >
+                  <MiniEditorWithState {...miniEditorProps} />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>{restOfChildren}</div>
+                {image}
+              </>
+            )}
+          </div>
         </Container>
       );
     }
@@ -239,6 +223,7 @@ const Step = dynamic(
             maxWidth: "80rem",
             margin: "2rem auto",
             display: "grid",
+            gap: "2rem",
             gridTemplateColumns: "1fr 1fr",
           }}
         >
@@ -277,29 +262,34 @@ const Step = dynamic(
 
           <div
             style={{
-              padding: "1rem 2rem",
               position: "relative",
               gridColumnStart: 2,
               gridRowStart: 1,
               gridRowEnd: subSteps.length + 1,
             }}
           >
-            <MiniEditorWithState
-              {...(inViewStep === currentStep
-                ? subStepsEditorProps[inViewSubstep]
-                : miniEditorProps)}
+            <div
               style={{
-                ...(inViewStep === currentStep
-                  ? subStepsEditorProps[inViewSubstep]
-                  : miniEditorProps
-                ).style,
-                position: subSteps.length > 1 ? "sticky" : "static",
-                top: `calc(50% - calc(${subStepsEditorProps[inViewSubstep].style.height} / 2))`,
-                maxHeight: "calc(100vh - 4rem)",
+                position: "sticky",
+                top: "1rem",
+                height: "calc(100vh - 3rem)",
                 overflowY: "auto",
-                transition: "top .5s",
               }}
-            />
+            >
+              <MiniEditorWithState
+                {...(inViewStep === currentStep
+                  ? subStepsEditorProps[inViewSubstep]
+                  : miniEditorProps)}
+                style={{
+                  ...(inViewStep === currentStep
+                    ? subStepsEditorProps[inViewSubstep]
+                    : miniEditorProps
+                  ).style,
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            </div>
           </div>
         </Container>
       </InView>
@@ -310,46 +300,47 @@ const Step = dynamic(
 
 interface StepWithExtractedCodeBlock {
   restOfChildren: React.ReactElement[];
-  codeBlock: React.ReactElement;
+  codeBlock?: React.ReactElement;
+  image?: React.ReactElement;
 }
 
-function extractCodeBlock(
-  children: React.ReactElement[]
-): StepWithExtractedCodeBlock {
+function parseStep(children: React.ReactElement[]): StepWithExtractedCodeBlock {
   const c = React.Children.toArray(children);
 
   let result: StepWithExtractedCodeBlock = {
     restOfChildren: [],
     codeBlock: null,
-  };
-
-  c.forEach((child: React.ReactElement) => {
-    if (child.props.mdxType === "pre") {
-      result.codeBlock = child;
-    } else result.restOfChildren.push(child);
-  });
-
-  return result;
-}
-
-interface StepWithExtractedImage {
-  restOfChildren: React.ReactElement[];
-  image: React.ReactElement;
-}
-
-function extractImage(children: React.ReactElement[]) {
-  const c = React.Children.toArray(children);
-
-  let result: StepWithExtractedImage = {
-    restOfChildren: [],
     image: null,
   };
 
   c.forEach((child: React.ReactElement) => {
-    if (child.props.mdxType === "img") {
+    if (child.props.mdxType === "pre" && !result.codeBlock) {
+      result.codeBlock = child;
+    } else if (child.props.mdxType === "img" && !result.image) {
       result.image = child;
     } else result.restOfChildren.push(child);
   });
 
   return result;
+}
+
+function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
+  return {
+    file: "Example.vue",
+    code: codeBlock.props.children.props.children,
+    focus:
+      codeBlock.props.children.props.metastring?.replace(/([^\d:,]*)/g, "") ||
+      undefined,
+    lang: codeBlock.props.children.props.className.replace(
+      /^language-(\w+).*/,
+      "$1"
+    ),
+    style: {
+      height:
+        Math.max(
+          7,
+          codeBlock.props.children.props.children.split("\n").length * 1.4
+        ) + "rem",
+    },
+  };
 }
