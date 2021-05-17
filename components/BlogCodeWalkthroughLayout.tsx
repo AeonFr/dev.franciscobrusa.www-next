@@ -326,7 +326,7 @@ function parseStep(children: React.ReactElement[]): StepWithExtractedCodeBlock {
 
 function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
   return {
-    file: "Example.vue",
+    file: "",
     code: codeBlock.props.children.props.children,
     focus:
       codeBlock.props.children.props.metastring?.replace(/([^\d:,]*)/g, "") ||
@@ -336,7 +336,8 @@ function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
       "$1"
     ),
     style: {
-      height:
+      height: "100%",
+      maxHeight:
         Math.max(
           7,
           codeBlock.props.children.props.children.split("\n").length * 1.4

@@ -1,13 +1,19 @@
 import "../styles/globals.css";
 import "../styles/CodeBlock.css";
-import "@code-hike/mini-editor/dist/index.css"
+import "@code-hike/mini-editor/dist/index.css";
 
 import Head from "next/head";
 import ColorSchemePicker from "../components/layout/ColorSchemePicker";
 import { useColorScheme } from "../hooks/useColorScheme";
+import { useCallback } from "react";
 
 function MyApp({ Component, pageProps }) {
   const [scheme, setScheme] = useColorScheme();
+
+  const handleSchemeChange = useCallback((ev) => {
+    setScheme(ev.target.value);
+  });
+
   return (
     <>
       <Head key="favicon">
@@ -33,7 +39,7 @@ function MyApp({ Component, pageProps }) {
 
       <ColorSchemePicker
         scheme={scheme}
-        handleSchemeChange={(ev) => setScheme(ev.target.value)}
+        handleSchemeChange={handleSchemeChange}
         style={{
           position: "absolute",
           top: 0,

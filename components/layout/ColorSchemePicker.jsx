@@ -17,7 +17,7 @@ export default function ColorSchemePicker({
       <Helmet>
         <html lang="en" class={htmlClasses} />
       </Helmet>
-      {/*<label aria-label="Use light color scheme">
+      <label aria-label="Use light color scheme">
         <input
           type="radio"
           name="color-scheme"
@@ -36,7 +36,7 @@ export default function ColorSchemePicker({
           onChange={handleSchemeChange}
         />
         🌑
-      </label>*/}
+      </label>
     </div>
   );
 }
