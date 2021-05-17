@@ -286,7 +286,6 @@ const Step = dynamic(
                     : miniEditorProps
                   ).style,
                   width: "100%",
-                  height: "100%",
                 }}
               />
             </div>
@@ -336,8 +335,7 @@ function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
       "$1"
     ),
     style: {
-      height: "100%",
-      maxHeight:
+      height:
         Math.max(
           7,
           codeBlock.props.children.props.children.split("\n").length * 1.4
