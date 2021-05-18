@@ -6,7 +6,7 @@ import Container from "./Container";
 import CodeBlock from "./CodeBlock";
 import blogPostStyles from "../styles/BlogPostLayout.module.css";
 
-const components = {
+export const components = {
   abbr: ({ children }) => <abbr>{children}</abbr>,
   pre: (props) => {
     if (!props.children.props.className) {
@@ -21,6 +21,7 @@ const components = {
       />
     );
   },
+  a: (props) => <a {...props} target="_blank" rel="noopen noreferer" />,
 };
 
 export default function BlogPostLayout({ title, language, children }) {

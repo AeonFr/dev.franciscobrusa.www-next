@@ -9,8 +9,7 @@ import Layout from "./Layout";
 import Container from "./Container";
 import dynamic from "next/dynamic";
 import blogPostStyles from "../styles/BlogPostLayout.module.css";
-
-const components = {};
+import { components } from "./BlogPostLayout";
 
 export default function BlogCodeWalkthrough({ children }) {
   const steps = useMemo(
@@ -340,6 +339,7 @@ function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
           7,
           codeBlock.props.children.props.children.split("\n").length * 1.4
         ) + "rem",
+      maxHeight: "90vh",
     },
   };
 }
