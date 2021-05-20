@@ -145,3 +145,11 @@ pre[class*="language-"] > code[class*="language-"] {
   line-height: inherit;
   white-space: pre;
 }
+
+/* quick fix for MiniEditor */
+.ch-editor-body {
+  background-color: var(--code-bg);
+}
+.ch-editor-body code {
+  padding: 0;
+}

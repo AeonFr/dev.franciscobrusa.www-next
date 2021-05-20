@@ -194,10 +194,10 @@ const Step = dynamic(
           >
             {!isInPresentationMode ? (
               <div>
-                {originalChildren.map((child) => {
+                {originalChildren.map((child, i) => {
                   if (child.props.mdxType === "pre") {
-                    return <MiniEditorWithState {...miniEditorProps} />;
-                  } else return child;
+                    return <MiniEditorWithState {...miniEditorProps} key={i} />;
+                  } else return <div key={i}>{child}</div>;
                 })}
               </div>
             ) : codeBlock ? (
@@ -347,22 +347,26 @@ function parseStep(children: React.ReactElement[]): StepWithExtractedCodeBlock {
 }
 
 function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
+  const metastring = codeBlock.props.children.props.metastring;
+
+  const metastringNumbers = metastring
+    ?.match(/(\d+)/g)
+    .map(Number)
+    .sort((a: number, b: number) => a > b);
+  const linesCount = metastringNumbers?.length
+    ? metastringNumbers[metastringNumbers.length - 1] - metastringNumbers[0] + 3
+    : codeBlock.props.children.props.children.split("\n").length;
+
   return {
     file: "",
     code: codeBlock.props.children.props.children,
-    focus:
-      codeBlock.props.children.props.metastring?.replace(/([^\d:,]*)/g, "") ||
-      undefined,
+    focus: metastring?.replace(/([^\d:,]*)/g, "") || undefined,
     lang: codeBlock.props.children.props.className.replace(
       /^language-(\w+).*/,
       "$1"
     ),
     style: {
-      height:
-        Math.max(
-          7,
-          codeBlock.props.children.props.children.split("\n").length * 1.5
-        ) + "rem",
+      height: Math.max(7, linesCount * 1.5) + "rem",
       maxHeight: "90vh",
     },
   };
