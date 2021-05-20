@@ -393,9 +393,7 @@ Returning a _ref_ from `setup()` is equivalent as declaring it in `data()`.
 
 ---
 
-We can continue creating our composition function.
-
-We have two methods in our component. Let's see how we could pass them to the composition function...
+Let's continue. We have two methods in our component. Let's see how we could pass them to the composition function...
 
 ```html 37:44
 <template>
@@ -647,7 +645,7 @@ Finally, let's deal with these event listeners...
 
 ---
 
-We can use `onMounted` and `onBeforeUnmount` to encapsulate this event listener into our composition function.
+We can use `onMounted` and `onBeforeUnmount` to move this event listeners into our composable.
 
 ```html 7,21:33
 <template>
@@ -833,7 +831,7 @@ In fact, we will extract our composition function into it's own file to clean up
 </template>
 
 <script>
-  import { useWindowWidth } from "@/composites/useWindowWidth";
+  import { useWindowWidth } from "@/composables/useWindowWidth";
 
   export default {
     setup() {
@@ -873,11 +871,11 @@ Using the options API, we would do something like this:
   // ...
 ```
 
-<small>(but that wouldn't be easy to reuse in other components)</small>
-
 ---
 
-So let's create a composition function...
+But that wouldn't be easy to reuse in other components. (You would have to copy and paste this computed every time).
+
+Let's create a composition function instead...
 
 ```js
 export const useIsMobile = () => {};
@@ -885,29 +883,25 @@ export const useIsMobile = () => {};
 
 ---
 
-For this function, we also need to keep track of the window width and update it when the user resizes the browser.
-
-<div style={{ fontSize: "1.5em" }}>
-
-In other words, our `useIsMobile` composite can **_use_** `windowWidth`.
-
-</div>
+For this function, we also need to keep track of the window width and update it when the user resizes the browser. We can just use the composable we already created!
 
 ```js 1,4
-import { useWindowWidth } from "@/composites/useWindowWidth";
+import { useWindowWidth } from "@/composables/useWindowWidth";
 
 export const useIsMobile = () => {
   const { windowWidth } = useWindowWidth();
 };
 ```
 
+Our `useIsMobile` composable can **_use_** `windowWidth`, literally just by calling `useWindowWidth`.
+
 ---
 
-Finally, let's create a computed and return it. (We will `import { computed } from "vue"`, which is the canonical way of creating computed properties inside _composites_).
+Finally, let's create a computed and return it. (We will `import { computed } from "vue"`, which is the canonical way of creating computed properties inside _composables_).
 
 ```js 1,7,9
 import { computed } from "vue";
-import { useWindowWidth } from "@/composites/useWindowWidth";
+import { useWindowWidth } from "@/composables/useWindowWidth";
 
 export const useIsMobile = () => {
   const { windowWidth } = useWindowWidth();
@@ -930,7 +924,7 @@ You can read more about `window.matchMedia` in the [MDN docs](https://developer.
 
 ---
 
-We could write a new _composite_ to use this API, adding event listeners in the proper lifecycle events (mounted, unmounted), and so on...
+We could write a new _composable_ to use this API, adding event listeners in the proper lifecycle events (mounted, unmounted), and so on...
 
 But why do it if someone else already did it before?
 
@@ -940,7 +934,7 @@ Luckly, the open-source community has published thousands of carefully crafter c
 
 For example, we can `useMediaQuery` from the excellent [vueuse](https://vueuse.org/core/useMediaQuery/) library.
 
-It's a wrapper around `window.matchMedia`. It will react to changes in the viewport (resizing) in a performant way.
+It's a wrapper around `window.matchMedia`. It will react to changes in the viewport (resizes) in a performant way.
 
 ```js 2,5
 import { computed } from "vue";
@@ -959,8 +953,8 @@ As you can see, composition functions unlock several features in Vue that were n
 
 1. We get to **reuse stateful logic**.
 2. We can compose _composition functions_ out of other _composition functions_.
-3. We can consume _composition functions_ out of npm packages, and publish our owns into the registry.
-4. And all this without loosing any features. Using functions like `ref()`, `computed()`, `onMounted()`, [and many more](https://v3.vuejs.org/api/composition-api.html), we can write elloquent code without needing to come back to the so-called _options API_.
+3. We can consume _composition functions_ out of npm packages, and publish ours into the registry.
+4. And all this without loosing any features. Using functions like `ref()`, `computed()`, `onMounted()`, [and many more](https://v3.vuejs.org/api/composition-api.html), we can write eloquent code without needing to come back to the so-called _options API_.
 
 If this sounds exiting and want to learn more, I recommend you to start by reading the [Composition API introduction (from the official Vue documentation)](https://v3.vuejs.org/guide/composition-api-introduction.html).
 
@@ -1008,7 +1002,7 @@ We have covered a step by step process of refactoring a Vue component from the *
 The potential of the composition API is huge to make your code more reusable.
 Once you're familiar with this new API, you will see that it's a solid pattern that can scale well, and has even the potential to replace Vuex entirely from your application and become a centralized state management solution. (But that's maybe a topic for another article).
 
-If you're starting with Vue 3, I recommend you to start writing some simple composition functions (or _composites_), and once you're comfortable with them, start writting **all of your stateful logic** this way.
+If you're starting with Vue 3, I recommend you to start writing some simple composition functions (or _composables_), and once you're comfortable with them, start writting **all of your stateful logic** this way.
 
 Good luck, and keep learning ✌️
 
