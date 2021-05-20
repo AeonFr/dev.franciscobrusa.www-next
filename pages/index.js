@@ -6,6 +6,12 @@ import indexStyles from "../styles/Index.module.css";
 
 const posts = [
   {
+    slug: "refactoring-to-vue-3",
+    title: "Refactoring to Vue 3",
+    excerpt:
+      "Using the Composition API to express reusable stateful logic in VueJS",
+  },
+  {
     slug: "service-workers-cache",
     title: "The Service Workers Cache API and the Fetch Event",
     excerpt:
