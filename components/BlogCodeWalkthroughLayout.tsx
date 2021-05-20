@@ -172,7 +172,7 @@ const Step = dynamic(
             style={{
               display: "grid",
               gridTemplateColumns:
-                !isMobile && (codeBlock || image) ? "1fr 1fr" : "1fr",
+                !isMobile && (codeBlock || image) ? "1fr 1fr" : "100%",
               gap: "2rem",
               padding: "2rem 0",
               alignItems: "center",
