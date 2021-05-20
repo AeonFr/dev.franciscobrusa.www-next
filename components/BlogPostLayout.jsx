@@ -1,5 +1,3 @@
-import Head from "next/head";
-import { Helmet } from "react-helmet";
 import { MDXProvider } from "@mdx-js/react";
 import Layout from "./Layout";
 import Container from "./Container";
@@ -26,14 +24,7 @@ export const components = {
 
 export default function BlogPostLayout({ title, language, children }) {
   return (
-    <Layout>
-      <Helmet>
-        <html lang={language || "en"} />
-      </Helmet>
-      <Head>
-        <title>{title}</title>
-      </Head>
-
+    <Layout title={title} language={language}>
       <Container>
         <MDXProvider components={components}>
           <article className={blogPostStyles["Post-article"]}>

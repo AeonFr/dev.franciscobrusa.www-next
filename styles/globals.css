@@ -16,6 +16,7 @@ body {
   --medium-gray: #9194a2;
   --dark-gray: #565869;
   --black: #282a36;
+  --blacker-than-black: #1d1e25;
   --light-red: #ff5c57;
   --dark-red: #ff5c57;
   --light-green: #59f78d;
@@ -53,7 +54,7 @@ body {
 
 .theme-snazzy.scheme-dark {
   /* website settings */
-  --bg: var(--black);
+  --bg: var(--blacker-than-black);
   --color: var(--light-gray);
   --accent: var(--light-teal);
   --code-bg: var(--black);

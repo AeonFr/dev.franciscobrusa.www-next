@@ -1,12 +1,20 @@
 import Link from "next/link";
-// import "./font.css";
+import Head from "next/head";
+import { Helmet } from "react-helmet";
 import layoutClasses from "../styles/Layout.module.css";
 
 export default Layout;
 
-function Layout({ children }) {
+function Layout({ children, title, language }) {
   return (
     <div className={layoutClasses["App"]}>
+      <Helmet>
+        <html lang={language || "en"} />
+      </Helmet>
+      <Head>
+        <title>{title}</title>
+      </Head>
+
       <header className={layoutClasses["App-frame"]}>
         <Link href="/">
           <a

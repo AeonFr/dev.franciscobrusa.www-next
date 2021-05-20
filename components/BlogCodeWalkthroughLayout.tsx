@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 import blogPostStyles from "../styles/BlogPostLayout.module.css";
 import { components } from "./BlogPostLayout";
 
-export default function BlogCodeWalkthrough({ children }) {
+export default function BlogCodeWalkthrough({ children, metadata }) {
   const steps = useMemo(
     () => divideIntoSteps(children).map(parseStep),
     [children]
@@ -69,7 +69,7 @@ export default function BlogCodeWalkthrough({ children }) {
   }, [isInPresentationMode, currentSlide, steps]);
 
   return (
-    <Layout>
+    <Layout {...metadata}>
       <div ref={rootRef} style={{ backgroundColor: "var(--bg)" }}>
         <MDXProvider components={components}>
           {!isInPresentationMode ? (
@@ -137,6 +137,13 @@ const Step = dynamic(
       () => steps[currentStep - 1] && !steps[currentStep - 1]?.codeBlock,
       [steps, currentStep]
     );
+    const isOnlyStepWithCode = useMemo(
+      () =>
+        isFirstStepWithCode &&
+        steps[currentStep + 1] &&
+        !steps[currentStep + 1]?.codeBlock,
+      [isFirstStepWithCode, steps, currentStep]
+    );
     const subSteps = useMemo(() => {
       let result = [];
 
@@ -157,7 +164,7 @@ const Step = dynamic(
     );
 
     // mobile version, no codeblock version & presentation mode: show every step one at a time
-    if (isInPresentationMode || !codeBlock || isMobile) {
+    if (isInPresentationMode || isOnlyStepWithCode || !codeBlock || isMobile) {
       return (
         <Container style={{ maxWidth: "100%" }}>
           <div
@@ -168,6 +175,7 @@ const Step = dynamic(
                 !isMobile && (codeBlock || image) ? "1fr 1fr" : "1fr",
               gap: "2rem",
               padding: "2rem 0",
+              alignItems: "center",
               ...(isInPresentationMode
                 ? {
                     position: "fixed",
@@ -237,6 +245,8 @@ const Step = dynamic(
                     subSteps[i + 1] !== undefined
                       ? "100vh"
                       : subStepsEditorProps[i].style.height,
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
                 <InView
@@ -254,7 +264,7 @@ const Step = dynamic(
                   }}
                   children={<span />}
                 />
-                {restOfChildren}
+                <div>{restOfChildren}</div>
               </div>
             );
           })}
@@ -273,6 +283,8 @@ const Step = dynamic(
                 top: "1rem",
                 height: "calc(100vh - 3rem)",
                 overflowY: "auto",
+                display: "flex",
+                alignItems: "center",
               }}
             >
               <MiniEditorWithState
@@ -337,7 +349,7 @@ function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
       height:
         Math.max(
           7,
-          codeBlock.props.children.props.children.split("\n").length * 1.4
+          codeBlock.props.children.props.children.split("\n").length * 1.5
         ) + "rem",
       maxHeight: "90vh",
     },
