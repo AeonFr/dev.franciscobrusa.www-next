@@ -123,7 +123,8 @@ interface StepProps {
 
 const Step = dynamic(
   Promise.resolve(({ currentStep, steps, isInPresentationMode }: StepProps) => {
-    const { restOfChildren, codeBlock, image } = steps[currentStep];
+    const { originalChildren, restOfChildren, codeBlock, image } =
+      steps[currentStep];
 
     const miniEditorProps: StatefulEditorProps = useMemo(
       () => (codeBlock ? getEditorProps(codeBlock) : null),
@@ -191,7 +192,13 @@ const Step = dynamic(
                 : {}),
             }}
           >
-            {codeBlock ? (
+            {!isInPresentationMode ? (
+              originalChildren.map((child) => {
+                if (child.props.mdxType === "pre") {
+                  return <MiniEditorWithState {...miniEditorProps} />;
+                } else return child;
+              })
+            ) : codeBlock ? (
               <>
                 <div>{restOfChildren}</div>
                 <div
@@ -309,6 +316,7 @@ const Step = dynamic(
 );
 
 interface StepWithExtractedCodeBlock {
+  originalChildren: React.ReactElement[];
   restOfChildren: React.ReactElement[];
   codeBlock?: React.ReactElement;
   image?: React.ReactElement;
@@ -318,12 +326,14 @@ function parseStep(children: React.ReactElement[]): StepWithExtractedCodeBlock {
   const c = React.Children.toArray(children);
 
   let result: StepWithExtractedCodeBlock = {
+    originalChildren: [],
     restOfChildren: [],
     codeBlock: null,
     image: null,
   };
 
   c.forEach((child: React.ReactElement) => {
+    result.originalChildren.push(child);
     if (child.props.mdxType === "pre" && !result.codeBlock) {
       result.codeBlock = child;
     } else if (child.props.mdxType === "img" && !result.image) {
