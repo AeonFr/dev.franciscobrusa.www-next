@@ -118,7 +118,7 @@ function divideIntoSteps(
 interface StepProps {
   currentStep: number;
   steps: ReturnType<typeof parseStep>[];
-  isInPresentationMode?: bool;
+  isInPresentationMode?: boolean;
 }
 
 const Step = dynamic(
