@@ -193,11 +193,13 @@ const Step = dynamic(
             }}
           >
             {!isInPresentationMode ? (
-              originalChildren.map((child) => {
-                if (child.props.mdxType === "pre") {
-                  return <MiniEditorWithState {...miniEditorProps} />;
-                } else return child;
-              })
+              <div>
+                {originalChildren.map((child) => {
+                  if (child.props.mdxType === "pre") {
+                    return <MiniEditorWithState {...miniEditorProps} />;
+                  } else return child;
+                })}
+              </div>
             ) : codeBlock ? (
               <>
                 <div>{restOfChildren}</div>
