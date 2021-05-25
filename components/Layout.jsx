@@ -5,7 +5,7 @@ import layoutClasses from "../styles/Layout.module.css";
 
 export default Layout;
 
-function Layout({ children, title, language }) {
+function Layout({ children, title, language, socialImage, description }) {
   return (
     <div className={layoutClasses["App"]}>
       <Helmet>
@@ -13,6 +13,29 @@ function Layout({ children, title, language }) {
       </Helmet>
       <Head>
         <title>{title}</title>
+
+        {description && (
+          <>
+            <meta name="description" content={description} />
+            <meta property="og:description" content={description} />
+          </>
+        )}
+
+        {socialImage && (
+          <>
+            <meta name="image" content={process.env.baseURL + socialImage} />
+            <meta
+              property="og:image"
+              content={process.env.baseURL + socialImage}
+            />
+            <meta
+              name="twitter:image"
+              content={process.env.baseURL + socialImage}
+            />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:creator" content="@FranCanoBr" />
+          </>
+        )}
       </Head>
 
       <header className={layoutClasses["App-frame"]}>
