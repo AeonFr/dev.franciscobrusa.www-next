@@ -1,6 +1,8 @@
 export const metadata = {
   title: "On writing documentation",
   date: "2020-08-05T20:36",
+  description:
+    "Writing documentation is relatively easy, but writing maintainable and useful documentation not so much.",
 };
 
 import BlogPostLayout from "../../components/BlogPostLayout";
@@ -8,7 +10,9 @@ export default ({ children }) => (
   <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
 );
 
-export const separatorStyles = { borderTop: "8px groove var(--accent)" };
+export const separatorStyles = {
+  borderTop: "8px groove var(--accent)",
+};
 export const highlightedContentStyles = {
   fontSize: "1.25em",
   fontWeight: "light",

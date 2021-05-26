@@ -1,6 +1,18 @@
-export const metadata = { title: "Refactoring to Vue 3", socialImage: "/blog/refactoring-to-vue-3/social-image.png", description: "Using the composition API to express reusable stateful logic in VueJS" };
+export const metadata = {
+  title: "Refactoring to Vue 3",
+  date: "2021-05-20",
+  socialImage:
+    "/blog/refactoring-to-vue-3/social-image.png",
+  description:
+    "Using the composition API to express reusable stateful logic in VueJS",
+};
 import BlogCodeWalkthroughLayout from "../../components/BlogCodeWalkthroughLayout";
-export default (props) => <BlogCodeWalkthroughLayout {...props} metadata={metadata} />;
+export default (props) => (
+  <BlogCodeWalkthroughLayout
+    {...props}
+    metadata={metadata}
+  />
+);
 
 # Refactoring to Vue&nbsp;3
 
@@ -38,7 +50,11 @@ UI = fn(state);
 
 For example, if we have a Button that retrieves data from the server and updates a list of items, the **state** would be the retrieved data.
 
-<img src="/blog/refactoring-to-vue-3/state-stream.svg" alt="Visual representation of a data stream (described below)" style={{backgroundColor: "#ffffff"}}/>
+<img
+  src="/blog/refactoring-to-vue-3/state-stream.svg"
+  alt="Visual representation of a data stream (described below)"
+  style={{ backgroundColor: "#ffffff" }}
+/>
 
 ---
 

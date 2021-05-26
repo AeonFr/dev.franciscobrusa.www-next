@@ -4,50 +4,13 @@ import Layout from "../components/Layout";
 import Container from "../components/Container";
 import indexStyles from "../styles/Index.module.css";
 
-const posts = [
-  {
-    slug: "refactoring-to-vue-3",
-    title: "Refactoring to Vue 3",
-    excerpt:
-      "Using the Composition API to express reusable stateful logic in VueJS",
-  },
-  {
-    slug: "service-workers-cache",
-    title: "The Service Workers Cache API and the Fetch Event",
-    excerpt:
-      "A Service Worker is a script that runs in a different environment than the browser, running only once per domain instead of once per tab...",
-  },
-  {
-    slug: "on-writing-documentation",
-    title: "On writing documentation",
-    excerpt:
-      "Writing documentation is relatively easy, but writing maintainable and useful documentation not so much.",
-  },
-  {
-    slug: "setting-up-visual-studio-code-to-work-with-php",
-    title: "Setting up Visual Studio Code to work with PHP",
-  },
-  {
-    slug: "history-of-react",
-    title: "History of React and Modern JS Frameworks",
-    excerpt:
-      "A lot of the apps that we use everyday already existed back in 2008, but they didn’t look like they do today.",
-  },
-  {
-    slug: "arquitectura-de-la-informacion-en-el-desarrollo-web",
-    title: "Arquitectura de la Información en el Desarrollo Web",
-    excerpt:
-      "La Arquitectura de la Información (IA, por sus siglas en inglés) es una actividad encargada de diseñar cómo las cosas que nos rodean se convierten en información.",
-  },
-  {
-    slug: "design-thinking",
-    title: "Dos métodos del Design Thinking",
-    excerpt:
-      "El Design Thinking se puede entender como una filosofía de diseño o un framework (estructura), que agrupa métodos de diseño y herramientas de investigación en diseño.",
-  },
-];
+export function getStaticProps() {
+  const getPostsMetadata = require("../build/getPostsMetadata");
 
-export default function Home() {
+  return { props: { posts: getPostsMetadata() } };
+}
+
+export default function Home({ posts }) {
   return (
     <Layout>
       <Head>
@@ -66,7 +29,8 @@ export default function Home() {
               <Link href={`/blog/${post.slug}`}>
                 <a className={indexStyles["Home-link"]}>{post.title}</a>
               </Link>
-              <p className={indexStyles["Home-excerpt"]}>{post.excerpt}</p>
+              {post.lang == "es" ? <span title="Español">🇪🇸</span> : ""}
+              <p className={indexStyles["Home-excerpt"]}>{post.description}</p>
             </li>
           ))}
         </ul>

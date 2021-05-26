@@ -1,10 +1,12 @@
 {
   "tabWidth": 2,
   "useTabs": false,
-  "overrides": [{
-    "files": "*.mdx",
-    "options": {
-      "printWidth": 60
+  "overrides": [
+    {
+      "files": "*.mdx",
+      "options": {
+        "printWidth": 60
+      }
     }
-  }]
+  ]
 }
