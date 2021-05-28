@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { Helmet } from "react-helmet";
+import { useEffect, useMemo } from "react";
 
 export default function ColorSchemePicker({
   scheme,
@@ -12,11 +11,12 @@ export default function ColorSchemePicker({
       : "theme-snazzy scheme-light";
   }, [scheme]);
 
+  useEffect(() => {
+    window.document.documentElement.className = htmlClasses;
+  }, [htmlClasses]);
+
   return (
     <div {...props}>
-      <Helmet>
-        <html lang="en" class={htmlClasses} />
-      </Helmet>
       <label aria-label="Use light color scheme">
         <input
           type="radio"
