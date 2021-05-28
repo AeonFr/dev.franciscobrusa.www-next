@@ -944,7 +944,7 @@ We could write a new _composable_ to use this API, adding event listeners in the
 
 But why do it if someone else already did it before?
 
-Luckly, the open-source community has published thousands of carefully crafter composition functions, mostly wrappers around browser APIs.
+Luckily, some npm libraries provide composition functions to wrap common browser APIs (and to do much more).
 
 ---
 
@@ -982,10 +982,6 @@ Now I know what you're thinking. This all sounds too good, but you're stuck in a
 
 In order to make the migration to Vue 3 easier, the Vue Core team developed a standalone package that brings the composition API to Vue 2.
 
-<!-- wrapping in a div to prevent column layout -->
-
-<div>
-
 ```js
 import { ref } from "@vue/composition-api";
 
@@ -996,12 +992,9 @@ const useWindowWidth = () => {
 };
 ```
 
-</div>
-
 When updating to Vue 3, just change the import to:  
-`import { ref } from "vue"`
-
-And everything should keep working!
+`import { ref } from "vue"`  
+...and everything should keep working.
 
 <div style={{ fontSize: "0.7em" }}>
 

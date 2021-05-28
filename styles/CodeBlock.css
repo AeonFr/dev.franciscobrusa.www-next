@@ -153,3 +153,7 @@ pre[class*="language-"] > code[class*="language-"] {
 .ch-editor-body code {
   padding: 0;
 }
+.ch-editor-tab {
+  background-color: transparent;
+  cursor: initial;
+}
