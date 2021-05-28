@@ -1,16 +1,17 @@
 import Link from "next/link";
 import Head from "next/head";
-import { Helmet } from "react-helmet";
 import layoutClasses from "../styles/Layout.module.css";
+import { useEffect } from "react";
 
 export default Layout;
 
-function Layout({ children, title, language, socialImage, description }) {
+function Layout({ children, title, lang, socialImage, description }) {
+  useEffect(() => {
+    window.document.documentElement.setAttribute("lang", lang || "en");
+  }, [lang]);
+
   return (
     <div className={layoutClasses["App"]}>
-      <Helmet>
-        <html lang={language || "en"} />
-      </Helmet>
       <Head>
         <title>{title}</title>
 

@@ -22,9 +22,9 @@ export const components = {
   a: (props) => <a {...props} target="_blank" rel="noopen noreferer" />,
 };
 
-export default function BlogPostLayout({ title, language, children }) {
+export default function BlogPostLayout({ children, ...metadata }) {
   return (
-    <Layout title={title} language={language}>
+    <Layout {...metadata}>
       <Container>
         <MDXProvider components={components}>
           <article className={blogPostStyles["Post-article"]}>
