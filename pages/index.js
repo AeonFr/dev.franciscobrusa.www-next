@@ -5,7 +5,7 @@ import Container from "../components/Container";
 import indexStyles from "../styles/Index.module.css";
 
 export function getStaticProps() {
-  const getPostsMetadata = require("../build/getPostsMetadata");
+  const { getPostsMetadata } = require("../utils/postsMetadata");
 
   return { props: { posts: getPostsMetadata() } };
 }
