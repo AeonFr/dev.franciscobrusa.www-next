@@ -6,6 +6,7 @@ import Head from "next/head";
 import ColorSchemePicker from "../components/layout/ColorSchemePicker";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { useCallback } from "react";
+import layoutStyles from "../styles/Layout.module.css";
 
 function MyApp({ Component, pageProps }) {
   const [scheme, setScheme] = useColorScheme();
@@ -36,18 +37,21 @@ function MyApp({ Component, pageProps }) {
         />
       </Head>
 
-      <ColorSchemePicker
-        scheme={scheme}
-        handleSchemeChange={handleSchemeChange}
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          paddingTop: "1rem",
-          paddingRight: "1rem",
-          fontSize: "1.5rem",
-        }}
-      />
+      <div
+        style={{ position: "relative", borderTop: "3px solid var(--accent)" }}
+        className={layoutStyles["App-frame"]}
+      >
+        <ColorSchemePicker
+          scheme={scheme}
+          handleSchemeChange={handleSchemeChange}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            fontSize: "1.5rem",
+          }}
+        />
+      </div>
       <Component {...pageProps} />
     </>
   );

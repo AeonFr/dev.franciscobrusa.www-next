@@ -1,0 +1,30 @@
+.root {
+  margin-right: 1rem; /* compensate for scrollbar */
+}
+
+.root input[type="radio"] {
+  display: none;
+}
+.root label {
+  display: inline-flex;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.root svg {
+  width: 1em;
+  height: 1em;
+}
+
+@media (min-width: 40rem) {
+  .root label {
+    margin: 1.5rem 0.25rem;
+  }
+}
+
+.root input:checked + label {
+  border-radius: 99px;
+  background-color: var(--color);
+  color: var(--bg);
+  background-color: var(--accent);
+}
