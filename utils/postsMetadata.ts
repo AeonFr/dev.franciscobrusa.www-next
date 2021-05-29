@@ -2,10 +2,12 @@ import fs from "fs";
 
 const normalizedPath = require("path").join("./", "./pages/blog/");
 
-interface PostMetadata {
+export interface PostMetadata {
   title: string;
   slug: string;
   date: string;
+  lang?: "es" | "en" | string;
+  socialImage?: string;
   [key: string]: any;
 }
 

@@ -2,10 +2,22 @@ import Link from "next/link";
 import Head from "next/head";
 import layoutClasses from "../styles/Layout.module.css";
 import { useEffect } from "react";
+import type { PostMetadata } from "../utils/postsMetadata";
 
-export default Layout;
+interface LayoutProps {
+  title: PostMetadata["title"];
+  lang: PostMetadata["lang"];
+  socialImage: PostMetadata["socialImage"];
+  description: PostMetadata["description"];
+}
 
-function Layout({ children, title, lang, socialImage, description }) {
+const Layout: React.FC<LayoutProps> = ({
+  children,
+  title,
+  lang,
+  socialImage,
+  description,
+}) => {
   useEffect(() => {
     window.document.documentElement.setAttribute("lang", lang || "en");
   }, [lang]);
@@ -73,4 +85,6 @@ function Layout({ children, title, lang, socialImage, description }) {
       </footer>
     </div>
   );
-}
+};
+
+export default Layout;
