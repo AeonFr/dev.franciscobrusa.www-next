@@ -52,8 +52,11 @@ For example, if we have a Button that retrieves data from the server and updates
 
 <img
   src="/blog/refactoring-to-vue-3/state-stream.svg"
-  alt="Visual representation of a data stream (described below)"
-  style={{ backgroundColor: "#ffffff" }}
+  alt="Visual representation of a data stream (described above)"
+  style={{
+    backgroundColor: "#ffffff",
+    maxWidth: "40rem",
+  }}
 />
 
 ---
@@ -65,6 +68,15 @@ For example, if we have a Button that retrieves data from the server and updates
 </div>
 
 In this example, we call **stateful logic** to the click event handler, the data fetching process, etc.
+
+<img
+  src="/blog/refactoring-to-vue-3/stateful-logic.svg"
+  alt="The stateful logic would include: the click stream, the retrieval of state from the server on click, and the logic that updates state when data is retrieved from the server"
+  style={{
+    backgroundColor: "#ffffff",
+    maxWidth: "40rem",
+  }}
+/>
 
 ---
 
@@ -519,21 +531,64 @@ Since a method is just a function, to replace our methods we can create a functi
 
 ---
 
-<div>
-
 Notice how the `windowWidth` _ref_ is mutated by changing it's `value` property.
 
-```js
-const calculateWindowWidth = () => {
-  windowWidth.value = window.innerWidth;
-};
+```html 11:16
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    return {
+      windowWidth,
+      calculateWindowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth, calculateWindowWidth } =
+        useWindowWidth();
+
+      return {
+        windowWidth,
+        calculateWindowWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
 ```
 
-A very common mistake beginners make is to change the `windowWidth` value directly. This would make the object loose all reactivity.
+A very common mistake to make in the beginning is to change the `windowWidth` value directly. But this would make the object loose all reactivity.
 
 _Refs_ are actually objects that wrap values inside. There are good reasons why the Vue developers choose on these implementation details, [you can read more about it here](https://v3.vuejs.org/guide/composition-api-introduction.html#reactive-variables-with-ref).
-
-</div>
 
 ---
 
@@ -1012,8 +1067,6 @@ The potential of the composition API is huge to make your code more reusable.
 Once you're familiar with this new API, you will see that it's a solid pattern that can scale well, and has even the potential to replace Vuex entirely from your application and become a centralized state management solution. (But that's maybe a topic for another article).
 
 If you're starting with Vue 3, I recommend you to start writing some simple composition functions (or _composables_), and once you're comfortable with them, start writing **all of your stateful logic** this way.
-
-Good luck, and keep learning ✌️
 
 ---
 
