@@ -155,14 +155,6 @@ const PresentationModeStep: React.FC<StepProps> = ({ currentStep, steps }) => {
 };
 
 const DesktopStep: React.FC<StepProps> = ({ currentStep, steps }) => {
-  const { originalChildren, restOfChildren, codeBlock, image } =
-    steps[currentStep];
-
-  const miniEditorProps: StatefulEditorProps = useMemo(
-    () => (codeBlock ? getEditorProps(codeBlock) : null),
-    [codeBlock]
-  );
-
   // for the desktop version
   const [inViewStep, setInViewStep] = useState(0);
   const [inViewSubstep, setInViewSubstep] = useState(0);
@@ -194,6 +186,7 @@ const DesktopStep: React.FC<StepProps> = ({ currentStep, steps }) => {
   // The desktop layout can just be a simple layout for steps
   // that have no codeblock or that are the only ones with code
   // of their kind
+  const { codeBlock } = steps[currentStep];
   if (!codeBlock || isOnlyStepWithCode) {
     return <BasicStep currentStep={currentStep} steps={steps} />;
   }
@@ -276,14 +269,16 @@ const DesktopStep: React.FC<StepProps> = ({ currentStep, steps }) => {
             <MiniEditorWithState
               {...(inViewStep === currentStep
                 ? subStepsEditorProps[inViewSubstep]
-                : miniEditorProps)}
-              style={{
-                ...(inViewStep === currentStep
-                  ? subStepsEditorProps[inViewSubstep]
-                  : miniEditorProps
-                ).style,
-                width: "100%",
-              }}
+                : {})}
+              style={
+                inViewStep === currentStep
+                  ? {
+                      ...subStepsEditorProps[inViewSubstep]?.style,
+                      minHeight:
+                        subStepsEditorProps[inViewSubstep - 1]?.style.height,
+                    }
+                  : undefined
+              }
             />
           </div>
         </div>
@@ -343,6 +338,7 @@ function getEditorProps(codeBlock: React.ReactElement): StatefulEditorProps {
     style: {
       height: Math.max(7, linesCount * 1.5) + "rem",
       maxHeight: "90vh",
+      width: "100%",
     },
   };
 }
