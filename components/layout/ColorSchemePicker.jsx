@@ -29,14 +29,14 @@ export default function ColorSchemePicker({
         checked={scheme === "light"}
         onChange={handleSchemeChange}
       />
-      <label aria-label="Use light color scheme" for="color-scheme-light">
+      <label aria-label="Use light color scheme" htmlFor="color-scheme-light">
         <svg
           viewBox="0 0 24 24"
           stroke="currentColor"
-          stroke-width="3"
+          strokeWidth="3"
           fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -57,14 +57,14 @@ export default function ColorSchemePicker({
         checked={scheme === "dark"}
         onChange={handleSchemeChange}
       />
-      <label aria-label="Use dark color scheme" for="color-scheme-dark">
+      <label aria-label="Use dark color scheme" htmlFor="color-scheme-dark">
         <svg
           viewBox="0 0 24 24"
           stroke="currentColor"
-          stroke-width="3"
+          strokeWidth="3"
           fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
