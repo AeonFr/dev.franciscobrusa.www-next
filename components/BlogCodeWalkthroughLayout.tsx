@@ -225,7 +225,14 @@ const DesktopStep: React.FC<StepProps> = ({ currentStep, steps }) => {
                     ? "100vh"
                     : subStepsEditorProps[i].style.height,
                 display: "flex",
-                alignItems: "center",
+                ...(subSteps[i + 1] !== undefined
+                  ? {
+                      minHeight: "100vh",
+                      alignItems: "center",
+                    }
+                  : {
+                      minHeight: subStepsEditorProps[i].style.height,
+                    }),
               }}
             >
               <InView

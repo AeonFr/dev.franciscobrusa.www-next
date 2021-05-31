@@ -782,7 +782,61 @@ We can use `onMounted` and `onBeforeUnmount` to move this event listeners into o
 
 ---
 
-After all these changes, the **options** part of our Vue component looks almost empty.
+After all these changes, all the stateful logic is now encapsulated, abstracted away, inside `useWindowWidth()`.
+
+```html 6:38
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref, onMounted, onBeforeUnmount } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    const calculateWindowWidthThrottled = throttle(
+      calculateWindowWidth,
+      200
+    );
+
+    onMounted(() => {
+      window.addEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    return {
+      windowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth } = useWindowWidth();
+
+      return {
+        windowWidth,
+      };
+    },
+  };
+</script>
+```
+
+---
 
 At the end, we only need to import the `windowWidth` variable from our composition function...
 
@@ -840,63 +894,7 @@ At the end, we only need to import the `windowWidth` variable from our compositi
 
 ---
 
-All the logic is encapsulated, abstracted away, inside `useWindowWidth()`.
-
-```html 6:38
-<template>
-  <div>Window width is: {{ windowWidth }}</div>
-</template>
-
-<script>
-  import throttle from "lodash/throttle";
-  import { ref, onMounted, onBeforeUnmount } from "vue";
-
-  function useWindowWidth() {
-    const windowWidth = ref(window.innerWidth);
-
-    const calculateWindowWidth = () => {
-      windowWidth.value = window.innerWidth;
-    };
-
-    const calculateWindowWidthThrottled = throttle(
-      calculateWindowWidth,
-      200
-    );
-
-    onMounted(() => {
-      window.addEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
-    });
-
-    onBeforeUnmount(() => {
-      window.removeEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
-    });
-
-    return {
-      windowWidth,
-    };
-  }
-
-  export default {
-    setup() {
-      const { windowWidth } = useWindowWidth();
-
-      return {
-        windowWidth,
-      };
-    },
-  };
-</script>
-```
-
----
-
-In fact, we will extract our composition function into it's own file to clean up our component. (And to make the function easier to reuse in other components).
+In fact, we can extract our composition function into it's own file to clean up our component. (And to make the function easier to reuse in other components).
 
 ```html
 <template>
