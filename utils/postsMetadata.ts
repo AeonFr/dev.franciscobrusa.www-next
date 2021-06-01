@@ -1,6 +1,5 @@
 import fs from "fs";
-
-const normalizedPath = require("path").join("./", "./pages/blog/");
+import { join } from "path";
 
 export interface PostMetadata {
   title: string;
@@ -11,13 +10,15 @@ export interface PostMetadata {
   [key: string]: any;
 }
 
+const blogDirectory = join(process.cwd(), "pages/blog");
+
+// @ts-expect-error webpack typings not be
+const context = require.context("../pages/blog", false, /\.mdx$/);
+
 export function getPostsMetadata() {
   const results: PostMetadata[] = [];
 
-  // @ts-expect-error webpack typings not be
-  const context = require.context("../pages/blog", false, /\.mdx$/);
-
-  fs.readdirSync(normalizedPath).forEach(function (file: string) {
+  fs.readdirSync(blogDirectory).forEach(function (file: string) {
     if (!file || !file.endsWith(".mdx")) return;
 
     const { metadata } = context("./" + file);
