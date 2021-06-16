@@ -4,6 +4,7 @@ import {
   MiniEditorWithState,
   StatefulEditorProps,
 } from "@code-hike/mini-editor";
+import "@code-hike/mini-editor/dist/index.css";
 import { InView } from "react-intersection-observer";
 import Layout from "./Layout";
 import Container from "./Container";

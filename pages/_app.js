@@ -1,5 +1,4 @@
 import "../styles/globals.css";
-import "@code-hike/mini-editor/dist/index.css";
 import "../styles/CodeBlock.css";
 
 import Head from "next/head";
