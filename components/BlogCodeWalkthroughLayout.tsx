@@ -54,6 +54,20 @@ export default function BlogCodeWalkthrough({ children, metadata }) {
           )}
         </MDXProvider>
       </div>
+
+      <style jsx global>{`
+        /* quick fix for MiniEditor */
+        .ch-editor-body {
+          background-color: var(--code-bg);
+        }
+        .ch-editor-body code {
+          padding: 0;
+        }
+        .ch-editor-tab {
+          background-color: transparent;
+          cursor: initial;
+        }
+      `}</style>
     </Layout>
   );
 }
