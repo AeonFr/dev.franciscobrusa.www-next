@@ -1,0 +1,195 @@
+export const metadata = {
+  title:
+    "Why you should never generate color palettes using sass' functions like darken()",
+  date: "2021-07-02",
+  description:
+    'Using "math" to generate color palettes, the right way.',
+  isDraft: true,
+};
+
+import BlogPostLayout from "../../components/BlogPostLayout";
+export default ({ children }) => (
+  <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+);
+
+import { ColorPalette } from "../../components/blog/mathematically-approved-color-palettes/ColorPalette";
+import {
+  SaturationSlider,
+  HueSlider,
+} from "../../components/blog/mathematically-approved-color-palettes/ColorSliders";
+
+<h1
+  style={{
+    maxWidth: "40rem",
+    fontSize: "2.5rem",
+    backgroundImage:
+      "linear-gradient(90deg, var(--accent, #00DBDE) 0%, var(--function, #FC00FF) 100%)",
+    backgroundClip: "text",
+    "-webkit-background-clip": "text",
+    textFillColor: "transparent",
+    "-webkit-text-fill-color": "transparent",
+  }}
+>
+  {metadata.title}
+</h1>
+
+The `hsl()` function is a CSS function used to express any hexadecimal color. It receives three arguments: Hue, Saturation and Luminosity (hence it's name).
+
+You could easily create color palettes this way. For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a white to black gradient...
+
+<div style={{fontSize: '0.8em'}}>
+
+```css
+.palette.gray .step:nth-child(1) {
+  background-color: hsl(0, 0%, 0%);
+}
+.palette.gray .step:nth-child(2) {
+  background-color: hsl(0, 0%, 10%);
+}
+.palette.gray .step:nth-child(3) {
+  background-color: hsl(0, 0%, 20%);
+}
+.palette.gray .step:nth-child(4) {
+  background-color: hsl(0, 0%, 30%);
+}
+// ...
+```
+
+</div>
+
+You can easily create [for-loops in Sass](https://sass-lang.com/documentation/at-rules/control/for) and use them to automate the code above.
+
+<div style={{fontSize: '0.8em'}}>
+
+```scss
+.palette.gray {
+  $hue: 0;
+  $saturation: 0%;
+  @for $i from 0 through 10 {
+    .step:nth-child(#{$i + 1}) {
+      background-color: hsl($hue, $saturation, $i * 10%);
+    }
+  }
+}
+```
+
+</div>
+
+The result looks like this:
+
+<p
+  className="codepen"
+  data-height="170"
+  data-slug-hash="BaRRrRZ"
+  data-editable="true"
+  data-user="frankno"
+  style={{
+    height: "170px",
+    boxSizing: "border-box",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "2px solid",
+    margin: "1em 0",
+    padding: "1em",
+  }}
+>
+  <span>
+    See the Pen{" "}
+    <a href="https://codepen.io/frankno/pen/BaRRrRZ">
+      SASS playground
+    </a>{" "}
+    by francisco (
+    <a href="https://codepen.io/frankno">@frankno</a>) on{" "}
+    <a href="https://codepen.io">CodePen</a>.
+  </span>
+</p>
+<script
+  async
+  src="https://cpwebassets.codepen.io/assets/embed/ei.js"
+></script>
+
+We can also use JSX to express this color palette, with a component like this:
+
+<div style={{fontSize: '0.8em'}}>
+
+<!-- prettier-ignore -->
+```jsx
+export const ColorPalette = ({ hue = 0, saturation = 0 }) => {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(11, 1fr)" }}>
+      {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((step) => (
+        <div
+          key={step}
+          style={{
+            backgroundColor: `hsl(${hue}, ${saturation}%, ${step}%)`,
+            height: "100%",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+```
+
+</div>
+
+<ColorPalette />
+
+So far so good, right? Let's try to apply this to generate palettes in different colors (besides gray)
+
+If we increase the color's **saturation**, (the **s** in **hsl()**) we can see how color starts to appear. In this case, since our hue is 0, we will see the color <strong style={{ color: "red" }}>red</strong>.
+
+Try it yourself: move the saturation slider until you see red fill up the box.
+
+<SaturationSlider />
+
+We can also increase **hue** (the **h** in **hsl()**), using values from 0 to 360, to get all the color spectrum, from red to green, then from green to blue, and then from blue to red again.
+
+<HueSlider />
+
+Given all we've discovered so far, we could try to create palettes this way. In fact, let's generate a palette for each hue, from 0 to 360, in steps of 90.
+
+```jsx
+<ColorPalette hue={0} saturation={100} />
+<ColorPalette hue={90} saturation={100} />
+<ColorPalette hue={180} saturation={100} />
+<ColorPalette hue={270} saturation={100} />
+<ColorPalette hue={360} saturation={100} />
+```
+
+<ColorPalette hue={0} saturation={100} />
+<ColorPalette hue={90} saturation={100} />
+<ColorPalette hue={180} saturation={100} />
+<ColorPalette hue={270} saturation={100} />
+<ColorPalette hue={360} saturation={100} />
+
+The result we would get surely must be a harmonic color palette, right?
+
+Well, as we can see, not so much.
+
+At the 50% luminosity step, for some colors we could easily <span style={{ backgroundColor: 'white', color: 'hsl(0, 100%, 50%)' }}>paint them on a white background</span> and they would still be legible, but for others we have to <span style={{ backgroundColor: 'black', color: 'hsl(180, 100%, 50%)' }}>paint them on a black background</span> to make them legible.
+
+Other colors have steps that are almost impossible to distinguish, so while a 50% red is clearly different than a 60% red, a 50% yellow is almost the same as a 60% yellow.
+
+<!-- TODO -->
+
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+  }}
+>
+  <div
+    style={{ backgroundColor: "", paddingBottom: "100%" }}
+  />
+</div>
+
+<div style={{ fontSize: '1.2em' }}>
+
+Therefore, **his palette is not reliable** to generate button variants or other UI styles. But we've got the math right; **so what is it that went wrong?** And, most importantly, **how can we get it right?**
+
+</div>
+
+## Understanding color

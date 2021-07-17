@@ -24,15 +24,19 @@ export default function Home({ posts }) {
 
       <Container>
         <ul className={indexStyles["Home"]}>
-          {posts.map((post) => (
-            <li key={post.slug} className={indexStyles["Home-post-block"]}>
-              <Link href={`/blog/${post.slug}`}>
-                <a className={indexStyles["Home-link"]}>{post.title}</a>
-              </Link>
-              {post.lang == "es" ? <span title="Español">🇪🇸</span> : ""}
-              <p className={indexStyles["Home-excerpt"]}>{post.description}</p>
-            </li>
-          ))}
+          {posts
+            .filter(({ isDraft }) => !isDraft)
+            .map((post) => (
+              <li key={post.slug} className={indexStyles["Home-post-block"]}>
+                <Link href={`/blog/${post.slug}`}>
+                  <a className={indexStyles["Home-link"]}>{post.title}</a>
+                </Link>
+                {post.lang == "es" ? <span title="Español">🇪🇸</span> : ""}
+                <p className={indexStyles["Home-excerpt"]}>
+                  {post.description}
+                </p>
+              </li>
+            ))}
         </ul>
       </Container>
     </Layout>
