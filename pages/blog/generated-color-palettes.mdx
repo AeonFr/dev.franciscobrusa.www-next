@@ -1,9 +1,8 @@
 export const metadata = {
-  title:
-    "Why you should never generate color palettes using sass' functions like darken()",
+  title: "Generating color palettes with code",
   date: "2021-07-02",
   description:
-    'Using "math" to generate color palettes, the right way.',
+    "Why you should never generate color palettes using sass' functions like darken() or do math with hsl()",
   isDraft: true,
 };
 
@@ -20,8 +19,8 @@ import {
 
 <h1
   style={{
-    maxWidth: "40rem",
-    fontSize: "2.5rem",
+    maxWidth: "35rem",
+    fontSize: "2.5em",
     backgroundImage:
       "linear-gradient(90deg, var(--accent, #00DBDE) 0%, var(--function, #FC00FF) 100%)",
     backgroundClip: "text",
@@ -33,9 +32,12 @@ import {
   {metadata.title}
 </h1>
 
-The `hsl()` function is a CSS function used to express any hexadecimal color. It receives three arguments: Hue, Saturation and Luminosity (hence it's name).
+The `hsl()` function is a CSS function used to express any hexadecimal color. It's called hsl because it receives three arguments: Hue, Saturation and Luminosity.
 
-You could easily create color palettes this way. For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a white to black gradient...
+With these three values you can generate any color from the [sRGB color space](https://en.wikipedia.org/wiki/SRGB), any hexadecimal color.
+
+Since this CSS function –unlike `rgb()`– accepts a single argument for luminosity, it seems particularly suited to generate color palettes.
+For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a white to black gradient...
 
 <div style={{fontSize: '0.8em'}}>
 
@@ -57,7 +59,7 @@ You could easily create color palettes this way. For example, we can set a fixed
 
 </div>
 
-You can easily create [for-loops in Sass](https://sass-lang.com/documentation/at-rules/control/for) and use them to automate the code above.
+We can even go a step further and use [for-loops in Sass](https://sass-lang.com/documentation/at-rules/control/for) to make the code less repetitive.
 
 <div style={{fontSize: '0.8em'}}>
 
@@ -115,15 +117,15 @@ We can also use JSX to express this color palette, with a component like this:
 
 <!-- prettier-ignore -->
 ```jsx
-export const ColorPalette = ({ hue = 0, saturation = 0 }) => {
+export const ColorPalette = () => {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(11, 1fr)" }}>
       {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((step) => (
         <div
           key={step}
           style={{
-            backgroundColor: `hsl(${hue}, ${saturation}%, ${step}%)`,
-            height: "100%",
+            backgroundColor: `hsl(0, 0%, ${step}%)`,
+            aspectRatio: "1 / 1",
           }}
         />
       ))}
@@ -141,7 +143,7 @@ So far so good, right? Let's try to apply this to generate palettes in different
 
 If we increase the color's **saturation**, (the **s** in **hsl()**) we can see how color starts to appear. In this case, since our hue is 0, we will see the color <strong style={{ color: "red" }}>red</strong>.
 
-Try it yourself: move the saturation slider until you see red fill up the box.
+Try it yourself: move the saturation slider until you see the box fill up in red.
 
 <SaturationSlider />
 
@@ -149,47 +151,86 @@ We can also increase **hue** (the **h** in **hsl()**), using values from 0 to 36
 
 <HueSlider />
 
-Given all we've discovered so far, we could try to create palettes this way. In fact, let's generate a palette for each hue, from 0 to 360, in steps of 90.
+Given all we've discovered so far, we could try to create palettes this way. In fact, let's generate a palettes for different hues.
+
+<div style={{ fontSize: "0.8em" }}>
 
 ```jsx
-<ColorPalette hue={0} saturation={100} />
-<ColorPalette hue={90} saturation={100} />
-<ColorPalette hue={180} saturation={100} />
-<ColorPalette hue={270} saturation={100} />
-<ColorPalette hue={360} saturation={100} />
+<ColorPalette hue={0} />
+<ColorPalette hue={60} />
+<ColorPalette hue={180} />
+<ColorPalette hue={200} />
 ```
 
-<ColorPalette hue={0} saturation={100} />
-<ColorPalette hue={90} saturation={100} />
-<ColorPalette hue={180} saturation={100} />
-<ColorPalette hue={270} saturation={100} />
-<ColorPalette hue={360} saturation={100} />
+Behind the scenes, I did a small refactor to the ColorSlider component to make it accept hue as a prop. You can see [the component's source code in the github repository for this this website](https://github.com/AeonFr/dev.franciscobrusa.www-next/blob/main/components/blog/generated-color-palettes/ColorPalette.jsx), which is open-source.
+
+</div>
 
 The result we would get surely must be a harmonic color palette, right?
+
+<ColorPalette hue={0} saturation={100} />
+<ColorPalette hue={60} saturation={100} />
+<ColorPalette hue={180} saturation={100} />
+<ColorPalette hue={200} saturation={100} />
 
 Well, as we can see, not so much.
 
 At the 50% luminosity step, for some colors we could easily <span style={{ backgroundColor: 'white', color: 'hsl(0, 100%, 50%)' }}>paint them on a white background</span> and they would still be legible, but for others we have to <span style={{ backgroundColor: 'black', color: 'hsl(180, 100%, 50%)' }}>paint them on a black background</span> to make them legible.
 
-Other colors have steps that are almost impossible to distinguish, so while a 50% red is clearly different than a 60% red, a 50% yellow is almost the same as a 60% yellow.
-
-<!-- TODO -->
+Other colors have steps that are almost impossible to distinguish, so while a purple at 50% luminosity is clearly different than the same purple at 40%, a yellow at 40% luminosity is indistinguishable from a yellow at 40%.
 
 <div
   style={{
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
+    gridTemplateRows: "1fr 1fr",
+    maxWidth: "20rem",
   }}
 >
-  <div
-    style={{ backgroundColor: "", paddingBottom: "100%" }}
-  />
+  {[270, 60].map((hue) => (
+    <>
+      <div
+        style={{
+          backgroundColor: `hsl(${hue}, 100%, 50%)`,
+          paddingBottom: "100%",
+        }}
+      />
+      <div
+        style={{
+          backgroundColor: `hsl(${hue}, 100%, 60%)`,
+          paddingBottom: "100%",
+        }}
+      />
+    </>
+  ))}
 </div>
 
 <div style={{ fontSize: '1.2em' }}>
 
-Therefore, **his palette is not reliable** to generate button variants or other UI styles. But we've got the math right; **so what is it that went wrong?** And, most importantly, **how can we get it right?**
+Therefore, **this method to generate palettes is not reliable** to generate button variants or other UI styles. But we've got the math right; **so what is it that went wrong?** **What can we do to get it right?**
 
 </div>
 
-## Understanding color
+---
+
+## Understanding the color spectrum
+
+Most screens and monitors use the sRGB color spectrum, which basically means they can represent a limited subset of the colors we can see in real life.
+
+<figure style={{  fontSize: "0.8em",  margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1em' }}>
+<img
+  src="/blog/generated-color-palettes/CIExy1931_sRGB.svg"
+  alt="Visual representation of the sRGB color spectrum inside the 'shoe-shaped' visual spectrum"
+  style={{ backgroundColor: 'white', width: '20em' }}
+/>
+
+<caption style={{  width: '20em', textAlign: 'left' }}>
+
+**sRGB color spectrum** (black triangle), as compared to the color range visible by the human eye ("shoe shape").
+
+[Via Wikimedia Commons](https://commons.wikimedia.org/wiki/File:CIExy1931_sRGB.svg), [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0)
+
+</caption>
+</figure>
+
+As a side-note, not all monitors use sRGB, notably, Apple monitors use Apple RGB or Display-P3, color spectrums that allow access to a wider color gamut than sRGB. But the web has not adapted to these technologies yet; right now it's just not possible to represent colors outside of the sRGB spectrum using CSS.

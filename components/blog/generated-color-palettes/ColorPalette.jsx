@@ -6,7 +6,10 @@ export const ColorPalette = ({ hue = 0, saturation = 0 }) => {
           key={step}
           style={{
             backgroundColor: `hsl(${hue}, ${saturation}%, ${step}%)`,
-            height: "100%",
+            // We could use aspectRatio or paddingBottom,
+            // using the latter for better browser support
+            // aspectRatio: "1 / 1",
+            paddingBottom: "100%",
           }}
         />
       ))}

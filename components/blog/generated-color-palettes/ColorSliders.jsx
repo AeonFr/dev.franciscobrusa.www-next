@@ -13,19 +13,24 @@ export const SaturationSlider = () => {
           maxWidth: "100%",
         }}
       >
-        <code>
-          hsl(0,{" "}
-          <span style={{ color: `hsl(0, 100%, 50%)` }}>{saturation}%</span>,
-          50%)
-        </code>
-
         <div
           style={{
             backgroundColor: color,
             paddingBottom: "100%",
-            margin: "1rem 0",
           }}
         />
+
+        <code
+          style={{
+            display: "block",
+            textAlign: "center",
+            margin: "1rem 0",
+          }}
+        >
+          hsl(0,{" "}
+          <span style={{ color: `hsl(0, 100%, 50%)` }}>{saturation}%</span>,
+          50%)
+        </code>
 
         <input
           type="range"
@@ -56,18 +61,23 @@ export const HueSlider = () => {
           maxWidth: "100%",
         }}
       >
-        <code>
-          hsl(
-          <span style={{ color: `hsl(0, 100%, 50%)` }}>{hue}</span>, 100%, 50%)
-        </code>
-
         <div
           style={{
             backgroundColor: color,
             paddingBottom: "100%",
-            margin: "1rem 0",
           }}
         />
+
+        <code
+          style={{
+            display: "block",
+            textAlign: "center",
+            margin: "1rem 0",
+          }}
+        >
+          hsl(
+          <span style={{ color: `hsl(0, 100%, 50%)` }}>{hue}</span>, 100%, 50%)
+        </code>
 
         <input
           type="range"
