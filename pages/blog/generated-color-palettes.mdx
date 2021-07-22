@@ -60,46 +60,31 @@ When you see an **hexadecimal color** (like `#FF0000`) or a **CSS color value** 
 
 <SmallText>
 
-As a side-note, not all monitors use sRGB; Apple monitors use Apple RGB or Display-P3, spectrums that allow access to a wider color gamut than sRGB. But this technologies are not standards, and CSS has not adapted to them yet; only the sRGB spectrum is supported right now.
+As a side-note, not all monitors use sRGB; Apple monitors use Apple RGB or Display-P3, spectrums that allow access to a wider color gamut than sRGB. But this color spaces are not industry standards (yet?), and CSS is not prepared to use them.
 
 </SmallText>
 
-## So let's say you want a color palette for the web
+## So let's say you want to generate a color palette for the web
 
 The `hsl()` function is a CSS function used to express any hexadecimal color. It's called hsl because it receives three arguments: Hue, Saturation and Luminosity.
 
 This CSS function –unlike `rgb()` or an hexadecimal string– accepts a distinct argument for luminosity, which makes it particularly suited to generate color palettes based on different lights and shadows of the same color.
 
-For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a white to black gradient.
+For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a palette of grays.
 
-We can even go a step further and use [for-loops in Sass](https://sass-lang.com/documentation/at-rules/control/for) to make the code less repetitive.
+<ColorPalette />
 
-<SmallText>
-
-```scss
-.palette.gray {
-  $hue: 0;
-  $saturation: 0%;
-  @for $i from 0 through 10 {
-    .step:nth-child(#{$i + 1}) {
-      background-color: hsl($hue, $saturation, $i * 10%);
-    }
-  }
-}
-```
-
-</SmallText>
-
-The result looks like this:
+Here we have an implementation of this palette using [for-loops in Sass](https://sass-lang.com/documentation/at-rules/control/for) to make the code less repetitive and easy to change.
 
 <p
   className="codepen"
-  data-height="170"
+  data-height="370"
   data-slug-hash="BaRRrRZ"
+  data-default-tab="css,result"
   data-editable="true"
   data-user="frankno"
   style={{
-    height: "170px",
+    height: "370px",
     boxSizing: "border-box",
     display: "flex",
     alignItems: "center",
@@ -143,13 +128,11 @@ export const ColorPalette = () => {
 
 </SmallText>
 
-<ColorPalette />
-
 So far so good, right?
 
 ## Hue and saturation
 
-Let's try to apply this to generate palettes in different colors (besides gray)
+But because we don't want to only use grays, let's try to use the same technique for different colors.
 
 <Column>
   <Row style={{ maxWidth: "14rem" }}>
@@ -176,7 +159,7 @@ Try it yourself: move the saturation slider until you see the box fill up in red
   </Row>
   <Row style={{ minWidth: "20rem" }}>
 
-We can also increase the **hue** (the **h** in **hsl()**), using values from 0 to 360, to get colors from all the sRGB spectrum.
+We can also change the **hue** (the **h** in **hsl()**), using values from 0 to 360, to get colors from all the sRGB spectrum.
 
   </Row>
 </Column>
@@ -210,12 +193,12 @@ Well, as we can see, not so much. We have inconsistencies all around!
 <Column>
   <Row style={{ minWidth: "20rem" }}>
 
-For example, even at the same luminosity of 50%, blue text is perfectly readable at a white background, while yellow text is perfectly readable at a black background. Inverting backgrounds, though, might make readability really difficult.
+For example, even at the same luminosity of 50%, blue text is perfectly readable at a white background, while yellow text is only readable with a black background.
 
-_Do these colors really have the same luminosity?_
+_According to the HSL function, these colors have the same luminosity. But do these colors really have the same luminosity?_
 
 </Row>
-<Row style={{ maxWidth: "14rem" }}>
+<Row style={{ maxWidth: "14rem", alignSelf: "flex-end" }}>
   <LegibilityBrokenSample/>
 </Row>
 </Column>
@@ -230,7 +213,7 @@ Other colors have steps that are almost impossible to distinguish.
 For example, in the image we have two colors at 50% and 60% luminosity. While for purple we can clearly perceive two colors, the two steps of yellow are almost impossible to tell apart.
 
 </Row>
-<Row style={{ maxWidth: "14rem" }}>
+<Row style={{ maxWidth: "14rem", alignSelf: "flex-end" }}>
   <ContrastBrokenSample/>
 </Row>
 </Column>
@@ -243,7 +226,7 @@ For example, in the image we have two colors at 50% and 60% luminosity. While fo
 To make things worse, the value for hue is also misleading. The orange/yellow colors in the image have the same hue difference as the blue colors, yet the blue colors look exactly the same, while the oranges look very distinct.
 
 </Row>
-<Row style={{ maxWidth: "14rem" }}>
+<Row style={{ maxWidth: "14rem", alignSelf: "flex-end" }}>
   <HueBrokenSample/>
 </Row>
 </Column>
@@ -251,12 +234,6 @@ To make things worse, the value for hue is also misleading. The orange/yellow co
 And let's not even look into start changing saturation, because that value tends to be misleading as well!
 
 Therefore, **this method to generate palettes is not reliable**. You do not want to use colors generated this way to generate button variants, or any other piece of UI where legibility and consistency is important. (Basically everything?)
-
-For example, here are some button variants using the same steps of different colors from the palettes from above...
-
-<ButtonIsBrokenSample />
-
-Looks terrible, right?
 
 <BigText>
 
@@ -267,9 +244,52 @@ But, if we can't use `hsl()`, `lighten()` or `darken()`, **what can we do?**
 </BigText>
 
 <Headline tag="h2" style={{ marginTop: "4em", maxWidth: "13em" }}>
-  HSLUV:
-  <br />
-  The human-friendly, intuitive alternative to HSL
+  The problem with HSL
 </Headline>
 
-What if we could represent
+<BigText>
+
+**HSL was created to be fast, not to be perceptually accurate**. It's a model based on how monitors output color, not on how humans perceive it.
+
+</BigText>
+
+To understand this statement better, let's look again at the sRGB spectrum inside the "shoe-shaped" figure (this "shoe shape" is actually a representation of the [CIE XYZ color space](https://en.wikipedia.org/wiki/CIE_1931_color_space), a color space that **takes into account psychological perception**).
+
+<Column as="figure">
+  <Row
+    tag="img"
+    src="/blog/generated-color-palettes/CIExy1931_sRGB_with_markers.svg"
+    style={{ backgroundColor: "white", width: "20em" }}
+  />
+  <Row tag="figcaption" style={{  width: '20em', textAlign: 'left' }}>
+
+In this figure, line **`a`** represents the distance of teal at 50% and 100% luminosity.
+Line **`b`** represents the distance of blue at 50% and 100% luminosity.
+
+</Row>
+</Column>
+
+According to the HSL function, the distance variation is the same. But, **are this distances really the same?**
+
+Well, as we can see in the graphic, **clearly not**. At least, not if we take into account psychological perception of color, instead of only considering how much power the LED pixel is receiving.
+
+<BigText>
+
+At 100% luminosity of any given color, we can only guarantee that the screen will be using it's full power to display that color.
+We can't guarantee, however, that two colors with the same luminosity are equally luminous.
+
+</BigText>
+
+So, are there more intuitive models to represent colors?
+
+<Headline tag="h2" style={{ marginTop: "4em", maxWidth: "13em" }}>
+  HSLUV:
+  <br />
+  The human-friendly alternative to HSL
+</Headline>
+
+Other people (smarter people) have thought about this problems and proposed solutions.
+
+In the article [Color Spaces for Human Beings](https://www.boronine.com/2012/03/26/Color-Spaces-for-Human-Beings/), Alexei Boronine explains the problems of HSL and discourages it's use.
+
+As an alternative,
