@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 export const LegibilityBrokenSample = () => {
   return (
     <div
@@ -63,9 +65,8 @@ export const ContrastBrokenSample = () => {
       }}
     >
       {[270, 60].map((hue) => (
-        <>
+        <Fragment key={`c-${hue}`}>
           <div
-            key={`contrast-${hue}`}
             style={{
               backgroundColor: `hsl(${hue}, 100%, 50%)`,
               paddingBottom: "100%",
@@ -76,7 +77,6 @@ export const ContrastBrokenSample = () => {
             s:50%
           </div>
           <div
-            key={`contrast-${hue}-2`}
             style={{
               backgroundColor: `hsl(${hue}, 100%, 60%)`,
               paddingBottom: "100%",
@@ -86,7 +86,7 @@ export const ContrastBrokenSample = () => {
           >
             s:60%
           </div>
-        </>
+        </Fragment>
       ))}
     </div>
   );
@@ -105,9 +105,8 @@ export const HueBrokenSample = () => {
       }}
     >
       {[30, 230].map((hue) => (
-        <>
+        <Fragment key={`h-${hue}`}>
           <div
-            key={hue + "-3"}
             style={{
               backgroundColor: `hsl(${hue}, 100%, 50%)`,
               padding: "1em 0.5em",
@@ -117,7 +116,6 @@ export const HueBrokenSample = () => {
             h:{hue}
           </div>
           <div
-            key={hue + "-4"}
             style={{
               backgroundColor: `hsl(${hue + 30}, 100%, 50%)`,
               padding: "1em 0.5em",
@@ -126,7 +124,7 @@ export const HueBrokenSample = () => {
           >
             h:{hue + 30}
           </div>
-        </>
+        </Fragment>
       ))}
     </div>
   );

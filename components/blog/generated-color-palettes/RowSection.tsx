@@ -1,4 +1,4 @@
-export const Column = ({ tag = "div", style, ...props }) => {
+export const Row = ({ tag = "div", style, ...props }) => {
   const Tag = tag as "div";
   return (
     <Tag
@@ -8,7 +8,7 @@ export const Column = ({ tag = "div", style, ...props }) => {
   );
 };
 
-export const Row = ({ tag = "div", style, ...props }) => {
+export const Col = ({ tag = "div", style, ...props }) => {
   const Tag = tag as "div";
   return <Tag style={{ flex: 1, ...style }} {...props} />;
 };
