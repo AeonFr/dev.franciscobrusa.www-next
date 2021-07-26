@@ -64,7 +64,7 @@ export const ContrastBrokenSample = () => {
         textAlign: "center",
       }}
     >
-      {[270, 60].map((hue) => (
+      {[270, 180].map((hue) => (
         <Fragment key={`c-${hue}`}>
           <div
             style={{

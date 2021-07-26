@@ -18,56 +18,43 @@
  * Line numbers are showed only if the block has >5 lines
  */
 
-import React from "react";
+import React, { Fragment } from "react";
 import Highlight, { defaultProps } from "prism-react-renderer";
 import MultiRange from "multi-integer-range";
 
-const preStyles = {
-  padding: "0.5rem 1rem",
-  paddingRight: "1.5rem" /* breathing room */,
-  borderRadius: "0.5rem",
-};
-
-const lineStyles = { display: "table-row" };
+const rootStyles = (hasLineNumbers) => ({
+  padding: "0.5em 1em",
+  borderRadius: "0.5em",
+  display: "grid",
+  gridTemplateColumns: hasLineNumbers ? "auto 1fr" : "1fr",
+});
 
 const lineNoStyles = {
-  display: "table-cell",
   textAlign: "right",
   paddingRight: "1em",
   userSelect: "none",
   opacity: "0.5",
 };
 
-const lineContentStyles = {
-  display: "table-cell",
-};
-
 const highlightLineStyles = {
-  fontWeight: "bold",
-  backgroundColor: "rgba(200,200,255,0.1)",
-  marginLeft: "-1rem",
-  paddingLeft: "1rem",
-  marginRight: "-1.5rem",
-  paddingRight: "1.5rem",
+  fontWeight: "600",
+  opacity: null,
+  backgroundColor: "rgba(200,200,255,0.2)",
 };
 
 export default function CodeBlock(props) {
   const className = props.children.props.className || "";
-  const matches = className.match(
-    /language-(?<lang>\w*)(?<highlightLines>\{[\d,-]*\})?/
-  );
+  const matches = className.match(/language-(?<lang>\w*)/);
 
+  const metastring = props.children.props.metastring;
   let highlightLines = [];
-  if (matches?.groups?.highlightLines) {
+  if (metastring) {
     try {
       highlightLines = new MultiRange(
-        matches.groups.highlightLines.replace(/[{}]/g, "")
+        metastring.replace(/[{}]/g, "")
       ).toArray();
     } catch (e) {
-      throw new Error(
-        "Syntax error in highlightLines:",
-        matches.groups.highlightLines
-      );
+      throw new Error("Syntax error in highlightLines:", metastring);
     }
   }
 
@@ -83,25 +70,43 @@ export default function CodeBlock(props) {
       }
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={className} style={{ ...style, ...preStyles }}>
+        <pre
+          className={className}
+          style={{
+            ...style,
+            ...rootStyles(tokens.length > 5),
+          }}
+        >
           {tokens
             .filter((l, i) => i !== tokens.length - 1) // fix issue with extra newline
             .map((line, i) => (
-              <div
-                {...getLineProps({ line, key: i })}
-                style={
-                  highlightLines.indexOf(i + 1) !== -1
-                    ? { ...highlightLineStyles, ...highlightLineStyles }
-                    : lineStyles
-                }
-              >
-                {tokens.length > 5 && <span style={lineNoStyles}>{i + 1}</span>}
-                <span style={lineContentStyles}>
+              <Fragment key={i}>
+                {tokens.length > 5 && (
+                  <div
+                    style={{
+                      ...lineNoStyles,
+                      ...(highlightLines.indexOf(i + 1) !== -1
+                        ? highlightLineStyles
+                        : {}),
+                    }}
+                    aria-hidden="true"
+                  >
+                    {i + 1}
+                  </div>
+                )}
+                <div
+                  {...getLineProps({ line, key: i })}
+                  style={
+                    highlightLines.indexOf(i + 1) !== -1
+                      ? highlightLineStyles
+                      : {}
+                  }
+                >
                   {line.map((token, key) => (
                     <span {...getTokenProps({ token, key })} />
                   ))}
-                </span>
-              </div>
+                </div>
+              </Fragment>
             ))}
         </pre>
       )}
