@@ -3,7 +3,6 @@ export const metadata = {
   date: "2021-07-02",
   description:
     "Why you should never generate color palettes using sass' functions like darken() or do math with hsl()",
-  isDraft: true,
 };
 
 import BlogPostLayout from "../../components/BlogPostLayout";
@@ -14,7 +13,6 @@ export default ({ children }) => (
 import {
   ColorPalette,
   HSLuvColorPalette,
-  AdobeContrastColorPalette,
 } from "../../components/blog/generated-color-palettes/ColorPalette";
 import {
   RGBSlider,
@@ -139,34 +137,17 @@ Here we have an implementation of the gray palette using [for-loops in Sass](htt
 }
 ```
 
-Given a fixed value for hue (0) and saturation (0%), we generate classes that apply different degrees of luminosity. Basically we go from `hsl(0, 0%, 0%)` to `hls(0, 0%, 100%)`, by steps of `10%`. Check out the demo below.
+The result looks like this:
 
-<p
-  className="codepen"
-  data-height="370"
-  data-slug-hash="BaRRrRZ"
-  data-default-tab="css,result"
-  data-editable="true"
-  data-user="frankno"
-  style={{
-    height: "370px",
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "2px solid",
-    margin: "1em 0",
-    padding: "1em",
-  }}
->
-  <span>
-    See the Pen{" "}
-    <a href="https://codepen.io/frankno/pen/BaRRrRZ">SASS playground</a> by
-    francisco (<a href="https://codepen.io/frankno">@frankno</a>) on{" "}
-    <a href="https://codepen.io">CodePen</a>.
-  </span>
-</p>
-<script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+<SmallText>
+
+<ColorPalette hue={0} saturation={0} />
+
+[Check the demo on CodePen.](https://codepen.io/frankno/pen/BaRRrRZ)
+
+</SmallText>
+
+Given a fixed value for hue (0) and saturation (0%), we generated classes that apply different degrees of luminosity. Basically we go from `hsl(0, 0%, 0%)` to `hls(0, 0%, 100%)`, by steps of `10%`.
 
 We can also use JSX to express this color palette, with a component like this:
 
@@ -316,7 +297,7 @@ But if we compare this output with a model that takes into account psychological
 
 </BigText>
 
-Luckily, smarter people have come up with solutions and alternatives to deal with color in code. We'll explore two of them, HSLuv and Leonardo Contrast Colors.
+Luckily, smarter people have come up with solutions and alternatives to deal with color in code. We'll explore one of them, HSLuv.
 
 <Headline tag="h2" style={{ marginTop: "4em", maxWidth: "13em" }}>
   HSLuv:
@@ -446,39 +427,9 @@ HSLuv makes reasoning about color, and doing "math" with colors, a much more int
 
 </BigText>
 
-If you're interested in start using HSLuv in your workflow, you can start right away with the help of this tools:
+If you're interested in start using HSLuv in your workflow, you might be interested in this tools:
 
 - [HSLuve figma plugin](https://www.figma.com/community/plugin/811341846366740536/HSLuve) displays an HSLuv color selector inside Figma.
 - [postcss-plugi-hsluv](https://www.npmjs.com/package/postcss-plugin-hsluv) brings HSLuv to PostCSS.
 - [hsluv-sass](https://www.npmjs.com/package/hsluv-sass) brings HSLuv to Sass
 - [hsluv-stylus](https://www.npmjs.com/package/hsluv-stylus) brings HSLuv to Stylus
-
----
-
-<BigText>
-
-HSLuv is a great tool that generates fast computations with minimal bundle size.
-
-When bundle size is not important, though, you might want to use a more advanced tool. We will check Leonardo Contrast Colors as an alternative.
-
-</BigText>
-
-<Headline tag="h2" style={{ marginTop: "4em", maxWidth: "13em" }}>
-  Leonardo Contrast Colors:
-  <br />
-  An advanced suite to generate color palettes
-</Headline>
-
-What I immediately loved about [Leonardo Contrast Colors](https://www.npmjs.com/package/@adobe/leonardo-contrast-colors) is that it's specifically designed to generate color palettes with WCAG compliant contrast ratios.
-
-This tool has a hugh size footprint for your website (88kb, vs the 2kb that HSLuv bring), so it's probably not suited for client-side, runtime generation of color palettes. It's probably better to use it for the internal tooling that surrounds your design system.
-
-For example, you could use Leonardo Contrast Colors (LCC for short) to generate palettes at build-time.
-
-It's usage is a little bit more complex than HSLuv as well. To begin with, we need to identify the "steps" we want to 
-
-<AdobeContrastColorPalette hue={0} />
-<AdobeContrastColorPalette hue={60} />
-<AdobeContrastColorPalette hue={180} />
-<AdobeContrastColorPalette hue={230} />
-<AdobeContrastColorPalette hue={270} />
