@@ -1,8 +1,9 @@
 export const metadata = {
   title: "Generating color palettes with code",
   date: "2021-07-02",
+  socialImage: "/blog/generated-color-palettes/social-image.png",
   description:
-    "Why you should never generate color palettes using sass' functions like darken() or do math with hsl()",
+    "Why you shouldn’t trust color functions like hsl(), lighten() or darken()",
 };
 
 import BlogPostLayout from "../../components/BlogPostLayout";
@@ -429,7 +430,8 @@ HSLuv makes reasoning about color, and doing "math" with colors, a much more int
 
 If you're interested in start using HSLuv in your workflow, you might be interested in this tools:
 
-- [HSLuve figma plugin](https://www.figma.com/community/plugin/811341846366740536/HSLuve) displays an HSLuv color selector inside Figma.
+- [HSLuve Figma plugin](https://www.figma.com/community/plugin/811341846366740536/HSLuve) displays an HSLuv color selector inside Figma.
+- [Chromatic Figma plugin](https://www.figma.com/community/plugin/759433498184507623/Chromatic-Figma) to create perceptually uniform gradients between two colors.
 - [postcss-plugi-hsluv](https://www.npmjs.com/package/postcss-plugin-hsluv) brings HSLuv to PostCSS.
 - [hsluv-sass](https://www.npmjs.com/package/hsluv-sass) brings HSLuv to Sass
 - [hsluv-stylus](https://www.npmjs.com/package/hsluv-stylus) brings HSLuv to Stylus
