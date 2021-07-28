@@ -41,7 +41,7 @@ import {
 
 <Headline>{metadata.title}</Headline>
 
-Most screens and monitors use the sRGB color spectrum, which basically means they can represent a limited subset of the colors we can see in real life.
+Most monitors use the sRGB color spectrum, which basically mean they can represent a limited subset of the colors we can see in real life.
 
 <Row tag="figure" style={{  fontSize: "0.8em", margin: "0" }}>
 
@@ -62,11 +62,11 @@ Most screens and monitors use the sRGB color spectrum, which basically means the
 
 </Row>
 
-When you see an **hexadecimal color** (like `#FF0000`) or a **CSS color value** (like `rgb(100,0,0)`), you are seeing the **representation of a color inside the sRGB spectrum**, the color scheme used by the browser. These are instructions that the browser sends to your screen to render a color inside the specified color range.
+When you see an **hexadecimal color** (like `#FF0000`) or a **CSS color value** (like `rgb(100,0,0)`), you are seeing the **representation of a color inside the sRGB spectrum**, the color scheme used by the browser. These are instructions that the browser sends to your screen to render a color, by adding light from red, green and blue LEDs (each pixel contains these three colors, that combined can achieve white).
 
 <SmallText>
 
-As a side-note, not all monitors use sRGB; Apple monitors use Apple RGB or Display-P3, spectrums that allow access to a wider color gamut than sRGB. But this color spaces are not industry standards (yet?), and CSS is not prepared to use them.
+As a side-note, not all monitors use sRGB; for example, Apple monitors use Apple RGB or Display-P3, spectrums that allow access to a wider color gamut than sRGB. But this color spaces are not industry standards (yet?), and CSS is not prepared to use them.
 
 </SmallText>
 
@@ -74,17 +74,15 @@ There are many ways to represent sRGB colors, the most common one is the hexadec
 
 <RGBSlider />
 
-Although the resulting hexadecimal value is a short string, this method for choosing colors is not particularly intuitive. We don't often think about colors as the addition of other colors. To make a better mental model, HSL was created.
+Although the resulting hexadecimal value is a short string, which makes it convenient to share and store, this method for choosing colors is not particularly intuitive for humans. We don't often think about colors as the addition of other colors. To have a better mental model, HSL was created.
 
 ## Hue, saturation, luminosity
 
 As an alternative to `rgb()`, `hsl()` is a CSS function used to express any hexadecimal color. It's called HSL because it receives three arguments: Hue, Saturation and Luminosity.
 
-This function alows for more intuitive ways to tweak its values.
+This function allows for more intuitive ways to tweak its values. For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a palette of any color.
 
-For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a palette.
-
-This is the result of going from `hsl(0, 0%, 0%)` to `hsl(0, 0%, 100%)`
+This is the result of going from `hsl(0, 0%, 0%)` to `hsl(0, 0%, 100%)`. Since the saturation is 0, this will get a palette of grays.
 
 <ColorPalette saturation={0} />
 
@@ -148,7 +146,7 @@ The result looks like this:
 
 </SmallText>
 
-Given a fixed value for hue (0) and saturation (0%), we generated classes that apply different degrees of luminosity. Basically we go from `hsl(0, 0%, 0%)` to `hls(0, 0%, 100%)`, by steps of `10%`.
+Given a fixed value for hue (0) and saturation (0%), we generated classes that apply different degrees of luminosity. Basically we went from `hsl(0, 0%, 0%)` to `hls(0, 0%, 100%)`, by steps of `10%`.
 
 We can also use JSX to express this color palette, with a component like this:
 
@@ -181,9 +179,13 @@ This component can then be used like this:
 <ColorPalette hue={325} saturation={90} />
 ```
 
-Try it yourself below! (Move the sliders to see how the component reacts to different values of hue and saturation).
-
 <ColorPaletteSlider />
+
+<SmallText>
+
+Try it yourself! Move the sliders to see how the component reacts to different values of hue and saturation.
+
+</SmallText>
 
 Let's go ahead and generate a palette for different hues, by using our `ColorPalette` component multiple times in the following way:
 
@@ -205,7 +207,7 @@ Let's go ahead and generate a palette for different hues, by using our `ColorPal
 <ColorPalette hue={230} />
 <ColorPalette hue={270} />
 
-You might think this is a good method to generate color palettes for graphic design or the web. After all, the result we would get surely must be a harmonic color palette... right?
+You might think this is a good method to generate color palettes for graphic design or the web. After all, the result we got surely must be a harmonic color palette... right?
 Well, as we can see, not so much. We have inconsistencies all around!
 
 <Row>
@@ -228,7 +230,7 @@ _According to the HSL function, these colors have the same luminosity. But do th
 
 Other colors have steps that are almost impossible to distinguish.
 
-For example, in this sample we have two colors at 50% and 60% luminosity. While for purple we can clearly perceive two different "shadows", the two shadows of teal are almost impossible to tell apart.
+For example, in the following sample we have two colors at 50% and 60% luminosity. While for purple we can clearly perceive two different "shadows", the two shadows of teal are almost impossible to tell apart.
 
 </Col>
 <Col style={{ maxWidth: "14rem", alignSelf: "flex-end" }}>
@@ -294,7 +296,7 @@ But if we compare this output with a model that takes into account psychological
 
 <BigText>
 
-**HSL was created to be fast, not to be perceptually accurate**. It's a model based on how monitors output color, not on how humans perceive it.
+**HSL was created to be fast, not to be perceptually accurate**. It inherits the flaws of RGB: both are models based on how monitors output color, not on how humans perceive it.
 
 </BigText>
 
@@ -310,7 +312,7 @@ Luckily, smarter people have come up with solutions and alternatives to deal wit
 
 It's based on the CIELUV color space, created in 1976 based on experiments that tried to "marry" the distributions of color wavelengths with the psychologically perceived colors in human vision.
 
-To say it plainly, HSLuv aims to make it easier to reason about color.
+Which basically means that HSLuv makes it easy to reason about color.
 
 It is commonly used for:
 
@@ -318,9 +320,7 @@ It is commonly used for:
 2. Generating themes, like this neat [code syntax highlighter theme generator](https://www.syntaxenvy.com/0104550).
 3. Build color palettes with consistent contrast ratios, like the one created for [Polaris](https://polaris.shopify.com/), Shopify's design system.
 
-HSLuv has dozens of open-source implementations for different programming languages, but we'll focus only on JavaScript.
-
-The JavaScript implementation has a tiny footprint in bundle size (2kb) and a very simple API.
+HSLuv has dozens of open-source implementations for different programming languages. The JavaScript implementation has a tiny footprint in bundle size (2kb) and a very simple API.
 
 ```js
 import hsluv from "hsluv";
@@ -332,7 +332,7 @@ hsluv.hsluvToHex([hue, saturation, lightness]);
 hsluv.hexToHsluv(hex);
 ```
 
-Once we have a HSLuv value, changing it's lightness for different hues will produce uniform palettes. The result is not guaranteed to be 100% accurate, but it gives decent enough results for some use cases. For other use cases, some optical adjustments in certain colors might be needed.
+Once we have a HSLuv value, changing it's lightness, even across different hues, will produce somewhat uniform results.
 
 Let's look at an implementation of the `ColorPalette` component using HSLuv. To achieve this, we only need to make a small change in line 8.
 
@@ -389,16 +389,30 @@ Let's try to generate the same palettes as before, and compare the results.
 <HSLuvColorPalette hue={230} />
 <HSLuvColorPalette hue={270} />
 
-You might notice that colors outputted by this method look more uniform. Although, since HSLuv makes some corrections in the Hue dimension, to get the same hues as before we might need to make some adjustments.
+You might notice that colors outputted by this method look more uniform.
 
-Let's look for example at the red color: it looks like magenta in HSLuv. The Hue for red in HSL might not necessarily have the same value in HSLuv. To get the value in HSLuv, we can execute this JS:
+Let's look for example at the red color: it looks like magenta in HSLuv.
+
+<SmallText>
+
+<ColorPalette hue={0} />
+<HSLuvColorPalette hue={0} />
+
+A Hue of 0 produces different reds in HSL and HSLuv.
+
+</SmallText>
+
+The Hue for red in HSL might not necessarily have the same value in HSLuv.
+Since HSLuv makes some corrections in the Hue dimension to achieve uniformity, we need adjustments to get the same red as with HSL.
+
+HSL can easily be converted to hexadecimal (for example, red is `#ff0000`) and we can convert that value to HSLuv using this function:
 
 ```js
 hsluv.hexToHsluv("#ff0000");
 // [12.177050630061776, 100.0000000000022, 53.23711559542933]
 ```
 
-As we can see, HSLuv needs a value of `12` for hue to show red. Let's paint the palette again after this optical adjustments...
+As we can see, HSLuv needs a value of `12` for hue to show red. (Technically, `12.1770...`, but we will round it up). So, let's paint the palette again after making this adjustments for all the colors...
 
 **HSL implementation (for reference):**
 
@@ -416,13 +430,37 @@ As we can see, HSLuv needs a value of `12` for hue to show red. Let's paint the 
 <HSLuvColorPalette hue={265} />
 <HSLuvColorPalette hue={274} />
 
-As you might see, the HSLuv implementation is much better at keeping consistency and preserving contrast for different colors.
+And _voilà_.
+
+As you can see, the HSLuv implementation is much better at keeping consistency and preserving contrast for different colors.
 
 Still, according to personal preference, some optical adjustments might be needed. For example, HSLuv tends to remove too much saturation and makes some colors look dull.
 
 For some scenarios, it might make sense to sacrifice some uniformity in the contrast dimension in pro of having more saturated colors. This tradeoff might make sense for some cases and not for others, so it's impossible for a fully automated tool to make this kind of judgments.
 
+# Side-note: alternative color models
+
+As a side-note, HSLuv is not the only color space that achieves perceptual uniformity. Although it's results are good enough for changes in luminosity only, if you also want to make gradient changes in Hue or Saturation, other color spaces are better-suited.
+
+In particular, CIECAM02-UCS performs much better for this use cases (thanks [Nate Baldwin](https://twitter.com/natebaldwinart) for pointing this out).
+
+Alternative tools like [Chroma.js](https://gka.github.io/chroma.js/) and [Leonardo Color](https://www.npmjs.com/package/@adobe/leonardo-contrast-colors) can be used to generate palettes.
+
+For this article, I sticked with HSLuv for some simple reasons:
+
+1. **Minimal bundle-size.** It's 2kb of JS in total, vs. ~14kb for Chroma.js and ~88kb for Leonardo Color. (Source: [bundle-phobia](https://bundlephobia.com/))
+2. **"Good enough" results.** I tested the palettes we generated in the article with all three tools. The differences where almost unnoticeable. (Again, this can change if you're changing other dimensions besides luminosity or trying different things. For example, I found Chroma.js has better APIs than HSLuv to create gradients between colors, and Leonardo Color is the only tool that takes into account the psychological effect that the background color has in the perception of the foreground color).
+3. **Simple API.** No need to understand different color spaces or concepts like interpolation. Or any other technical knowledge besides the basics, for that matter.
+
+Still, if you **don't need to generate palettes with code, I recomend you to check the [Leonardo Color web UI](https://leonardocolor.io/)**. It uses the CIECAM02 color space by default, which produces some nice gradients between colors.
+
+# Conclusion
+
 <BigText>
+
+Don't do math with color when using RGB, HSL, or Sass functions. CSS and Sass use a color model that doesn't guarantee consistency.
+
+Instead, use an alternative color space. If you're a frontend developer, you will need JS for this, but some small libraries like HSLuv can perform a pretty good job.
 
 HSLuv makes reasoning about color, and doing "math" with colors, a much more intuitive process.
 
@@ -433,7 +471,10 @@ HSLuv makes reasoning about color, and doing "math" with colors, a much more int
 Links of interest:
 
 - [HSLuve Figma plugin](https://www.figma.com/community/plugin/811341846366740536/HSLuve) displays an HSLuv color selector inside Figma.
-- [Chromatic Figma plugin](https://www.figma.com/community/plugin/759433498184507623/Chromatic-Figma) fix gradients to achieve perceptual uniformity.
+- [Chromatic Figma plugin](https://www.figma.com/community/plugin/759433498184507623/Chromatic-Figma) fix gradients to achieve perceptual uniformity. Supports HSLuv (search for "Lab" color mode when using the "Fix gradient" option).
 - [postcss-plugin-hsluv](https://www.npmjs.com/package/postcss-plugin-hsluv) brings HSLuv to PostCSS.
 - [hsluv-sass](https://www.npmjs.com/package/hsluv-sass) brings HSLuv to Sass
 - [hsluv-stylus](https://www.npmjs.com/package/hsluv-stylus) brings HSLuv to Stylus
+- [Chroma.js documentation](https://gka.github.io/chroma.js/)
+- [Leonardo Color npm package](https://www.npmjs.com/package/@adobe/leonardo-contrast-colors)
+- [Leonardo Color web UI](https://leonardocolor.io/)
