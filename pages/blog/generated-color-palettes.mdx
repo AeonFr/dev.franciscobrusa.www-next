@@ -82,7 +82,7 @@ As an alternative to `rgb()`, `hsl()` is a CSS function used to express any hexa
 
 This function allows for more intuitive ways to tweak its values. For example, we can set a fixed value for hue and saturation, and increment lightness by 10%, from 0 to 100 (11 steps in total), to get a palette of any color.
 
-This is the result of going from `hsl(0, 0%, 0%)` to `hsl(0, 0%, 100%)`. Since the saturation is 0, this will get a palette of grays.
+This is the result of going from `hsl(0, 0%, 0%)` to `hsl(0, 0%, 100%)`, by steps of `10%`. Since the saturation is 0, this will get a palette of grays.
 
 <ColorPalette saturation={0} />
 
@@ -120,7 +120,7 @@ We can also change **hue** (the **h** in **hsl()**), using values from 0 to 360,
 
 ## Generating color palettes
 
-Given all we've discovered so far, we could try to create palettes using the arguments of the `hsl()` function.
+Given all we've discovered so far, we could try to create palettes dynamically using the arguments of the `hsl()` function.
 
 Here we have an implementation of the gray palette using [for-loops in Sass](https://sass-lang.com/documentation/at-rules/control/for).
 
@@ -145,8 +145,6 @@ The result looks like this:
 [Check the demo on CodePen.](https://codepen.io/frankno/pen/BaRRrRZ)
 
 </SmallText>
-
-Given a fixed value for hue (0) and saturation (0%), we generated classes that apply different degrees of luminosity. Basically we went from `hsl(0, 0%, 0%)` to `hls(0, 0%, 100%)`, by steps of `10%`.
 
 We can also use JSX to express this color palette, with a component like this:
 
@@ -442,9 +440,9 @@ For some scenarios, it might make sense to sacrifice some uniformity in the cont
 
 As a side-note, HSLuv is not the only color space that achieves perceptual uniformity. Although it's results are good enough for changes in luminosity only, if you also want to make gradient changes in Hue or Saturation, other color spaces are better-suited.
 
-In particular, CIECAM02-UCS performs much better for this use cases (thanks [Nate Baldwin](https://twitter.com/natebaldwinart) for pointing this out).
+In particular, CIECAM02-UCS performs much better for this use cases (thanks [Nate Baldwin](https://twitter.com/natebaldwinart) for pointing this out). If you want to try it out, there's a [D3 module](https://github.com/connorgr/d3-cam02) to work with this color appearance model, and the [Leonardo Color](https://www.npmjs.com/package/@adobe/leonardo-contrast-colors) library (a tool specifically created to generate color palettes) uses this model by default.
 
-Alternative tools like [Chroma.js](https://gka.github.io/chroma.js/) and [Leonardo Color](https://www.npmjs.com/package/@adobe/leonardo-contrast-colors) can be used to generate palettes.
+Other alternative tools like [Chroma.js](https://gka.github.io/chroma.js/) can be used to generate palettes using alternative models like LAB, LCH, CMYK, etc. Some of this models work better for certain scenarios.
 
 For this article, I sticked with HSLuv for some simple reasons:
 
@@ -452,7 +450,7 @@ For this article, I sticked with HSLuv for some simple reasons:
 2. **"Good enough" results.** I tested the palettes we generated in the article with all three tools. The differences where almost unnoticeable. (Again, this can change if you're changing other dimensions besides luminosity or trying different things. For example, I found Chroma.js has better APIs than HSLuv to create gradients between colors, and Leonardo Color is the only tool that takes into account the psychological effect that the background color has in the perception of the foreground color).
 3. **Simple API.** No need to understand different color spaces or concepts like interpolation. Or any other technical knowledge besides the basics, for that matter.
 
-Still, if you **don't need to generate palettes with code, I recomend you to check the [Leonardo Color web UI](https://leonardocolor.io/)**. It uses the CIECAM02 color space by default, which produces some nice gradients between colors.
+Again, there are always tradeoffs. If you don't need to generate color palettes dynamically, I recommend you to check the [Leonardo Color web UI](https://leonardocolor.io/). It uses the CIECAM02 color space by default, which produces some nice gradients between colors.
 
 # Conclusion
 
