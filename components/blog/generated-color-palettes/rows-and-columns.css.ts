@@ -15,4 +15,11 @@ export const row = style({
 
 export const column = style({
   flex: 1,
+  "@supports": {
+    "not ((gap: 1em) with (display: flex))": {
+      // dirty safari fallback
+      marginBottom: "1em",
+      marginRight: "1em",
+    },
+  },
 });

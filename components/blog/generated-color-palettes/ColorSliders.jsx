@@ -16,7 +16,6 @@ export const RGBSlider = () => {
       style={{
         display: "flex",
         flexWrap: "wrap",
-        gap: "2em",
         alignItems: "center",
       }}
     >
@@ -26,6 +25,7 @@ export const RGBSlider = () => {
           maxWidth: "50%",
           flexShrink: 0,
           flexGrow: 1,
+          marginRight: "1em",
         }}
       >
         <div
@@ -42,10 +42,9 @@ export const RGBSlider = () => {
           flexGrow: 2,
           display: "flex",
           flexDirection: "column",
-          gap: "1em",
         }}
       >
-        <span>
+        <span style={{ marginBottom: "1em" }}>
           Hex: <code>{hex}</code>
         </span>
 
@@ -196,16 +195,18 @@ export const ColorPaletteSlider = () => {
   const [saturation, setSaturation] = useState(90);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>
+    <>
       <ColorPalette hue={hue} saturation={saturation} />
+      <div style={{ marginTop: "1em" }} />
       <RangeColorInput label="Hue" value={hue} onChange={setHue} max={360} />
+      <div style={{ marginTop: "1em" }} />
       <RangeColorInput
         label="Saturation"
         value={saturation}
         onChange={setSaturation}
         max={100}
       />
-    </div>
+    </>
   );
 };
 
@@ -214,16 +215,18 @@ export const HSLuvColorPaletteSlider = () => {
   const [saturation, setSaturation] = useState(90);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>
+    <>
       <HSLuvColorPalette hue={hue} saturation={saturation} />
+      <div style={{ marginTop: "1em" }} />
       <RangeColorInput label="Hue" value={hue} onChange={setHue} max={360} />
+      <div style={{ marginTop: "1em" }} />
       <RangeColorInput
         label="Saturation"
         value={saturation}
         onChange={setSaturation}
         max={100}
       />
-    </div>
+    </>
   );
 };
 
@@ -232,15 +235,17 @@ export const HCLColorPaletteSlider = () => {
   const [saturation, setSaturation] = useState(90);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>
+    <>
       <HCLColorPalette hue={hue} saturation={saturation} />
+      <div style={{ marginTop: "1em" }} />
       <RangeColorInput label="Hue" value={hue} onChange={setHue} max={360} />
+      <div style={{ marginTop: "1em" }} />
       <RangeColorInput
         label="Saturation"
         value={saturation}
         onChange={setSaturation}
         max={100}
       />
-    </div>
+    </>
   );
 };

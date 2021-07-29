@@ -29,6 +29,15 @@ body {
   --dark-teal: #14bbb7;
 }
 
+@supports (color: color(display-p3 1 1 1)) {
+  .theme-snazzy {
+    --light-blue: color(display-p3 0.455 0.779 1);
+    --dark-blue: color(display-p3 0 0.493 0.905);
+    --light-pink: color(display-p3 1 0.425 0.78);
+    --dark-pink: color(display-p3 0.97 0.437 0.762);
+  }
+}
+
 .theme-snazzy.scheme-light {
   /* website settings */
   --bg: var(--white);

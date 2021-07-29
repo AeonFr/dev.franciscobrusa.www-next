@@ -15,6 +15,12 @@ export const headline = style({
     "linear-gradient(90deg, " +
     colors.map((color, i) => `${color} ${i * 2}% ${(i + 1) * 2}%`).join(", ") +
     ")",
+  "@supports": {
+    "(color: color(display-p3 1 1 1))": {
+      backgroundImage:
+        "linear-gradient(90deg, color(display-p3 1 0.425 0.78), color(display-p3 0.455 0.779 1))",
+    },
+  },
   backgroundClip: "text",
   WebkitBackgroundClip: "text",
   // textFillColor: "transparent",

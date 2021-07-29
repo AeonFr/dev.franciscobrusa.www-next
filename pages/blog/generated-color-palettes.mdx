@@ -49,7 +49,7 @@ Most monitors use the sRGB color spectrum, which basically means they can repres
   tag="img"
   src="/blog/generated-color-palettes/CIExy1931_sRGB.svg"
   alt="Visual representation of the sRGB color spectrum inside the 'shoe-shaped' visual spectrum"
-  style={{ backgroundColor: "white", width: "20em" }}
+  style={{ backgroundColor: "white", width: "20em", height: "20em" }}
 />
 
 <Col tag="figcaption" style={{  width: '20em', textAlign: 'left' }}>
@@ -66,7 +66,9 @@ When you see an **hexadecimal color** (like `#FF0000`) or a **CSS color value** 
 
 <SmallText>
 
-As a side-note, not all monitors use sRGB; for example, Apple monitors use Apple RGB or Display-P3, spectrums that allow access to a wider color gamut than sRGB. But this color spaces are not industry standards (yet?), and CSS is not prepared to use them.
+As a side-note, not all monitors use sRGB; for example, Apple monitors use Apple RGB or Display-P3, spectrums that allow access to a wider color gamut than sRGB. <s>But this color spaces are not industry standards (yet?), and CSS is not prepared to use them.</s>
+
+Update: The CSS spec (color level 4 and 5) standardizes support for new color spaces. Right now it only works in Safari Tech Preview. [More info here.](https://twitter.com/argyleink/status/1420730831283400707)
 
 </SmallText>
 
@@ -271,7 +273,7 @@ Let's look again at the sRGB spectrum inside the "shoe-shaped" figure (this "sho
   <Col
     tag="img"
     src="/blog/generated-color-palettes/CIExy1931_sRGB_with_markers.svg"
-    style={{ backgroundColor: "white", width: "20em" }}
+    style={{ backgroundColor: "white", width: "20em", height: "20em" }}
   />
   <Col tag="figcaption" style={{  width: '20em', textAlign: 'left' }}>
 
