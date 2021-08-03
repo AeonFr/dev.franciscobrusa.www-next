@@ -21,7 +21,7 @@ export const block = style({
 });
 
 export const headerLink = style({
-  display: "block",
+  display: "inline-block",
   padding: "0.5rem 1rem",
   fontWeight: "bold",
   color: "var(--accent)",
