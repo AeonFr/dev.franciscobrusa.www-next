@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import colorPickerStyles from "../../styles/ColorSchemePicker.module.css";
+import * as styles from "../../styles/color-scheme-picker.css";
 
 export default function ColorSchemePicker({
   scheme,
@@ -18,19 +18,25 @@ export default function ColorSchemePicker({
 
   return (
     <div
-      className={colorPickerStyles.root + " " + (props.className || "")}
+      className={styles.wrapper + " " + (props.className || "")}
       style={props.style}
     >
       <input
         type="radio"
         name="color-scheme"
         id="color-scheme-light"
+        className={styles.radioInput}
         value="light"
         checked={scheme === "light"}
         onChange={handleSchemeChange}
       />
-      <label aria-label="Use light color scheme" htmlFor="color-scheme-light">
+      <label
+        className={styles.label}
+        aria-label="Use light color scheme"
+        htmlFor="color-scheme-light"
+      >
         <svg
+          className={styles.svg}
           viewBox="0 0 24 24"
           stroke="currentColor"
           strokeWidth="3"
@@ -53,12 +59,18 @@ export default function ColorSchemePicker({
         type="radio"
         name="color-scheme"
         id="color-scheme-dark"
+        className={styles.radioInput}
         value="dark"
         checked={scheme === "dark"}
         onChange={handleSchemeChange}
       />
-      <label aria-label="Use dark color scheme" htmlFor="color-scheme-dark">
+      <label
+        className={styles.label}
+        aria-label="Use dark color scheme"
+        htmlFor="color-scheme-dark"
+      >
         <svg
+          className={styles.svg}
           viewBox="0 0 24 24"
           stroke="currentColor"
           strokeWidth="3"

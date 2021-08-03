@@ -8,9 +8,9 @@ import "@code-hike/mini-editor/dist/index.css";
 import { InView } from "react-intersection-observer";
 import Layout from "./Layout";
 import Container from "./Container";
-import blogPostStyles from "../styles/BlogPostLayout.module.css";
 import { components } from "./BlogPostLayout";
 import { useMediaQuery } from "react-responsive";
+import { article } from "../styles/article.css";
 
 export default function BlogCodeWalkthrough({ children, metadata }) {
   const steps = useMemo(
@@ -110,7 +110,7 @@ const BasicStep: React.FC<StepProps> = ({ currentStep, steps }) => {
 
   return (
     <Container style={{ maxWidth: "100%" }}>
-      <div className={blogPostStyles["Post-article"]}>
+      <div className={article}>
         {originalChildren.map((child, i) => {
           if (child.props.mdxType === "pre") {
             return <MiniEditorWithState {...getEditorProps(child)} key={i} />;
@@ -131,7 +131,7 @@ const PresentationModeStep: React.FC<StepProps> = ({ currentStep, steps }) => {
   return (
     <Container style={{ maxWidth: "100%" }}>
       <div
-        className={blogPostStyles["Post-article"]}
+        className={article}
         style={{
           display: "grid",
           gridTemplateColumns: codeBlock || image ? "1fr 1fr" : "100%",
@@ -218,7 +218,7 @@ const DesktopStep: React.FC<StepProps> = ({ currentStep, steps }) => {
       onChange={(inView) => inView && setInViewStep(currentStep)}
     >
       <Container
-        className={blogPostStyles["Post-article"]}
+        className={article}
         style={{
           width: "100%",
           maxWidth: "80rem",
@@ -232,7 +232,6 @@ const DesktopStep: React.FC<StepProps> = ({ currentStep, steps }) => {
           return (
             <div
               key={`${currentStep}-${i}`}
-              className={blogPostStyles["Post-article"]}
               style={{
                 position: "relative",
                 minHeight:

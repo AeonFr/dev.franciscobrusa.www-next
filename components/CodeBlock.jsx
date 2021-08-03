@@ -21,6 +21,7 @@
 import React, { Fragment } from "react";
 import Highlight, { defaultProps } from "prism-react-renderer";
 import MultiRange from "multi-integer-range";
+import "../styles/code-block.css";
 
 const rootStyles = (hasLineNumbers) => ({
   padding: "0.5em 1em",

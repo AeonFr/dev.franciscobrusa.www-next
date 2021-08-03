@@ -1,11 +1,10 @@
 import "../styles/globals.css";
-import "../styles/CodeBlock.css";
 
 import Head from "next/head";
 import ColorSchemePicker from "../components/layout/ColorSchemePicker";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { useCallback } from "react";
-import layoutStyles from "../styles/Layout.module.css";
+import * as layoutStyles from "../styles/layout.css";
 
 function MyApp({ Component, pageProps }) {
   const [scheme, setScheme] = useColorScheme();
@@ -38,7 +37,7 @@ function MyApp({ Component, pageProps }) {
 
       <div
         style={{ position: "relative", borderTop: "3px solid var(--accent)" }}
-        className={layoutStyles["App-frame"]}
+        className={layoutStyles.block}
       >
         <ColorSchemePicker
           scheme={scheme}

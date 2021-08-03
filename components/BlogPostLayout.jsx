@@ -2,7 +2,7 @@ import { MDXProvider } from "@mdx-js/react";
 import Layout from "./Layout";
 import Container from "./Container";
 import CodeBlock from "./CodeBlock";
-import blogPostStyles from "../styles/BlogPostLayout.module.css";
+import { article } from "../styles/article.css";
 
 export const components = {
   abbr: ({ children }) => <abbr>{children}</abbr>,
@@ -27,9 +27,7 @@ export default function BlogPostLayout({ children, ...metadata }) {
     <Layout {...metadata}>
       <Container>
         <MDXProvider components={components}>
-          <article className={blogPostStyles["Post-article"]}>
-            {children}
-          </article>
+          <article className={article}>{children}</article>
         </MDXProvider>
       </Container>
     </Layout>

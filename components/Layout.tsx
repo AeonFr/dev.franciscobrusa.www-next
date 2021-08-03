@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Head from "next/head";
-import layoutClasses from "../styles/Layout.module.css";
 import { useEffect } from "react";
 import type { PostMetadata } from "../utils/postsMetadata";
+import * as styles from "../styles/layout.css";
 
 interface LayoutProps {
   title: PostMetadata["title"];
@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({
   }, [lang]);
 
   return (
-    <div className={layoutClasses["App"]}>
+    <div className={styles.wrapper}>
       <Head>
         <title>{title}</title>
 
@@ -51,26 +51,20 @@ const Layout: React.FC<LayoutProps> = ({
         )}
       </Head>
 
-      <header className={layoutClasses["App-frame"]}>
+      <header className={styles.block}>
         <Link href="/">
-          <a
-            className={
-              layoutClasses["App-logo"] + " " + layoutClasses["App-header-link"]
-            }
-          >
-            Francisco Brusa
-          </a>
+          <a className={styles.logo}>Francisco Brusa</a>
         </Link>
       </header>
 
       <main>{children}</main>
 
-      <footer className={layoutClasses["App-frame"]}>
+      <footer className={styles.block}>
         <a
           href="https://twitter.com/francanobr"
           target="_blank"
           rel="noreferrer"
-          className={layoutClasses["App-header-link"]}
+          className={styles.headerLink}
         >
           Twitter
         </a>
@@ -78,7 +72,7 @@ const Layout: React.FC<LayoutProps> = ({
           href="https://github.com/aeonfr"
           target="_blank"
           rel="noreferrer"
-          className={layoutClasses["App-header-link"]}
+          className={styles.headerLink}
         >
           Github
         </a>

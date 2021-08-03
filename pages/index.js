@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Layout from "../components/Layout";
 import Container from "../components/Container";
-import indexStyles from "../styles/Index.module.css";
+import * as styles from "./index.css";
 
 export function getStaticProps() {
   const { getPostsMetadata } = require("../utils/postsMetadata");
@@ -23,18 +23,29 @@ export default function Home({ posts }) {
       </Head>
 
       <Container>
-        <ul className={indexStyles["Home"]}>
+        <ul className={styles.listContainer}>
           {posts
             .filter(({ isDraft }) => !isDraft)
             .map((post) => (
-              <li key={post.slug} className={indexStyles["Home-post-block"]}>
+              <li
+                key={post.slug}
+                className={styles.listItem}
+                lang={post.lang !== "en" ? post.lang : undefined}
+              >
                 <Link href={`/blog/${post.slug}`}>
-                  <a className={indexStyles["Home-link"]}>{post.title}</a>
+                  <a className={styles.link}>{post.title}</a>
                 </Link>
-                {post.lang == "es" ? <span title="Español">🇪🇸</span> : ""}
-                <p className={indexStyles["Home-excerpt"]}>
-                  {post.description}
-                </p>
+                {post.lang == "es" ? (
+                  <span
+                    className={styles.label}
+                    style={{ marginLeft: "0.5em" }}
+                  >
+                    Español
+                  </span>
+                ) : (
+                  ""
+                )}
+                <p className={styles.excerpt}>{post.description}</p>
               </li>
             ))}
         </ul>

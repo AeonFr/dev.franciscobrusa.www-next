@@ -1,11 +1,11 @@
-import layoutStyles from "../styles/Layout.module.css";
+import * as layoutStyles from "../styles/layout.css";
 
 export default function Container(props) {
   const { className, ...restOfProps } = props;
   return (
-    <div className={layoutStyles["App-frame"]}>
+    <div className={layoutStyles.block}>
       <div
-        className={layoutStyles["App-content"] + " " + (className || "")}
+        className={layoutStyles.content + " " + (className || "")}
         {...restOfProps}
       />
     </div>
