@@ -25,7 +25,7 @@
     "react-dom": "17.0.2",
     "react-intersection-observer": "^8.31.1",
     "react-responsive": "^8.2.0",
-    "vanilla-extract-plugin-nextjs": "0.0.1"
+    "vanilla-extract-plugin-nextjs": "0.0.5"
   },
   "devDependencies": {
     "@types/react": "^17.0.3",
