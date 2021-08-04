@@ -1,7 +1,7 @@
 const withMDX = require("@next/mdx")({
   extension: /\.mdx$/,
 });
-const withVanillaExtract = require("./utils/withVanillaExtract");
+const withVanillaExtract = require("vanilla-extract-plugin-nextjs");
 
 const baseURL = "https://franciscobrusa.dev";
 
