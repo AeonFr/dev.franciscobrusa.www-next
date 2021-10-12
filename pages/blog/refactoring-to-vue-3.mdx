@@ -1,17 +1,14 @@
 export const metadata = {
   title: "Refactoring to Vue 3",
   date: "2021-05-20",
-  socialImage:
-    "/blog/refactoring-to-vue-3/social-image.png",
+  socialImage: "/blog/refactoring-to-vue-3/social-image.png",
   description:
     "Using the composition API to express reusable stateful logic in VueJS",
+  thumbnail: "/blog/refactoring-to-vue-3/thumbnail.png",
 };
 import BlogCodeWalkthroughLayout from "../../components/BlogCodeWalkthroughLayout";
 export default (props) => (
-  <BlogCodeWalkthroughLayout
-    {...props}
-    metadata={metadata}
-  />
+  <BlogCodeWalkthroughLayout {...props} metadata={metadata} />
 );
 
 # Refactoring to Vue&nbsp;3
@@ -147,16 +144,10 @@ We can add **resize** event handlers to our component.
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidth
-      );
+      window.addEventListener("resize", this.calculateWindowWidth);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidth
-      );
+      window.removeEventListener("resize", this.calculateWindowWidth);
     },
     methods: {
       calculateWindowWidth() {
@@ -194,16 +185,10 @@ We can add a throttled version of the `calculateWindowWidth`, and use it as the 
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidth() {
@@ -236,16 +221,10 @@ By now our component has quite some **stateful logic**.
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidth() {
@@ -294,16 +273,10 @@ By convention, the name of our function will start with `use*`.
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidth() {
@@ -341,16 +314,10 @@ To begin, let's define a `windowWidth` value using `ref()`.
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidth() {
@@ -398,16 +365,10 @@ Returning a _ref_ from `setup()` is equivalent as declaring it in `data()`.
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidth() {
@@ -451,16 +412,10 @@ Let's continue. We have two methods in our component. Let's see how we could pas
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidth() {
@@ -502,8 +457,7 @@ Since a method is just a function, to replace our methods we can create a functi
 
   export default {
     setup() {
-      const { windowWidth, calculateWindowWidth } =
-        useWindowWidth();
+      const { windowWidth, calculateWindowWidth } = useWindowWidth();
 
       return {
         windowWidth,
@@ -511,16 +465,10 @@ Since a method is just a function, to replace our methods we can create a functi
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidthThrottled: throttle(function () {
@@ -559,8 +507,7 @@ Notice how the `windowWidth` _ref_ is mutated by changing it's `value` property.
 
   export default {
     setup() {
-      const { windowWidth, calculateWindowWidth } =
-        useWindowWidth();
+      const { windowWidth, calculateWindowWidth } = useWindowWidth();
 
       return {
         windowWidth,
@@ -568,16 +515,10 @@ Notice how the `windowWidth` _ref_ is mutated by changing it's `value` property.
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
     methods: {
       calculateWindowWidthThrottled: throttle(function () {
@@ -612,10 +553,7 @@ Just like with the `calculateWindowWidth` method, we can extract it's throttled 
       windowWidth.value = window.innerWidth;
     };
 
-    const calculateWindowWidthThrottled = throttle(
-      calculateWindowWidth,
-      200
-    );
+    const calculateWindowWidthThrottled = throttle(calculateWindowWidth, 200);
 
     return {
       windowWidth,
@@ -639,16 +577,10 @@ Just like with the `calculateWindowWidth` method, we can extract it's throttled 
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
   };
 </script>
@@ -674,10 +606,7 @@ Finally, let's deal with these event listeners...
       windowWidth.value = window.innerWidth;
     };
 
-    const calculateWindowWidthThrottled = throttle(
-      calculateWindowWidth,
-      200
-    );
+    const calculateWindowWidthThrottled = throttle(calculateWindowWidth, 200);
 
     return {
       windowWidth,
@@ -701,16 +630,10 @@ Finally, let's deal with these event listeners...
       };
     },
     mounted() {
-      window.addEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", this.calculateWindowWidthThrottled);
     },
     beforeDestroy() {
-      window.removeEventListener(
-        "resize",
-        this.calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", this.calculateWindowWidthThrottled);
     },
   };
 </script>
@@ -736,23 +659,14 @@ We can use `onMounted` and `onBeforeUnmount` to move this event listeners into o
       windowWidth.value = window.innerWidth;
     };
 
-    const calculateWindowWidthThrottled = throttle(
-      calculateWindowWidth,
-      200
-    );
+    const calculateWindowWidthThrottled = throttle(calculateWindowWidth, 200);
 
     onMounted(() => {
-      window.addEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", calculateWindowWidthThrottled);
     });
 
     onBeforeUnmount(() => {
-      window.removeEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", calculateWindowWidthThrottled);
     });
 
     return {
@@ -800,23 +714,14 @@ After all these changes, all the stateful logic is now encapsulated, abstracted 
       windowWidth.value = window.innerWidth;
     };
 
-    const calculateWindowWidthThrottled = throttle(
-      calculateWindowWidth,
-      200
-    );
+    const calculateWindowWidthThrottled = throttle(calculateWindowWidth, 200);
 
     onMounted(() => {
-      window.addEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", calculateWindowWidthThrottled);
     });
 
     onBeforeUnmount(() => {
-      window.removeEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", calculateWindowWidthThrottled);
     });
 
     return {
@@ -856,23 +761,14 @@ At the end, we only need to import the `windowWidth` variable from our compositi
       windowWidth.value = window.innerWidth;
     };
 
-    const calculateWindowWidthThrottled = throttle(
-      calculateWindowWidth,
-      200
-    );
+    const calculateWindowWidthThrottled = throttle(calculateWindowWidth, 200);
 
     onMounted(() => {
-      window.addEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
+      window.addEventListener("resize", calculateWindowWidthThrottled);
     });
 
     onBeforeUnmount(() => {
-      window.removeEventListener(
-        "resize",
-        calculateWindowWidthThrottled
-      );
+      window.removeEventListener("resize", calculateWindowWidthThrottled);
     });
 
     return {

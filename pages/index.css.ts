@@ -3,19 +3,37 @@ import { style } from "@vanilla-extract/css";
 export const listContainer = style({
   padding: 0,
   listStyle: "none",
+  "@media": {
+    "(min-width: 58em)": {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(20em, 1fr))",
+      gap: "1em",
+      alignItems: "start",
+    },
+  },
 });
 
 export const listItem = style({
-  margin: "1em 0",
+  margin: "2em 0",
   listStyle: "none",
-  padding: 0,
+  padding: "1em 1em 1.5em 1.5em",
+  backgroundColor: "var(--code-bg)",
+  borderRadius: "1em",
+  cursor: "pointer",
+});
+
+export const thumbnail = style({
+  borderTopLeftRadius: "1em",
+  borderTopRightRadius: "1em",
+  margin: "-1em -1em 1.5em -1.5em",
+  width: "calc(100% + 2.5em)",
 });
 
 export const link = style({
   color: "inherit",
-  fontSize: "1.25em",
+  fontSize: "1.5em",
+  fontWeight: "bold",
   textDecoration: "none",
-  borderBottom: "1px solid var(--accent)",
   lineHeight: 1.2,
 });
 

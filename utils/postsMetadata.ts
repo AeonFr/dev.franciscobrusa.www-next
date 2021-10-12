@@ -7,6 +7,7 @@ export interface PostMetadata {
   date: string;
   lang?: "es" | "en" | string;
   socialImage?: string;
+  thumbnail?: string;
   [key: string]: any;
 }
 

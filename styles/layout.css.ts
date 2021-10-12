@@ -1,13 +1,5 @@
 import { composeStyles, style } from "@vanilla-extract/css";
 
-const contentPaddingDesktop = {
-  "@media": {
-    "(min-width: 40rem)": {
-      padding: "2rem",
-    },
-  },
-};
-
 export const wrapper = style({
   display: "flex",
   flexDirection: "column",
@@ -18,6 +10,12 @@ export const block = style({
   width: "100%",
   maxWidth: "70rem",
   margin: "0 auto",
+  padding: "1rem",
+  "@media": {
+    "(min-width: 40rem)": {
+      padding: "1rem 2rem",
+    },
+  },
 });
 
 export const headerLink = style({
@@ -25,7 +23,6 @@ export const headerLink = style({
   padding: "0.5rem 1rem",
   fontWeight: "bold",
   color: "var(--accent)",
-  ...contentPaddingDesktop,
 });
 
 export const logo = composeStyles(
@@ -34,14 +31,14 @@ export const logo = composeStyles(
     userSelect: "none",
     fontWeight: "bolder",
     fontSize: "1.5rem",
-    padding: "1rem",
+    padding: "0",
     textDecoration: "none",
   })
 );
 
 export const content = style({
-  maxWidth: "50rem",
-  padding: "1em",
+  maxWidth: "55em",
+  margin: "0 auto",
+  paddingRight: "5em",
   flexGrow: 1,
-  ...contentPaddingDesktop,
 });

@@ -1,9 +1,8 @@
 export const metadata = {
-  title:
-    "The Service Workers Cache API and the Fetch Event",
+  title: "The Service Workers Cache API and the Fetch Event",
   date: "2021-01-15T18:06:23.400Z",
-  description:
-    "Exploring the potential of the Service Workers Cache API",
+  description: "Exploring the potential of the Service Workers Cache API",
+  thumbnail: "/blog/service-workers-cache/service-worker.svg",
 };
 
 import BlogPostLayout from "../../components/BlogPostLayout";
@@ -11,8 +10,7 @@ export default ({ children }) => (
   <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
 );
 
-export const serviceWorker =
-  "/blog/service-workers-cache/service-worker.svg";
+export const serviceWorker = "/blog/service-workers-cache/service-worker.svg";
 
 <img src={serviceWorker} alt="" />
 
@@ -71,30 +69,28 @@ self.addEventListener("fetch", function (e) {
       ? "images"
       : "core";
     e.respondWith(
-      caches
-        .open(cacheName + "-v" + VERSION)
-        .then((cache) => {
-          return cache.match(url).then((response) => {
-            return (
-              response ||
-              fetch(e.request)
-                .then((networkResponse) => {
-                  if (
-                    networkResponse &&
-                    networkResponse.status === 200 &&
-                    networkResponse.type === "basic"
-                  ) {
-                    cache.put(url, networkResponse.clone());
-                    return networkResponse;
-                  }
-                  return returnNoNetwork();
-                })
-                .catch(() => {
-                  return returnNoNetwork();
-                })
-            );
-          });
-        })
+      caches.open(cacheName + "-v" + VERSION).then((cache) => {
+        return cache.match(url).then((response) => {
+          return (
+            response ||
+            fetch(e.request)
+              .then((networkResponse) => {
+                if (
+                  networkResponse &&
+                  networkResponse.status === 200 &&
+                  networkResponse.type === "basic"
+                ) {
+                  cache.put(url, networkResponse.clone());
+                  return networkResponse;
+                }
+                return returnNoNetwork();
+              })
+              .catch(() => {
+                return returnNoNetwork();
+              })
+          );
+        });
+      })
     );
   }
 });
@@ -223,9 +219,7 @@ self.addEventListener("fetch", async (event) => {
 });
 
 function isRequestingImage(request) {
-  return /image\/[^,]+$/i.test(
-    request.headers.get("Accept")
-  );
+  return /image\/[^,]+$/i.test(request.headers.get("Accept"));
 }
 ```
 

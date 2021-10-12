@@ -2,9 +2,9 @@ import "../styles/globals.css";
 
 import Head from "next/head";
 import ColorSchemePicker from "../components/layout/ColorSchemePicker";
+import Block from "../components/Block";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { useCallback } from "react";
-import * as layoutStyles from "../styles/layout.css";
 
 function MyApp({ Component, pageProps }) {
   const [scheme, setScheme] = useColorScheme();
@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }) {
   });
 
   return (
-    <>
+    <div>
       <Head key="favicon">
         <link
           rel="apple-touch-icon"
@@ -35,9 +35,10 @@ function MyApp({ Component, pageProps }) {
         />
       </Head>
 
-      <div
-        style={{ position: "relative", borderTop: "3px solid var(--accent)" }}
-        className={layoutStyles.block}
+      <Block
+        style={{
+          position: "relative",
+        }}
       >
         <ColorSchemePicker
           scheme={scheme}
@@ -49,9 +50,9 @@ function MyApp({ Component, pageProps }) {
             fontSize: "1.5rem",
           }}
         />
-      </div>
+      </Block>
       <Component {...pageProps} />
-    </>
+    </div>
   );
 }
 

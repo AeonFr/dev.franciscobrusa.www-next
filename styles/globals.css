@@ -4,6 +4,10 @@ body {
   margin: 0;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .theme-snazzy {
   /**
    * Colors based on the snazzy theme palette
