@@ -2,8 +2,6 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 .theme-snazzy {
@@ -16,6 +14,7 @@ body {
   --medium-gray: #9194a2;
   --dark-gray: #565869;
   --black: #282a36;
+  --blacker-than-black: #1d1e25;
   --light-red: #ff5c57;
   --dark-red: #ff5c57;
   --light-green: #59f78d;
@@ -30,12 +29,22 @@ body {
   --dark-teal: #14bbb7;
 }
 
+@supports (color: color(display-p3 1 1 1)) {
+  .theme-snazzy {
+    --light-blue: color(display-p3 0.455 0.779 1);
+    --dark-blue: color(display-p3 0 0.493 0.905);
+    --light-pink: color(display-p3 1 0.425 0.78);
+    --dark-pink: color(display-p3 0.97 0.437 0.762);
+  }
+}
+
 .theme-snazzy.scheme-light {
   /* website settings */
   --bg: var(--white);
   --color: var(--black);
   --accent: var(--dark-pink);
-  --code-bg: var(--white);
+  --accent-alt: var(--dark-blue);
+  --code-bg: var(--light-gray);
   --blockquote-line: var(--accent);
 
   /* code syntax highlight */
@@ -53,9 +62,10 @@ body {
 
 .theme-snazzy.scheme-dark {
   /* website settings */
-  --bg: var(--black);
+  --bg: var(--blacker-than-black);
   --color: var(--light-gray);
-  --accent: var(--light-teal);
+  --accent: var(--light-blue);
+  --accent-alt: var(--light-pink);
   --code-bg: var(--black);
   --blockquote-line: var(--accent);
 

@@ -1,6 +1,8 @@
 export const metadata = {
   date: "2020-02-05T23:18:09Z",
   title: "History of React and Modern JS Frameworks",
+  description:
+    "We take a look into the history of React and the declarative paradigm for building UIs",
 };
 
 import BlogPostLayout from "../../components/BlogPostLayout";
@@ -10,8 +12,10 @@ export default ({ children }) => (
 
 import Counter from "../../components/blog/history-of-react/Counter";
 
-export const timeline = "/blog/history-of-react/timeline.svg";
-export const fiberTreeDiagram = "/blog/history-of-react/fiber-tree-diagram.png";
+export const timeline =
+  "/blog/history-of-react/timeline.svg";
+export const fiberTreeDiagram =
+  "/blog/history-of-react/fiber-tree-diagram.png";
 export const oopVsReact =
   "/blog/history-of-react/OOP-obj-vs-react-component.svg";
 export const rh1 = "/blog/history-of-react/rh1.png";
@@ -186,7 +190,9 @@ let myFunction = (event) => {
   /* do something */
 };
 
-var select = <Select options={options} onChange={myFunction} />;
+var select = (
+  <Select options={options} onChange={myFunction} />
+);
 ```
 
 This property that’s actually a function, is what in React is called an **event**. This allows the _child_ component to comunicate back to the _parent_ component what is happening inside.
@@ -235,9 +241,12 @@ export default function Counter() {
 
   return (
     <div>
-      Counter was clicked {count} time{count !== 1 ? "s" : null}
+      Counter was clicked {count} time
+      {count !== 1 ? "s" : null}
       <br />
-      <button onClick={() => setCount(count + 1)}>Increment 1</button>
+      <button onClick={() => setCount(count + 1)}>
+        Increment 1
+      </button>
     </div>
   );
 }

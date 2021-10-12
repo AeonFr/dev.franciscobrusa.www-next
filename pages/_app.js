@@ -1,12 +1,18 @@
 import "../styles/globals.css";
-import "../styles/CodeBlock.css";
 
 import Head from "next/head";
 import ColorSchemePicker from "../components/layout/ColorSchemePicker";
 import { useColorScheme } from "../hooks/useColorScheme";
+import { useCallback } from "react";
+import * as layoutStyles from "../styles/layout.css";
 
 function MyApp({ Component, pageProps }) {
   const [scheme, setScheme] = useColorScheme();
+
+  const handleSchemeChange = useCallback((ev) => {
+    setScheme(ev.target.value);
+  });
+
   return (
     <>
       <Head key="favicon">
@@ -27,21 +33,23 @@ function MyApp({ Component, pageProps }) {
           sizes="16x16"
           href="/favicon/favicon-16x16.png"
         />
-        <link rel="manifest" href="/favicon/site.webmanifest"></link>
       </Head>
 
-      <ColorSchemePicker
-        scheme={scheme}
-        handleSchemeChange={(ev) => setScheme(ev.target.value)}
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          paddingTop: "1rem",
-          paddingRight: "1rem",
-          fontSize: "1.5rem",
-        }}
-      />
+      <div
+        style={{ position: "relative", borderTop: "3px solid var(--accent)" }}
+        className={layoutStyles.block}
+      >
+        <ColorSchemePicker
+          scheme={scheme}
+          handleSchemeChange={handleSchemeChange}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            fontSize: "1.5rem",
+          }}
+        />
+      </div>
       <Component {...pageProps} />
     </>
   );

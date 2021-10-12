@@ -1,6 +1,9 @@
 export const metadata = {
-  title: "The Service Workers Cache API and the Fetch Event",
+  title:
+    "The Service Workers Cache API and the Fetch Event",
   date: "2021-01-15T18:06:23.400Z",
+  description:
+    "Exploring the potential of the Service Workers Cache API",
 };
 
 import BlogPostLayout from "../../components/BlogPostLayout";
@@ -8,7 +11,8 @@ export default ({ children }) => (
   <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
 );
 
-export const serviceWorker = "/blog/service-workers-cache/service-worker.svg";
+export const serviceWorker =
+  "/blog/service-workers-cache/service-worker.svg";
 
 <img src={serviceWorker} alt="" />
 
@@ -27,7 +31,12 @@ When intercepting a request, you're allowed to modify it's response. You can cho
 
 </div>
 
-<div style={{ fontSize: "1rem", borderTop: "1px dashed var(--accent)" }} />
+<div
+  style={{
+    fontSize: "1rem",
+    borderTop: "1px dashed var(--accent)",
+  }}
+/>
 
 ### The Cache API (WindowOrWorkerGlobalScope.caches)
 
@@ -62,28 +71,30 @@ self.addEventListener("fetch", function (e) {
       ? "images"
       : "core";
     e.respondWith(
-      caches.open(cacheName + "-v" + VERSION).then((cache) => {
-        return cache.match(url).then((response) => {
-          return (
-            response ||
-            fetch(e.request)
-              .then((networkResponse) => {
-                if (
-                  networkResponse &&
-                  networkResponse.status === 200 &&
-                  networkResponse.type === "basic"
-                ) {
-                  cache.put(url, networkResponse.clone());
-                  return networkResponse;
-                }
-                return returnNoNetwork();
-              })
-              .catch(() => {
-                return returnNoNetwork();
-              })
-          );
-        });
-      })
+      caches
+        .open(cacheName + "-v" + VERSION)
+        .then((cache) => {
+          return cache.match(url).then((response) => {
+            return (
+              response ||
+              fetch(e.request)
+                .then((networkResponse) => {
+                  if (
+                    networkResponse &&
+                    networkResponse.status === 200 &&
+                    networkResponse.type === "basic"
+                  ) {
+                    cache.put(url, networkResponse.clone());
+                    return networkResponse;
+                  }
+                  return returnNoNetwork();
+                })
+                .catch(() => {
+                  return returnNoNetwork();
+                })
+            );
+          });
+        })
     );
   }
 });
@@ -189,7 +200,9 @@ This simple code adds a header to any outbound request made by our web app.
 self.addEventListener("fetch", (e) => {
   // extend original request to add new header
   const request = new Request(e.request, {
-    headers: new Headers({ "X-My-Custom-Header": "Zeke are cool" }),
+    headers: new Headers({
+      "X-My-Custom-Header": "Zeke are cool",
+    }),
   });
 
   e.respondWith(fetch(request));
@@ -210,7 +223,9 @@ self.addEventListener("fetch", async (event) => {
 });
 
 function isRequestingImage(request) {
-  return /image\/[^,]+$/i.test(request.headers.get("Accept"));
+  return /image\/[^,]+$/i.test(
+    request.headers.get("Accept")
+  );
 }
 ```
 

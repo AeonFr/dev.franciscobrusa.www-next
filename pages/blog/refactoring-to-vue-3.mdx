@@ -1,0 +1,1081 @@
+export const metadata = {
+  title: "Refactoring to Vue 3",
+  date: "2021-05-20",
+  socialImage:
+    "/blog/refactoring-to-vue-3/social-image.png",
+  description:
+    "Using the composition API to express reusable stateful logic in VueJS",
+};
+import BlogCodeWalkthroughLayout from "../../components/BlogCodeWalkthroughLayout";
+export default (props) => (
+  <BlogCodeWalkthroughLayout
+    {...props}
+    metadata={metadata}
+  />
+);
+
+# Refactoring to Vue&nbsp;3
+
+<div style={{ fontSize: "1.5em" }}>
+
+Using the Composition API to express reusable **stateful logic** in VueJS
+
+</div>
+
+---
+
+## UI as a function of state
+
+One of the core principles of React, Vue and other frameworks or libraries, is that the UI is a result of passing **state** through a function.
+
+<small>
+
+(you don't even need a framework to apply this concept)
+
+</small>
+
+But what is **state** exactly?
+
+```js
+UI = fn(state);
+```
+
+---
+
+<div style={{ fontSize: "1.5em" }}>
+
+**State** is data that changes over time. In other words, a **data stream**.
+
+</div>
+
+For example, if we have a Button that retrieves data from the server and updates a list of items, the **state** would be the retrieved data.
+
+<img
+  src="/blog/refactoring-to-vue-3/state-stream.svg"
+  alt="Visual representation of a data stream (described above)"
+  style={{
+    backgroundColor: "#ffffff",
+    width: "40rem",
+    maxWidth: "100%",
+  }}
+/>
+
+---
+
+<div style={{ fontSize: "1.5em" }}>
+
+**Stateful logic** is all the logic involved in mutating state.
+
+</div>
+
+In this example, we call **stateful logic** to the click event handler, the data fetching process, etc.
+
+<img
+  src="/blog/refactoring-to-vue-3/stateful-logic.svg"
+  alt="The stateful logic would include: the click stream, the retrieval of state from the server on click, and the logic that updates state when data is retrieved from the server"
+  style={{
+    backgroundColor: "#ffffff",
+    width: "40rem",
+    maxWidth: "100%",
+  }}
+/>
+
+---
+
+## Stateful logic in Vue
+
+Let's see how we could represent some simple stateful logic in a VueJS component.
+
+We will do it "the old way" for now, and then refactor it to the composition API.
+
+---
+
+We will start with a component that shows the current window width.
+
+```html
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+  };
+</script>
+```
+
+---
+
+The value of the window width is calculated when the component is mounted, but it's not updated if the user resizes the browser...
+
+Let's fix that!
+
+```html 9
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+  };
+</script>
+```
+
+---
+
+We can add **resize** event handlers to our component.
+
+```html 11:28
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidth
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidth
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+    },
+  };
+</script>
+```
+
+---
+
+It's a good practice to **throttle** the resize event, otherwise this component will update many times per second while the user is scrolling, and that might cause the experience to feel "laggy".
+
+<div style={{ fontSize: "0.7em" }}>
+
+(In case you're not familiar with _throttling_ and _debouncing_, here's a great [CSS-tricks article on the subject](https://css-tricks.com/debouncing-throttling-explained-examples/)).
+
+</div>
+
+We can add a throttled version of the `calculateWindowWidth`, and use it as the event listener function.
+
+```html 17, 23, 30:32
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+---
+
+By now our component has quite some **stateful logic**.
+
+```html
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+To make this logic easily reusable, and to clean up our code, we will create a **composition function**.
+
+---
+
+<div style={{ fontSize: "1.5em" }}>
+
+A **composition function** (also known as a **hook** in React) is a way to encapsulate stateful logic so that it's reusable between components.
+
+</div>
+
+---
+
+We will cover step-by-step how to create our composition function and replace all our stateful logic in the **options** part of our component.
+
+(By the **options** part, we mean `data()`, `mounted()`, `beforeDestroy()`, etc).
+
+By convention, the name of our function will start with `use*`.
+
+```html 8
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+
+  function useWindowWidth() {}
+
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+---
+
+To begin, let's define a `windowWidth` value using `ref()`.
+
+```html 7,10
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+  }
+
+  export default {
+    data() {
+      return {
+        windowWidth: window.innerWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+---
+
+We can already consume this composition function in our component and everything will keep working.
+
+To do so, we will replace the `data()` section of our component with our composition function, called in `setup()`.
+
+Returning a _ref_ from `setup()` is equivalent as declaring it in `data()`.
+
+```html 9:15,18:24
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    return {
+      windowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth } = useWindowWidth();
+
+      return {
+        windowWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+---
+
+Let's continue. We have two methods in our component. Let's see how we could pass them to the composition function...
+
+```html 37:44
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    return {
+      windowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth } = useWindowWidth();
+
+      return {
+        windowWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidth() {
+        this.windowWidth = window.innerWidth;
+      },
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+---
+
+Since a method is just a function, to replace our methods we can create a function inside `useWindowWidth`, return it, and then consume it inside `setup()`.
+
+```html 9,12:14,16,18:19,23:25,27,29:30
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    return {
+      windowWidth,
+      calculateWindowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth, calculateWindowWidth } =
+        useWindowWidth();
+
+      return {
+        windowWidth,
+        calculateWindowWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+---
+
+Notice how the `windowWidth` _ref_ is mutated by changing it's `value` property.
+
+```html 11:16
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    return {
+      windowWidth,
+      calculateWindowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth, calculateWindowWidth } =
+        useWindowWidth();
+
+      return {
+        windowWidth,
+        calculateWindowWidth,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    methods: {
+      calculateWindowWidthThrottled: throttle(function () {
+        this.calculateWindowWidth();
+      }, 200),
+    },
+  };
+</script>
+```
+
+A very common mistake to make in the beginning is to change the `windowWidth` value directly. But this would make the object loose all reactivity.
+
+_Refs_ are actually objects that wrap values inside. There are good reasons why the Vue developers choose on these implementation details, [you can read more about it here](https://v3.vuejs.org/guide/composition-api-introduction.html#reactive-variables-with-ref).
+
+---
+
+Just like with the `calculateWindowWidth` method, we can extract it's throttled version into the composition function.
+
+```html 9,16:19,21,24:25
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    const calculateWindowWidthThrottled = throttle(
+      calculateWindowWidth,
+      200
+    );
+
+    return {
+      windowWidth,
+      calculateWindowWidth,
+      calculateWindowWidthThrottled,
+    };
+  }
+
+  export default {
+    setup() {
+      const {
+        windowWidth,
+        calculateWindowWidth,
+        calculateWindowWidthThrottled,
+      } = useWindowWidth();
+
+      return {
+        windowWidth,
+        calculateWindowWidth,
+        calculateWindowWidthThrottled,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+  };
+</script>
+```
+
+---
+
+Finally, let's deal with these event listeners...
+
+```html 42:53
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    const calculateWindowWidthThrottled = throttle(
+      calculateWindowWidth,
+      200
+    );
+
+    return {
+      windowWidth,
+      calculateWindowWidth,
+      calculateWindowWidthThrottled,
+    };
+  }
+
+  export default {
+    setup() {
+      const {
+        windowWidth,
+        calculateWindowWidth,
+        calculateWindowWidthThrottled,
+      } = useWindowWidth();
+
+      return {
+        windowWidth,
+        calculateWindowWidth,
+        calculateWindowWidthThrottled,
+      };
+    },
+    mounted() {
+      window.addEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+    beforeDestroy() {
+      window.removeEventListener(
+        "resize",
+        this.calculateWindowWidthThrottled
+      );
+    },
+  };
+</script>
+```
+
+---
+
+We can use `onMounted` and `onBeforeUnmount` to move this event listeners into our composable.
+
+```html 7,21:33
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref, onMounted, onBeforeUnmount } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    const calculateWindowWidthThrottled = throttle(
+      calculateWindowWidth,
+      200
+    );
+
+    onMounted(() => {
+      window.addEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    return {
+      windowWidth,
+      calculateWindowWidth,
+      calculateWindowWidthThrottled,
+    };
+  }
+
+  export default {
+    setup() {
+      const {
+        windowWidth,
+        calculateWindowWidth,
+        calculateWindowWidthThrottled,
+      } = useWindowWidth();
+
+      return {
+        windowWidth,
+        calculateWindowWidth,
+        calculateWindowWidthThrottled,
+      };
+    },
+  };
+</script>
+```
+
+---
+
+After all these changes, all the stateful logic is now encapsulated, abstracted away, inside `useWindowWidth()`.
+
+```html 6:38
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref, onMounted, onBeforeUnmount } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    const calculateWindowWidthThrottled = throttle(
+      calculateWindowWidth,
+      200
+    );
+
+    onMounted(() => {
+      window.addEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    return {
+      windowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth } = useWindowWidth();
+
+      return {
+        windowWidth,
+      };
+    },
+  };
+</script>
+```
+
+---
+
+At the end, we only need to import the `windowWidth` variable from our composition function...
+
+```html 40:48
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import throttle from "lodash/throttle";
+  import { ref, onMounted, onBeforeUnmount } from "vue";
+
+  function useWindowWidth() {
+    const windowWidth = ref(window.innerWidth);
+
+    const calculateWindowWidth = () => {
+      windowWidth.value = window.innerWidth;
+    };
+
+    const calculateWindowWidthThrottled = throttle(
+      calculateWindowWidth,
+      200
+    );
+
+    onMounted(() => {
+      window.addEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener(
+        "resize",
+        calculateWindowWidthThrottled
+      );
+    });
+
+    return {
+      windowWidth,
+    };
+  }
+
+  export default {
+    setup() {
+      const { windowWidth } = useWindowWidth();
+
+      return {
+        windowWidth,
+      };
+    },
+  };
+</script>
+```
+
+---
+
+In fact, we can extract our composition function into it's own file to clean up our component. (And to make the function easier to reuse in other components).
+
+```html
+<template>
+  <div>Window width is: {{ windowWidth }}</div>
+</template>
+
+<script>
+  import { useWindowWidth } from "@/composables/useWindowWidth";
+
+  export default {
+    setup() {
+      const { windowWidth } = useWindowWidth();
+
+      return {
+        windowWidth,
+      };
+    },
+  };
+</script>
+```
+
+---
+
+## Many ways to reuse composition functions
+
+Our `useWindowWidth` function now encapsulates all the stateful logic of the `windowWidth` state.
+
+We can also reuse it in multiple components, just `import { useWindowWidth }` and you're good to go.
+
+---
+
+Now let's imagine we want to create a _computed property_ that indicates if the user is in a desktop or a mobile device.
+
+Additionally, we want to reuse this value in several components.
+
+Using the options API, we would do something like this:
+
+```js
+  // ...
+  computed: {
+    isMobile() {
+      return this.windowWidth < 750
+    }
+  },
+  // ...
+```
+
+---
+
+But that wouldn't be easy to reuse in other components. (You would have to copy and paste this computed every time).
+
+Let's create a composition function instead...
+
+```js
+export const useIsMobile = () => {};
+```
+
+---
+
+For this function, we also need to keep track of the window width and update it when the user resizes the browser. We can just use the composable we already created!
+
+```js 1,4
+import { useWindowWidth } from "@/composables/useWindowWidth";
+
+export const useIsMobile = () => {
+  const { windowWidth } = useWindowWidth();
+};
+```
+
+Our `useIsMobile` composable can **_use_** `windowWidth`, literally just by calling `useWindowWidth`.
+
+---
+
+Finally, let's create a computed and return it. (We will `import { computed } from "vue"`, which is the canonical way of creating computed properties inside _composables_).
+
+```js 1,7,9
+import { computed } from "vue";
+import { useWindowWidth } from "@/composables/useWindowWidth";
+
+export const useIsMobile = () => {
+  const { windowWidth } = useWindowWidth();
+
+  const isMobile = computed(() => windowWidth.value < 750);
+
+  return { isMobile };
+};
+```
+
+---
+
+Although this approach is fine, we can take advantage of the `window.matchMedia` browser API to compute this value; since this browser API has better performance.
+
+<div style={{ fontSize: "0.7em" }}>
+
+You can read more about `window.matchMedia` in the [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia).
+
+</div>
+
+---
+
+We could write a new _composable_ to use this API, adding event listeners in the proper lifecycle events (mounted, unmounted), and so on...
+
+But why do it if someone else already did it before?
+
+Luckily, some npm libraries provide composition functions to wrap common browser APIs (and to do much more).
+
+---
+
+For example, we can `useMediaQuery` from the excellent [vueuse](https://vueuse.org/core/useMediaQuery/) library.
+
+It's a wrapper around `window.matchMedia`. It will react to changes in the viewport (resizes) in a performant way.
+
+```js 2,5
+import { computed } from "vue";
+import { useMediaQuery } from "@vueuse/core";
+
+export const useIsMobile = () => {
+  const isMobile = useMediaQuery("(max-width: 750px)");
+
+  return { isMobile };
+};
+```
+
+---
+
+As you can see, composition functions unlock several features in Vue that were not previously available.
+
+1. We get to **reuse stateful logic**.
+2. We can compose _composition functions_ out of other _composition functions_.
+3. We can consume _composition functions_ out of npm packages, and publish ours into the registry.
+4. And all this without loosing any features. Using functions like `ref()`, `computed()`, `onMounted()`, [and many more](https://v3.vuejs.org/api/composition-api.html), we can write eloquent code without needing to come back to the so-called _options API_.
+
+If this sounds exiting and want to learn more, I recommend you to start by reading the [Composition API introduction (from the official Vue documentation)](https://v3.vuejs.org/guide/composition-api-introduction.html).
+
+---
+
+## Migrating from Vue 2 to Vue 3
+
+Now I know what you're thinking. This all sounds too good, but you're stuck in an old codebase that uses Vue 2 and migrating all your app at once is not possible 😰 ...
+
+In order to make the migration to Vue 3 easier, the Vue Core team developed a standalone package that brings the composition API to Vue 2.
+
+```js
+import { ref } from "@vue/composition-api";
+
+const useWindowWidth = () => {
+  const windowWidth = ref(window.innerWidth);
+
+  // ...
+};
+```
+
+When updating to Vue 3, just change the import to:  
+`import { ref } from "vue"`  
+...and everything should keep working.
+
+<div style={{ fontSize: "0.7em" }}>
+
+You can learn more about how to get started with the composition API plugin [here](https://github.com/vuejs/composition-api)
+
+</div>
+
+---
+
+## Wrapping up
+
+We have covered a step by step process of refactoring a Vue component from the **options API** to the **composition API**.
+
+The potential of the composition API is huge to make your code more reusable.
+Once you're familiar with this new API, you will see that it's a solid pattern that can scale well, and has even the potential to replace Vuex entirely from your application and become a centralized state management solution. (But that's maybe a topic for another article).
+
+If you're starting with Vue 3, I recommend you to start writing some simple composition functions (or _composables_), and once you're comfortable with them, start writing **all of your stateful logic** this way.
+
+---
+
+<div style={{ fontSize: "0.7em", maxWidth: "60em" }}>
+
+## Credits
+
+Thanks to the React community for providing components to make this article more interactive on desktop. (And Yes, this is a Vue article written in React. Deal with it.)
+
+In particular, the animations and scroll interactivity that you can see in this article (desktop only, sorry!) wouldn't have been possible without the work of [Rodrigo Pombo](https://pomb.us/) (specially [this conference talk](https://www.youtube.com/watch?v=xEu3t-KJVVg)).
+
+</div>
