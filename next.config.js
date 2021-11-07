@@ -6,7 +6,6 @@ const withVanillaExtract = createVanillaExtractPlugin();
 const {
   getGlobalCssLoader,
 } = require("next/dist/build/webpack/config/blocks/css/loaders");
-const MiniCssExtractPlugin = require("next/dist/compiled/mini-css-extract-plugin");
 
 const baseURL = "https://franciscobrusa.dev";
 
