@@ -10,6 +10,7 @@ const {
 const baseURL = "https://franciscobrusa.dev";
 
 const nextConfig = {
+  swcMinify: true,
   pageExtensions: ["js", "jsx", "mdx"],
   env: {
     baseURL,
@@ -37,6 +38,8 @@ const nextConfig = {
           isClient: !isServer,
           isServer,
           isDevelopment: dev,
+          future: {},
+          experimental: {},
         },
         [],
         []
