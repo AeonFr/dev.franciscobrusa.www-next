@@ -39,6 +39,10 @@ export const logo = composeStyles(
 export const content = style({
   maxWidth: "55em",
   margin: "0 auto",
-  paddingRight: "5em",
   flexGrow: 1,
+  "@media": {
+    "(max-width: 40rem)": {
+      paddingRight: "5em",
+    },
+  },
 });
