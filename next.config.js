@@ -8,9 +8,6 @@ const baseURL = "https://franciscobrusa.dev";
 module.exports = withMDX(
   withVanillaExtract({
     pageExtensions: ["js", "jsx", "mdx"],
-    future: {
-      webpack5: true,
-    },
     env: {
       baseURL,
     },
