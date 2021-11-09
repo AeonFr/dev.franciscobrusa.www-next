@@ -1,0 +1,117 @@
+export const metadata = {
+  title: "Secure npm package versions",
+  date: "2021-11-09",
+  socialImage: null,
+  description:
+    "How to use package-lock.json and handle dependencies in CI environments.",
+  thumbnail: null,
+  draft: true,
+};
+
+export const Info = (props) => (
+  <div
+    {...props}
+    style={{
+      padding: "1rem",
+      border: "1px solid",
+      borderRadius: "5px",
+      lineHeight: "1.5",
+    }}
+  >
+    {props.children.props.children}
+  </div>
+);
+
+import BlogPostLayout from "../../components/BlogPostLayout";
+export default ({ children }) => (
+  <BlogPostLayout {...metadata}>{children}</BlogPostLayout>
+);
+
+<h1 style={{ fontSize: "2em" }}>{metadata.title}</h1>
+
+Every now and then, a security breach occurs in an NPM package, and one of it's
+versions is compomised. A compromised package version usually contains mallicius
+code intended to gain control of the system in which it's deployed to.
+Sometimes, these packages might contain crypto miners and take advantage of the
+compromised system's resources.
+
+The reasons why a package might get compromised are many, but the most common is
+that a "hacker" gained control of the account of one of the maintainers of the repository.
+
+Although the scene might seem scary at first, there are ways to highly reduce
+the risks of installing compromised package versions.
+
+## Package versions
+
+When we run `npm install packageName` for the first time, a new line will be
+added to the `package.json` file, and changes will be saved to the `package-lock.json` file.
+
+The `package.json` file specifies the version of the package that we want to install,
+but in a vague format that can be as follow:
+
+```json
+{
+  "dependencies": {
+    "packageName": "^1.2.3"
+  }
+}
+```
+
+This `package.json` file says that we want to install the latest available release
+of the package `packageName`, as long as it's in not a major version (that's why the `^` is there).
+
+This is another way to express the same requirement:
+
+```json
+{
+  "dependencies": {
+    "packageName": "1.x"
+  }
+}
+```
+
+<Info>
+
+To lock a package in a _major_ version, and install the latest available _minor_ version, use the `^1.2.3` or `1.x` syntax.
+
+</Info>
+
+If we don't rely in the developer not introducing breaking changes, and we want
+to install the latest available _patch_ version,
+we can use another syntax:
+
+```json
+{
+  "dependencies": {
+    "packageName": "~1.2.3"
+  }
+}
+```
+
+Or it's equivalent:
+
+```json
+{
+  "dependencies": {
+    "packageName": "1.2.x"
+  }
+}
+```
+
+<Info>
+
+To lock a package in a _minor_ version, and install the latest available _patch_ version, use the `~1.2.3` or `1.2.x` syntax.
+
+</Info>
+
+Notice that `npm` will, by default, lock packages to a _major_ version, using the `^1.2.3` syntax.
+
+## Lockfiles
+
+The first time we run `npm install`, the `package-lock.json` file will be created.
+
+This file contains the dependencies and versions that were finally installed.
+While the `package.json` file might contain a vague instruction like `1.x`,
+the `package-lock.json` file always contains a determined version number.
+
+This file **should be commited to your repository**,
