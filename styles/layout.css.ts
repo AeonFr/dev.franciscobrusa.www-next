@@ -41,7 +41,7 @@ export const content = style({
   margin: "0 auto",
   flexGrow: 1,
   "@media": {
-    "(max-width: 40rem)": {
+    "(min-width: 40rem)": {
       paddingRight: "5em",
     },
   },
