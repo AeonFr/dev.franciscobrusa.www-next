@@ -80,7 +80,8 @@ const RangeColorInput = ({ label, value, onChange, max = 255 }) => {
           marginRight: "1em",
         }}
       >
-        {label}:<code style={{ width: "1.9em" }}>{value}</code>
+        {label}:
+        <code style={{ width: "2.4em", whiteSpace: "nowrap" }}>{value}</code>
       </label>
       <input
         id="red"
