@@ -1,0 +1,82 @@
+export const metadata = {
+title: "You can’t replace Redux with Hooks and Context",
+date: "2022-12-03",
+socialImage: "/blog/you-cant-replace-redux-with-hooks-and-context/social-image.png",
+description: "Alternatives to manage state and leave React at what’s good at: rendering the UI.",
+thumbnail: "/blog/you-cant-replace-redux-with-hooks-and-context/thumbnail.png",
+};
+import Layout from "../../components/Layout";
+import {
+Layout as ArticleLayout,
+TextSlide,
+LeadSlide,
+TextAndCodeSlide,
+} from '../../components/blog/you-cant-replace-redux-with-hooks-and-context'
+
+export default ({children}) => (
+<Layout metadata={metadata}>
+<ArticleLayout>{children}</ArticleLayout>
+</Layout>
+);
+
+<LeadSlide>
+
+# You can’t replace Redux with Hooks and Context
+
+React Context is a great tool for simple use cases, but not suited for complex applications. We explore alternatives to manage state outside of React and leave React at what's good at: rendering the UI.
+
+</LeadSlide>
+
+<TextSlide>
+
+We can deduce by looking at the amount of state management libraries there are, that managing state in a complex application can be challenging. With the introduction of hooks and context, many developers have looked to replace established solutions like Redux with these new tools. However, as much as we may want them to, hooks and context simply cannot replace Redux in most cases.
+
+Claiming React by itself is not suited as a state management solution might seem like a spicy take, but if we review the core principles behind React, we can understand it better.
+
+React’s responsibility is to render the UI, and it has always leaved everything else on the side. This is a difference with, for example, frameworks like Vue or Svelte, that also ship with, or have official versions of, state-management libraries, router libraries, etc. By only focusing on one thing, perhaps React was able to iterate on it faster, and maintain it’s focus there, while also fostering competitiveness and diversity in the ecosystem.
+
+React’s innovative paradigm to render UIs it’s, contradictorily, also what makes it so lame at managing state under any meaningful scale. One of the paradigms React is buit on is known as “reactive programming” (it literally inspired its name). Under Reactive Programming, stream are a fundamental concept, and one that will allow us to understand how React reacts (no pun intended) to state changes.
+
+Streams are typically used to represent events, data or other asynchronous sources of information. It refers to a series of elements over time. As shown in the code block, it can be represented with a line running straight from left to right (representing linear time), that contains a series of dots, representing the events.
+
+</TextSlide>
+
+<TextAndCodeSlide>
+
+```
+
+Reactive programming
+--------------------
+
+  ┌────────────┐
+  │            │
+  │   Stream   ├───◉─────◉──────────◉─────────────◉──────
+  │            │
+  └────────────┘
+
+```
+
+React state, which includes the result of `useState`, `useReducer`, and a component's props, can be thought of as a stream of data. Each change in that stream, in turn, triggers a _re-render_. In other words, UI components are subscribed to their state.
+
+```
+
+Reactive programming
+--------------------
+
+  ┌────────────┐
+  │            │
+  │   State    ├───◉─────◉──────────◉─────────────◉──────
+  │            │   │     │          │             │
+  └────────────┘   │     │          │             │
+                   │     │          │             │
+  ┌────────────┐   │     │          │             │
+  │            │   ▼     ▼          ▼             ▼
+  │ Re-renders ├───◉─────◉──────────◉─────────────◉──────
+  │            │
+  └────────────┘
+
+```
+
+React’s narrow focus as a tool to render UIs also means that, well, every API it offers is meant to render UIs... And this definitely makes sense. But most apps big enough will need a place to put global state, and a way to query it. And simply triggering a re-render in any component subscribed to that global state any time that global state changes is simply put, impossible to work with. Performance will be terrible. (Another cases where you shouldn't use Context to manage shared state is for state that changes a lot, like form input values.)
+
+</TextAndCodeSlide>

@@ -1,14 +1,14 @@
 export const metadata = {
-  title: "Refactoring to Vue 3",
-  date: "2021-05-20",
-  socialImage: "/blog/refactoring-to-vue-3/social-image.png",
-  description:
-    "Using the composition API to express reusable stateful logic in VueJS",
-  thumbnail: "/blog/refactoring-to-vue-3/thumbnail.png",
+title: "Refactoring to Vue 3",
+date: "2021-05-20",
+socialImage: "/blog/refactoring-to-vue-3/social-image.png",
+description:
+"Using the composition API to express reusable stateful logic in VueJS",
+thumbnail: "/blog/refactoring-to-vue-3/thumbnail.png",
 };
-import BlogCodeWalkthroughLayout from "../../components/BlogCodeWalkthroughLayout";
+import { BlogCodeWalkthroughLayout } from "../../components/blog/refactoring-to-vue-3/BlogCodeWalkthroughLayout";
 export default (props) => (
-  <BlogCodeWalkthroughLayout {...props} metadata={metadata} />
+<BlogCodeWalkthroughLayout {...props} metadata={metadata} />
 );
 
 # Refactoring to Vue&nbsp;3
@@ -23,15 +23,7 @@ Using the Composition API to express reusable **stateful logic** in VueJS
 
 ## UI as a function of state
 
-One of the core principles of React, Vue and other frameworks or libraries, is that the UI is a result of passing **state** through a function.
-
-<small>
-
-(you don't even need a framework to apply this concept)
-
-</small>
-
-But what is **state** exactly?
+One of the core principles of React, Vue, Solid, Svelete, and similar libraries, is that the UI is a result of passing **state** through a function. <small>(you don't even need a framework to apply this concept)</small>
 
 ```js
 UI = fn(state);
@@ -39,18 +31,12 @@ UI = fn(state);
 
 ---
 
-<div style={{ fontSize: "1.5em" }}>
-
-**State** is data that changes over time. In other words, a **data stream**.
-
-</div>
-
-For example, if we have a Button that retrieves data from the server and updates a list of items, the **state** would be the retrieved data.
+But what is **state** exactly? **State** is data that changes over time. In other words, a **data stream**. For example, if we have a Button that retrieves data from the server and updates a list of items, the **state** would be the retrieved data.
 
 <img
-  src="/blog/refactoring-to-vue-3/state-stream.svg"
-  alt="Visual representation of a data stream (described above)"
-  style={{
+src="/blog/refactoring-to-vue-3/state-stream.svg"
+alt="Visual representation of a data stream (described above)"
+style={{
     backgroundColor: "#ffffff",
     width: "40rem",
     maxWidth: "100%",
@@ -68,9 +54,9 @@ For example, if we have a Button that retrieves data from the server and updates
 In this example, we call **stateful logic** to the click event handler, the data fetching process, etc.
 
 <img
-  src="/blog/refactoring-to-vue-3/stateful-logic.svg"
-  alt="The stateful logic would include: the click stream, the retrieval of state from the server on click, and the logic that updates state when data is retrieved from the server"
-  style={{
+src="/blog/refactoring-to-vue-3/stateful-logic.svg"
+alt="The stateful logic would include: the click stream, the retrieval of state from the server on click, and the logic that updates state when data is retrieved from the server"
+style={{
     backgroundColor: "#ffffff",
     width: "40rem",
     maxWidth: "100%",

@@ -4,6 +4,10 @@ import { useEffect } from "react";
 import type { PostMetadata } from "../utils/postsMetadata";
 import * as styles from "../styles/layout.css";
 
+import ColorSchemePicker from "../components/layout/ColorSchemePicker";
+import { useColorScheme } from "../hooks/useColorScheme";
+import { useCallback } from "react";
+
 interface LayoutProps {
   title: PostMetadata["title"];
   lang: PostMetadata["lang"];
@@ -21,6 +25,12 @@ const Layout: React.FC<LayoutProps> = ({
   useEffect(() => {
     window.document.documentElement.setAttribute("lang", lang || "en");
   }, [lang]);
+
+  const [scheme, setScheme] = useColorScheme();
+
+  const handleSchemeChange = useCallback((ev) => {
+    setScheme(ev.target.value);
+  });
 
   return (
     <div className={styles.wrapper}>
@@ -52,6 +62,16 @@ const Layout: React.FC<LayoutProps> = ({
       </Head>
 
       <header className={styles.block}>
+        <ColorSchemePicker
+          scheme={scheme}
+          handleSchemeChange={handleSchemeChange}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            fontSize: "1.5rem",
+          }}
+        />
         <Link href="/">
           <a className={styles.logo}>Francisco Brusa</a>
         </Link>

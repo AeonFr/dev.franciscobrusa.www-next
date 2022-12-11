@@ -6,19 +6,21 @@ import {
 } from "@code-hike/mini-editor";
 import "@code-hike/mini-editor/dist/index.css";
 import { InView } from "react-intersection-observer";
-import Layout from "./Layout";
-import Container from "./Container";
-import { components } from "./BlogPostLayout";
+import Layout from "../../Layout";
+import Container from "../../Container";
+import { components } from "../../BlogPostLayout";
 import { useMediaQuery } from "react-responsive";
-import { article } from "../styles/article.css";
+import { article } from "../../../styles/article.css";
 
 export default function BlogCodeWalkthrough({ children, metadata }) {
-  const steps = useMemo(
-    () => divideIntoSteps(children).map(parseStep),
-    [children]
-  );
-  const { isInPresentationMode, fullscreenElementRef, currentSlide } =
-    usePresentationMode(steps);
+  const steps = useMemo(() => divideIntoSteps(children).map(parseStep), [
+    children,
+  ]);
+  const {
+    isInPresentationMode,
+    fullscreenElementRef,
+    currentSlide,
+  } = usePresentationMode(steps);
 
   // todo add resize handlers I guess
   const isMobile = useMediaQuery({

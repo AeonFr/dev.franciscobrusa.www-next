@@ -29,42 +29,41 @@ export default function Home({ posts }) {
       </Head>
 
       <Block>
-        <ul className={styles.listContainer}>
-          {posts
-            .filter(({ isDraft }) => !isDraft)
-            .map((post) => (
-              <li
-                key={post.slug}
-                className={styles.listItem}
-                lang={post.lang !== "en" ? post.lang : undefined}
-              >
-                <Link href={`/blog/${post.slug}`}>
-                  <div>
-                    {post.thumbnail && (
-                      <img
-                        src={post.thumbnail}
-                        className={styles.thumbnail}
-                        alt=""
-                        draggable="false"
-                      />
-                    )}
-                    <a className={styles.link}>{post.title}</a>
-                    {post.lang == "es" ? (
-                      <span
-                        className={styles.label}
-                        style={{ marginLeft: "0.5em" }}
-                      >
-                        Español
-                      </span>
-                    ) : (
-                      ""
-                    )}
-                    <p className={styles.excerpt}>{post.description}</p>
-                  </div>
-                </Link>
-              </li>
-            ))}
-        </ul>
+        <nav>
+          <ul className={styles.listContainer}>
+            {posts
+              .filter(({ isDraft }) => !isDraft)
+              .map((post) => (
+                <li
+                  key={post.slug}
+                  className={styles.listItem}
+                  lang={post.lang !== "en" ? post.lang : undefined}
+                >
+                  <Link href={`/blog/${post.slug}`}>
+                    <div className={styles.linkWrapper}>
+                      <a className={styles.link}>{post.title}</a>
+                      <p className={styles.excerpt}>
+                        {post.lang == "es" ? (
+                          <span className={styles.label}>Español</span>
+                        ) : (
+                          ""
+                        )}
+                        {post.description}
+                      </p>
+                      {post.thumbnail && (
+                        <img
+                          src={post.thumbnail}
+                          className={styles.thumbnail}
+                          alt=""
+                          draggable="false"
+                        />
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </nav>
       </Block>
     </Layout>
   );
