@@ -15,6 +15,9 @@ const nextConfig = {
   env: {
     baseURL,
   },
+  images: {
+    domains: ["pbs.twimg.com"],
+  },
   webpack(config, options) {
     const { dev, isServer } = options;
 

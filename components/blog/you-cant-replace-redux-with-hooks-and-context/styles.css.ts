@@ -1,9 +1,15 @@
-import { globalStyle, style } from "@vanilla-extract/css";
+import { style, createVar } from "@vanilla-extract/css";
+
+export const DESKTOP_MEDIA_QUERY = "(min-width: 750px)";
+
+const contentMaxWidth = createVar("36ch");
+const contentMarginLeftDesktop = createVar("10ch");
+const columnGapDesktop = createVar("4ch");
 
 const mediaDesktop = ({ ...styles }) => {
   return {
     "@media": {
-      "(min-width: 750px)": styles,
+      [DESKTOP_MEDIA_QUERY]: styles,
     },
   };
 };
@@ -21,37 +27,45 @@ export const documentFlow = style({
 });
 
 export const singleColumn = style({
+  vars: {
+    [contentMaxWidth]: "36ch",
+    [contentMarginLeftDesktop]: "10ch",
+  },
   alignSelf: "flex-start",
   ...mediaDesktop({
-    marginLeft: "10ch",
+    marginLeft: contentMarginLeftDesktop,
     marginRight: "auto",
   }),
 });
 
 export const doubleColumn = style({
+  vars: {
+    [contentMaxWidth]: "36ch",
+    [contentMarginLeftDesktop]: "10ch",
+    [columnGapDesktop]: "4ch",
+  },
   ...mediaDesktop({
-    marginLeft: "10ch",
+    marginLeft: contentMarginLeftDesktop,
     position: "relative",
   }),
 });
 
-export const rightColumn = style({});
+export const leftColumn = style({});
 
-export const leftColumn = style({
+export const rightColumn = style({
   ...mediaDesktop({
     position: "absolute",
     top: 0,
     right: 0,
-    bottom: 0,
-    left: "calc(36ch + 4ch)",
+    bottom: "-50%",
+    left: `calc(${contentMaxWidth} + ${columnGapDesktop})`,
   }),
 });
 
-export const leftColumnStickyWrapper = style({
+export const rightColumnStickyWrapper = style({
   ...mediaDesktop({
     position: "sticky",
     top: "50%",
-    bottom: "-50%",
     transform: "translateY(-50%)",
     "::after": {
       content: '""',
@@ -64,9 +78,28 @@ export const leftColumnStickyWrapper = style({
   }),
 });
 
+export const overflowWrapper = style({
+  ...mediaDesktop({
+    maxHeight: "100vh",
+    overflowY: "auto",
+  }),
+});
+
 export const intersectionStop = style({
-  borderTop: "1px solid var(--code-bg)",
-  width: "36ch",
+  borderRight: "1px solid var(--code-bg)",
+  maxWidth: `calc(${contentMaxWidth} + ${columnGapDesktop} - 1ch)`,
+});
+
+export const intersectionStopInline = style({
+  position: "relative",
+  "::before": {
+    content: '""',
+    borderRight: "2px solid var(--code-bg)",
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
 });
 
 const columnChild = {
@@ -79,25 +112,49 @@ export const paragraph = style({
   ...columnChild,
   fontSize: "1rem",
   lineHeight: 1.5,
-  maxWidth: "36ch",
+  maxWidth: contentMaxWidth,
 });
 
 export const title1 = style({
   ...columnChild,
+  fontSize: "1.3rem",
+  lineHeight: 1.2,
+  maxWidth: contentMaxWidth,
+  ...mediaDesktop({ paddingLeft: 0 }),
+});
+
+export const title2 = style({
+  ...columnChild,
   fontSize: "1.2rem",
   lineHeight: 1.2,
-  maxWidth: "40ch",
+  maxWidth: contentMaxWidth,
+  ...mediaDesktop({ paddingLeft: 0 }),
 });
 
 export const pre = style({
   ...columnChild,
   overflowX: "auto",
-  maxWidth: "100%",
+  maxWidth: "100vw",
 });
 
 export const lead = style({
   ...columnChild,
   fontSize: "1.25rem",
   lineHeight: 1.25,
-  maxWidth: "40ch",
+  maxWidth: contentMaxWidth,
+});
+
+export const tweetColumn = style({
+  ...columnChild,
+  maxWidth: "550px",
+});
+
+export const highlightedCodeLine = style({
+  fontWeight: "bold",
+  backgroundColor: "var(--bg)",
+  backgroundImage:
+    "linear-gradient(to right, var(--code-bg), var(--bg) 10%, var(--code-bg))",
+  transition: "background .5s",
+  marginLeft: "-1em",
+  paddingLeft: "1em",
 });

@@ -10,11 +10,15 @@ import {
   useRef,
   useState,
 } from "react";
+import { useMediaQuery } from "react-responsive";
+import { throttle } from "lodash-es";
 import CodeBlock from "./CodeBlock";
 
 interface State {
   nodes: any[];
   currentEditorContent: null;
+  // highlighted lines
+  lines: number[];
 }
 
 type Listener = (s: State) => void;
@@ -25,7 +29,7 @@ type CodeContext = {
 };
 
 type CodeContextAPI = {
-  getState: () => CodeContext;
+  getState: () => CodeContext["state"];
   addListener: (l: Listener) => void;
   removeListener: (l: Listener) => void;
   setState: ((newState: State) => void) &
@@ -44,41 +48,85 @@ const CodeContext = createContext<CodeContextAPI>(
   ) as any
 );
 
-const IntersectionStop = ({ children }) => {
-  const { setState } = useContext(CodeContext);
-  const observedNode = useRef();
-  const [observer, setObserver] = useState<IntersectionObserver>();
+const CodeBlockWrapper = ({ children }) => {
+  const { useSelector, setState } = useContext(CodeContext);
 
   useEffect(() => {
-    setObserver(
-      new IntersectionObserver(
-        (entries) => {
-          const entry = entries.find(
-            ({ target }) => target === observedNode.current
-          );
+    setState(({ nodes, ...state }) => ({
+      ...state,
+      nodes: [...nodes, children],
+    }));
 
-          if (entry && !entry.isIntersecting) {
-            if (entry.rootBounds.y > entry.boundingClientRect.y) {
-              // Comming at it from the top
-              setState(({ currentEditorContent, ...state }) => ({
-                ...state,
-                currentEditorContent: children,
-              }));
-            } else {
-              setState(({ currentEditorContent, nodes, ...state }) => ({
-                ...state,
-                nodes,
-                currentEditorContent:
-                  nodes[nodes.indexOf((node: any) => node === children) - 1],
-              }));
-            }
-          }
-          if (!entry?.isIntersecting) return;
-        },
-        { threshold: 0, rootMargin: "-49% 0px -49% 0px" }
-      )
-    );
+    return () => {
+      setState(({ nodes, ...state }) => ({
+        ...state,
+        nodes: nodes.splice(nodes.indexOf(children), 1),
+      }));
+    };
   }, []);
+
+  const currentEditorContent = useSelector(
+    ({ currentEditorContent }) => currentEditorContent
+  );
+  const hightlightedLines = useSelector(({ lines }) => lines);
+  const isFirstCodeBlock = useSelector(
+    ({ nodes }) => nodes[0] !== undefined && nodes[0] === children
+  );
+
+  const isDesktop = useMediaQuery({
+    query: styles.DESKTOP_MEDIA_QUERY,
+  });
+
+  const [codeBlockWrapper, setCodeBlockWrapper] = useState<HTMLDivElement>();
+  const mutationObserver = useRef<MutationObserver>();
+  const [codeBlockHeight, setCodeBlockHeight] = useState(0);
+
+  useEffect(() => {
+    if (!codeBlockWrapper) return;
+
+    const updateHeightThrottled = throttle(() => {
+      setCodeBlockHeight(codeBlockWrapper.clientHeight);
+    }, 100);
+
+    mutationObserver.current = new MutationObserver(updateHeightThrottled);
+    mutationObserver.current.observe(codeBlockWrapper, {
+      subtree: true,
+      childList: false,
+      attributes: true,
+      attributeFilter: ["style"],
+    });
+
+    return () => {
+      mutationObserver.current.disconnect();
+    };
+  }, [codeBlockWrapper]);
+
+  const editorContent = (isDesktop && currentEditorContent) || children;
+
+  return !isDesktop || isFirstCodeBlock ? (
+    <div
+      className={styles.rightColumn}
+      style={{
+        bottom: `-${codeBlockHeight}px`,
+        transition: "bottom .1s linear",
+      }}
+    >
+      <div className={styles.rightColumnStickyWrapper}>
+        <div ref={setCodeBlockWrapper} className={styles.overflowWrapper}>
+          <CodeBlock highlightedLines={hightlightedLines}>
+            {editorContent}
+          </CodeBlock>
+        </div>
+      </div>
+    </div>
+  ) : null;
+};
+
+const useObserver = (
+  observerFn: (entry: IntersectionObserverEntry) => void
+) => {
+  const observedNode = useRef();
+  const [observer, setObserver] = useState<IntersectionObserver>();
 
   const ref = useCallback(
     (node) => {
@@ -93,44 +141,98 @@ const IntersectionStop = ({ children }) => {
     [observer]
   );
 
-  return <div ref={ref} className={styles.intersectionStop} />;
-};
-
-const CodeStep = ({ children }) => {
-  const { useSelector, setState } = useContext(CodeContext);
-
   useEffect(() => {
-    setState(({ nodes, ...state }) => ({
-      ...state,
-      nodes: [...nodes, children],
-    }));
+    setObserver(
+      new IntersectionObserver(
+        (entries) => {
+          const entry = entries.find(
+            ({ target }) => target === observedNode.current
+          );
+          if (entry) {
+            observerFn(entry);
+          }
+        },
+        window.matchMedia(styles.DESKTOP_MEDIA_QUERY).matches
+          ? { threshold: 0, rootMargin: "-49% 0px -49% 0px" }
+          : { threshold: 0, rootMargin: "-24% 0px -74% 0px" }
+      )
+    );
+
+    return () => {
+      observer?.disconnect();
+    };
   }, []);
 
-  const currentEditorContent = useSelector(
-    ({ currentEditorContent }) => currentEditorContent
-  );
-  const isFirstCodeBlock = useSelector(
-    ({ nodes }) => nodes[0] !== undefined && nodes[0] === children
-  );
+  return ref;
+};
+
+export const CodeStep = ({ children }) => {
+  const { setState } = useContext(CodeContext);
+  const ref = useObserver((entry) => {
+    const preChild = children.find((c) => c.props?.originalType === "pre");
+    if (!preChild) {
+      return undefined;
+    }
+    if (entry.isIntersecting) {
+      setState(({ currentEditorContent, ...state }) => ({
+        ...state,
+        currentEditorContent: preChild.props.children,
+      }));
+    }
+  });
 
   return (
-    <>
-      <IntersectionStop>{children}</IntersectionStop>
-      {isFirstCodeBlock ? (
-        <div className={styles.leftColumn}>
-          <div className={styles.leftColumnStickyWrapper}>
-            <CodeBlock>{currentEditorContent || children}</CodeBlock>
-          </div>
-        </div>
-      ) : null}
-    </>
+    <div
+      ref={ref}
+      className={styles.documentFlow + " " + styles.intersectionStop}
+    >
+      {children}
+    </div>
+  );
+};
+
+export const CodeHighlight = ({
+  children,
+  lines = [],
+}: {
+  lines: Array<number>;
+  children: any;
+}) => {
+  const { setState } = useContext(CodeContext);
+
+  const ref = useObserver((entry) => {
+    if (entry.isIntersecting) {
+      setState((state) => ({
+        ...state,
+        lines,
+      }));
+    } else {
+      setState((state) => ({
+        ...state,
+        lines: [],
+      }));
+    }
+  });
+
+  return (
+    <span ref={ref} className={styles.intersectionStopInline}>
+      {children}
+    </span>
   );
 };
 
 const textAndCodeComponents = {
   ...textComponents,
-  p: (props) => textComponents.p({ ...props, className: styles.rightColumn }),
-  pre: (props) => <CodeStep {...props} />,
+  p: (props) => (
+    <p {...props} className={styles.paragraph + " " + styles.leftColumn} />
+  ),
+  h1: (props) => (
+    <h1 {...props} className={styles.title1 + " " + styles.leftColumn} />
+  ),
+  h2: (props) => (
+    <h2 {...props} className={styles.title2 + " " + styles.leftColumn} />
+  ),
+  pre: (props) => <CodeBlockWrapper {...props} />,
 };
 
 export default function TextAndCodeSlide({ children }) {
@@ -139,6 +241,7 @@ export default function TextAndCodeSlide({ children }) {
     state: {
       nodes: [],
       currentEditorContent: null,
+      lines: [],
     },
   });
   const codeContextAPI = useMemo<CodeContextAPI>(() => {
@@ -182,11 +285,9 @@ export default function TextAndCodeSlide({ children }) {
 
   return (
     <div className={styles.documentFlow + " " + styles.doubleColumn}>
-      <MDXProvider components={textAndCodeComponents}>
-        <CodeContext.Provider value={codeContextAPI}>
-          {children}
-        </CodeContext.Provider>
-      </MDXProvider>
+      <CodeContext.Provider value={codeContextAPI}>
+        <MDXProvider components={textAndCodeComponents}>{children}</MDXProvider>
+      </CodeContext.Provider>
     </div>
   );
 }
