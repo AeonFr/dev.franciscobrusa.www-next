@@ -7,4 +7,5 @@ export const textComponents = {
   h1: (props) => <h1 {...props} className={styles.title1} />,
   h2: (props) => <h2 {...props} className={styles.title2} />,
   pre: (props) => <pre {...props} className={styles.pre} />,
+  hr: (props) => <hr {...props} className={styles.hr} />,
 };

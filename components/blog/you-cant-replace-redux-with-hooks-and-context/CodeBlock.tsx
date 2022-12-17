@@ -4,15 +4,17 @@
 
 import Highlight, { defaultProps } from "prism-react-renderer";
 import { useEffect, useMemo, useRef } from "react";
-import {
-  useTransition,
-  animated,
-  Globals,
-  useReducedMotion,
-} from "react-spring";
+import { TransitionMotion, spring } from "react-motion";
 import { lcs } from "fast-myers-diff";
 import "../../../styles/code-block.css";
 import * as styles from "./styles.css";
+
+type CSymbol = number;
+
+const createSymbol = (): CSymbol => {
+  // Since they should be used as keys for React, we can't use Symbol()
+  return Math.random();
+};
 
 const Lines = ({
   className,
@@ -24,7 +26,8 @@ const Lines = ({
   code,
 }) => {
   const previousCodeRef = useRef<string>(code);
-  const previousSymbols = useRef<Symbol[]>([]);
+  const previousSymbols = useRef<CSymbol[]>([]);
+  const previousTokens = useRef<any[]>(tokens);
 
   /* A collection of symbols where each item (that represents a line of code) has a stable identity ammong diffs. */
   const tokenSymbols = useMemo(() => {
@@ -32,7 +35,7 @@ const Lines = ({
 
     if (previousCode === code) {
       // initial render
-      previousSymbols.current = tokens.map(() => Symbol());
+      previousSymbols.current = tokens.map(() => createSymbol());
     }
     const symbols = previousSymbols.current;
 
@@ -48,73 +51,104 @@ const Lines = ({
         diffResult.shift();
         skipIndexes = length - 1;
 
-        return [...acc, ...symbols.slice(prevIndex, prevIndex + length)];
+        acc.push(...symbols.slice(prevIndex, prevIndex + length));
       } else if (skipIndexes > 0) {
         skipIndexes--;
-        return acc;
       } else {
-        return [...acc, Symbol()];
+        acc.push(createSymbol());
       }
+      return acc;
     }, []);
-
-    // save for future iterations
-    previousCodeRef.current = code;
-    previousSymbols.current = newSymbols;
 
     return newSymbols;
   }, [code]); // tokens change alongside code, but code is a string so its safe to compare it
 
-  const transitions = useTransition(tokens, {
-    key: (token) => {
-      const index = tokens.indexOf(token);
-      return tokenSymbols[index];
-    },
-    /*
-    // TODO use better keys
-    keys: (token) => {
-      const content = token[0].content;
-      const contentIndex = tokens
-        .filter((token) => token[0].content === content)
-        .indexOf(token);
-      return `{${contentIndex}} ${content}`;
-    },
-     */
-    ...(typeof window != "undefined" &&
-    window.matchMedia(styles.DESKTOP_MEDIA_QUERY).matches
-      ? {
-          from: { height: "0em", opacity: 0, transform: "translateX(50%)" },
-          enter: () => [
-            { height: "1.5em" },
-            { opacity: 1, transform: "translateX(0)" },
-          ],
-          leave: () => [{ opacity: 0 }, { height: "0em" }],
-          trail: 50,
-        }
-      : {}),
-  });
+  const tokensWithStableIdentities = useMemo(() => {
+    const result = tokenSymbols.map((symbol, index) => {
+      if (previousSymbols.current[index] === symbol) {
+        return previousTokens[index];
+      } else {
+        return tokens[index];
+      }
+    });
+
+    return result;
+  }, [code]);
+
+  useEffect(() => {
+    previousCodeRef.current = code;
+    previousSymbols.current = tokenSymbols;
+    previousTokens.current = tokens;
+  }, [code]);
+
+  const getRealLineProps = (token, index) => {
+    const lineProps = getLineProps({ line: token });
+    const highlighted = highlightedLines?.includes(index);
+    const notHighlighted = highlightedLines?.length && !highlighted;
+
+    lineProps.className =
+      lineProps.className +
+      " " +
+      (highlighted ? styles.highlightedCodeLine : "") +
+      " " +
+      (notHighlighted ? styles.nonHighlightedCodeLine : "");
+
+    return lineProps;
+  };
+
+  const iterateLines = (iteratorFn) => {
+    const callIterator = (token, index, animationStyles) => {
+      const lineProps = getLineProps({ line: token });
+      const highlighted = highlightedLines?.includes(index);
+      const notHighlighted = highlightedLines?.length && !highlighted;
+
+      lineProps.className =
+        lineProps.className +
+        " " +
+        (highlighted ? styles.highlightedCodeLine : "") +
+        " " +
+        (notHighlighted ? styles.nonHighlightedCodeLine : "");
+
+      return iteratorFn({ animationStyles, token, lineProps });
+    };
+
+    return tokens.map((token, index) => callIterator(token, index, null));
+  };
 
   return (
-    <pre className={className} style={style}>
-      {transitions((style, item, _, index) => {
-        const lineProps = getLineProps({ line: item });
-        const highlighted = highlightedLines?.includes(index);
-
-        return (
-          <animated.div
-            style={style}
-            className={
-              lineProps.className +
-              " " +
-              (highlighted ? styles.highlightedCodeLine : "")
-            }
-          >
-            {item.map((token, key) => (
-              <span {...getTokenProps({ token, key })} />
-            ))}
-          </animated.div>
-        );
-      })}
-    </pre>
+    <TransitionMotion
+      willLeave={() => ({ opacity: spring(0), height: spring(0) })}
+      willEnter={() => ({ opacity: 0, height: 0 })}
+      styles={tokens.map((token, i) => ({
+        key: tokenSymbols[i],
+        data: token,
+        style: {
+          height: spring(20),
+          opacity: spring(1),
+        },
+        index: i,
+      }))}
+    >
+      {(interpolatedStyles) => (
+        <pre className={className} style={style}>
+          {interpolatedStyles.map(({ key, data: token, style }) => {
+            const lineProps = getRealLineProps(
+              token,
+              tokens.findIndex((t) => t === token)
+            );
+            return (
+              <div key={key} style={style}>
+                <div className={lineProps.className}>
+                  {token.map((token, key) => (
+                    <span {...getTokenProps({ token, key })} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </pre>
+      )}
+    </TransitionMotion>
   );
 };
 
@@ -125,13 +159,6 @@ export default function CodeBlock({
   children: any;
   highlightedLines: number[];
 }) {
-  const prefersReducedMotion = useReducedMotion();
-  useEffect(() => {
-    Globals.assign({
-      skipAnimation: prefersReducedMotion,
-    });
-  }, [prefersReducedMotion]);
-
   const code = children.props.children;
 
   return useMemo(

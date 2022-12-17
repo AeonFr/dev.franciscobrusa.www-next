@@ -2,9 +2,9 @@ import { style, createVar } from "@vanilla-extract/css";
 
 export const DESKTOP_MEDIA_QUERY = "(min-width: 750px)";
 
-const contentMaxWidth = createVar("36ch");
-const contentMarginLeftDesktop = createVar("10ch");
-const columnGapDesktop = createVar("4ch");
+const contentMaxWidth = createVar("36rem");
+const contentMarginLeftDesktop = createVar("10rem");
+const columnGapDesktop = createVar("4rem");
 
 const mediaDesktop = ({ ...styles }) => {
   return {
@@ -15,10 +15,18 @@ const mediaDesktop = ({ ...styles }) => {
 };
 
 const flexChild = {
-  // sensitive defaults for all flex childrens
+  // sensitive defaults for all flex remildrens
   minWidth: 0,
   margin: 0,
 };
+
+export const layoutRoot = style({
+  vars: {
+    [contentMaxWidth]: "29rem",
+    [contentMarginLeftDesktop]: "5rem",
+    [columnGapDesktop]: "4rem",
+  },
+});
 
 export const documentFlow = style({
   display: "flex",
@@ -27,10 +35,6 @@ export const documentFlow = style({
 });
 
 export const singleColumn = style({
-  vars: {
-    [contentMaxWidth]: "36ch",
-    [contentMarginLeftDesktop]: "10ch",
-  },
   alignSelf: "flex-start",
   ...mediaDesktop({
     marginLeft: contentMarginLeftDesktop,
@@ -39,11 +43,6 @@ export const singleColumn = style({
 });
 
 export const doubleColumn = style({
-  vars: {
-    [contentMaxWidth]: "36ch",
-    [contentMarginLeftDesktop]: "10ch",
-    [columnGapDesktop]: "4ch",
-  },
   ...mediaDesktop({
     marginLeft: contentMarginLeftDesktop,
     position: "relative",
@@ -87,7 +86,7 @@ export const overflowWrapper = style({
 
 export const intersectionStop = style({
   borderRight: "1px solid var(--code-bg)",
-  maxWidth: `calc(${contentMaxWidth} + ${columnGapDesktop} - 1ch)`,
+  maxWidth: `calc(${contentMaxWidth} + ${columnGapDesktop} - 1rem)`,
 });
 
 export const intersectionStopInline = style({
@@ -95,6 +94,7 @@ export const intersectionStopInline = style({
   "::before": {
     content: '""',
     borderRight: "2px solid var(--code-bg)",
+    borderBottom: "2px solid transparent",
     position: "absolute",
     right: 0,
     top: 0,
@@ -104,23 +104,29 @@ export const intersectionStopInline = style({
 
 const columnChild = {
   ...flexChild,
-  paddingLeft: "2ch",
-  paddingRight: "2ch",
+  paddingLeft: "1rem",
+  paddingRight: "1rem",
 };
 
 export const paragraph = style({
   ...columnChild,
   fontSize: "1rem",
-  lineHeight: 1.5,
+  lineHeight: 1.55,
   maxWidth: contentMaxWidth,
 });
 
 export const title1 = style({
   ...columnChild,
-  fontSize: "1.3rem",
+  fontSize: "1.5rem",
   lineHeight: 1.2,
   maxWidth: contentMaxWidth,
-  ...mediaDesktop({ paddingLeft: 0 }),
+  marginTop: "4rem",
+  marginBottom: "2rem",
+  ...mediaDesktop({
+    paddingLeft: 0,
+    paddingRight: 0,
+    fontSize: "2rem",
+  }),
 });
 
 export const title2 = style({
@@ -139,22 +145,30 @@ export const pre = style({
 
 export const lead = style({
   ...columnChild,
-  fontSize: "1.25rem",
-  lineHeight: 1.25,
+  fontSize: "1.2rem",
+  lineHeight: 1.4,
   maxWidth: contentMaxWidth,
+});
+
+export const hr = style({
+  border: 0,
+  height: 2,
+  backgroundColor: "var(--code-bg)",
+  width: "100%",
 });
 
 export const tweetColumn = style({
   ...columnChild,
   maxWidth: "550px",
+  lineHeight: 1.6,
+  fontSize: "1.2rem",
+});
+
+export const nonHighlightedCodeLine = style({
+  opacity: 0.55,
+  transition: "opacity .2s",
 });
 
 export const highlightedCodeLine = style({
-  fontWeight: "bold",
-  backgroundColor: "var(--bg)",
-  backgroundImage:
-    "linear-gradient(to right, var(--code-bg), var(--bg) 10%, var(--code-bg))",
-  transition: "background .5s",
-  marginLeft: "-1em",
-  paddingLeft: "1em",
+  fontWeight: "600",
 });

@@ -14,6 +14,7 @@ body {
    * https://github.com/loilo/vscode-snazzy-light
    */
   --white: #fff;
+  --lighter-gray: #f8f8f7;
   --light-gray: #f1f1f0;
   --medium-gray: #9194a2;
   --dark-gray: #565869;
@@ -48,20 +49,38 @@ body {
   --color: var(--black);
   --accent: var(--dark-pink);
   --accent-alt: var(--dark-blue);
-  --code-bg: var(--light-gray);
+  --code-bg: var(--lighter-gray);
   --blockquote-line: var(--accent);
 
   /* code syntax highlight */
+  /*
   --user-selection: var(--light-gray);
   --comment: var(--medium-gray);
   --punctuation: var(--medium-gray);
-  --plain: var(--medium-gray);
+  --plain: var(--dark-gray);
   --number: var(--dark-red);
   --property: var(--dark-gray);
   --variable: var(--dark-yellow);
   --operator: var(--medium-gray);
   --keyword: var(--dark-pink);
   --function: var(--dark-blue);
+  */
+
+  /**
+   * Based on the relaxed theme
+   * https://github.com/Relaxed-Theme/vscode-theme-relaxed
+   */
+  /* --code-bg: white; */
+  --plain: #1a1a1a;
+  --user-selection: #c2e8f4;
+  --comment: #96928f;
+  --punctuation: #398bc9;
+  --number: #398bc9;
+  --property: #398bc9;
+  --variable: #333333;
+  --operator: #398bc9;
+  --keyword: #7b1fa2;
+  --function: #3f831e;
 }
 
 .theme-snazzy.scheme-dark {
@@ -84,6 +103,22 @@ body {
   --operator: var(--light-pink);
   --keyword: var(--light-pink);
   --function: var(--light-blue);
+
+  /**
+   * Based on the relaxed theme
+   * https://github.com/Relaxed-Theme/vscode-theme-relaxed
+  --code-bg: #2e333b;
+  --plain: #d9d9d9;
+  --user-selection: #6a79853a;
+  --comment: #727272;
+  --punctuation: #6a8799;
+  --number: #b06698;
+  --property: #ebc17a;
+  --variable: #d9d9d9;
+  --operator: #6a8799;
+  --keyword: #b06698;
+  --function: #7eaac7;
+   */
 }
 
 .theme-gruvbox {
@@ -101,7 +136,7 @@ body {
 
   --dark-red: #cc241d;
   --dark-green: #79740e;
-  --dark-yellow: #b57614;
+  --dark-yellow: #b57614; /* DOES NOT MEAT CONTRAST INSIDE CODEBLOCKS */
   --dark-blue: #076678;
   --dark-purple: #8f3f71;
   --dark-aqua: #427b58;
@@ -139,7 +174,7 @@ body {
   --property: var(--fg0);
   --variable: var(--dark-aqua);
   --operator: var(--fg0);
-  --keyword: var(--dark-yellow);
+  --keyword: var(--dark-orange);
   --function: var(--dark-blue);
 }
 
@@ -202,7 +237,6 @@ code {
   font-size: 0.875em;
   background-color: var(--code-bg);
   line-height: 1;
-  font-weight: bold;
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
   word-break: break-word;

@@ -13,6 +13,7 @@ import {
 import { useMediaQuery } from "react-responsive";
 import { throttle } from "lodash-es";
 import CodeBlock from "./CodeBlock";
+import { createState, StateAPI } from "./state";
 
 interface State {
   nodes: any[];
@@ -21,23 +22,7 @@ interface State {
   lines: number[];
 }
 
-type Listener = (s: State) => void;
-
-type CodeContext = {
-  listeners: Listener[];
-  state: State;
-};
-
-type CodeContextAPI = {
-  getState: () => CodeContext["state"];
-  addListener: (l: Listener) => void;
-  removeListener: (l: Listener) => void;
-  setState: ((newState: State) => void) &
-    ((setStateFn: (prevState: State) => State) => void);
-  useSelector: <T>(selectorFn: (s: State, prevRes?: T) => T) => T;
-};
-
-const CodeContext = createContext<CodeContextAPI>(
+const CodeContext = createContext<StateAPI<State>>(
   new Proxy(
     {},
     {
@@ -198,7 +183,7 @@ export const CodeHighlight = ({
   lines: Array<number>;
   children: any;
 }) => {
-  const { setState } = useContext(CodeContext);
+  const { setState, getState } = useContext(CodeContext);
 
   const ref = useObserver((entry) => {
     if (entry.isIntersecting) {
@@ -206,7 +191,8 @@ export const CodeHighlight = ({
         ...state,
         lines,
       }));
-    } else {
+    } else if (getState().lines === lines) {
+      // unset if leaving and not entering any other highlight
       setState((state) => ({
         ...state,
         lines: [],
@@ -236,51 +222,12 @@ const textAndCodeComponents = {
 };
 
 export default function TextAndCodeSlide({ children }) {
-  let codeContext = useRef<CodeContext>({
-    listeners: [],
-    state: {
+  const codeContextAPI = useMemo<StateAPI<State>>(() => {
+    return createState<State>({
       nodes: [],
       currentEditorContent: null,
       lines: [],
-    },
-  });
-  const codeContextAPI = useMemo<CodeContextAPI>(() => {
-    return {
-      getState: () => codeContext.current.state,
-      addListener: (listener: Listener) =>
-        codeContext.current.listeners.push(listener),
-      removeListener: (listener: Listener) =>
-        (codeContext.current.listeners = codeContext.current.listeners.filter(
-          (l: any) => l !== listener
-        )),
-      setState: (newState: any) => {
-        if (typeof newState === "function") {
-          codeContext.current.state = newState(codeContext.current.state);
-        } else {
-          codeContext.current.state = newState;
-        }
-        codeContext.current.listeners.forEach((listener: Listener) =>
-          listener(codeContext.current.state)
-        );
-      },
-      useSelector<T>(selectorFn: (s: State, prevRes?: T) => T) {
-        const [state, setState] = useState<T>();
-
-        useEffect(() => {
-          const onUpdate = (codeContextState: State) => {
-            setState((prevRes) => selectorFn(codeContextState, prevRes));
-          };
-
-          codeContextAPI.addListener(onUpdate);
-
-          return () => {
-            codeContextAPI.removeListener(onUpdate);
-          };
-        }, []);
-
-        return state;
-      },
-    };
+    });
   }, []);
 
   return (
