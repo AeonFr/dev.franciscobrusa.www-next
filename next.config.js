@@ -17,6 +17,8 @@ const nextConfig = {
   },
   images: {
     domains: ["pbs.twimg.com"],
+    loader: 'akamai',
+    path: '',
   },
   webpack(config, options) {
     const { dev, isServer } = options;
