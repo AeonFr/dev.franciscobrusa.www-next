@@ -29,8 +29,9 @@ const Layout: React.FC<LayoutProps> = ({
   const [scheme, setScheme] = useColorScheme();
 
   const handleSchemeChange = useCallback((ev) => {
+    // @ts-expect-error
     setScheme(ev.target.value);
-  });
+  }, []);
 
   return (
     <div className={styles.wrapper}>

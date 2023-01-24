@@ -10,6 +10,7 @@ export const textComponents = {
   h3: (props) => <h2 {...props} className={styles.title3} />,
   pre: ({ children, ...props }) => (
     <CodeBlock
+      highlightedLines={[]}
       {...{
         ...props,
         children: {

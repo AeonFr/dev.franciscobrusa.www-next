@@ -14,6 +14,8 @@ const mediaDesktop = ({ ...styles }) => {
   };
 };
 
+export const svg = style({})
+
 const flexChild = {
   // sensitive defaults for all flex remildrens
   minWidth: 0,
