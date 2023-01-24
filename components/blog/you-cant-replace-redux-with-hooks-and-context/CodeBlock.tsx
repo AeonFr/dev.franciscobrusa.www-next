@@ -119,15 +119,17 @@ const Lines = ({
     <TransitionMotion
       willLeave={() => ({ opacity: spring(0), height: spring(0) })}
       willEnter={() => ({ opacity: 0, height: 0 })}
-      styles={tokens.map((token, i) => ({
-        key: tokenSymbols[i],
-        data: token,
-        style: {
-          height: spring(20),
-          opacity: spring(1),
-        },
-        index: i,
-      }))}
+      styles={tokens.map((token, i) => {
+        return {
+          key: tokenSymbols[i],
+          data: token,
+          style: {
+            height: spring(20),
+            opacity: spring(1, { stiffness: 137, damping: 18 }),
+          },
+          index: i,
+        };
+      })}
     >
       {(interpolatedStyles) => (
         <pre className={className} style={style}>
@@ -155,9 +157,11 @@ const Lines = ({
 export default function CodeBlock({
   children,
   highlightedLines = [],
+  className,
 }: {
   children: any;
   highlightedLines: number[];
+  className?: string;
 }) {
   const code = children.props.children;
 
@@ -169,10 +173,16 @@ export default function CodeBlock({
         theme={undefined}
         language={children.props.className?.replace(/^language-/, "")}
       >
-        {({ className, style, tokens, getLineProps, getTokenProps }) => {
+        {({
+          className: highlightClassName,
+          style,
+          tokens,
+          getLineProps,
+          getTokenProps,
+        }) => {
           return (
             <Lines
-              className={className}
+              className={`${className || ""} ${highlightClassName}`}
               style={style}
               tokens={tokens}
               getLineProps={getLineProps}

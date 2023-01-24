@@ -6,20 +6,21 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { useMediaQuery } from "react-responsive";
-import { throttle } from "lodash-es";
+import { debounce } from "lodash-es";
 import CodeBlock from "./CodeBlock";
 import { createState, StateAPI } from "./state";
 
-interface State {
+export interface State {
   nodes: any[];
   currentEditorContent: null;
-  // highlighted lines
-  lines: number[];
+  lines: number[]; // focused lines
+  isAnyActive: boolean;
 }
 
 const CodeContext = createContext<StateAPI<State>>(
@@ -69,7 +70,7 @@ const CodeBlockWrapper = ({ children }) => {
   useEffect(() => {
     if (!codeBlockWrapper) return;
 
-    const updateHeightThrottled = throttle(() => {
+    const updateHeightThrottled = debounce(() => {
       setCodeBlockHeight(codeBlockWrapper.clientHeight);
     }, 100);
 
@@ -88,6 +89,11 @@ const CodeBlockWrapper = ({ children }) => {
 
   const editorContent = (isDesktop && currentEditorContent) || children;
 
+  useLayoutEffect(() => {
+    const numLines = editorContent.props.children.split("\n");
+    setCodeBlockHeight(numLines * 20 + 28);
+  }, [editorContent]);
+
   return !isDesktop || isFirstCodeBlock ? (
     <div
       className={styles.rightColumn}
@@ -98,7 +104,10 @@ const CodeBlockWrapper = ({ children }) => {
     >
       <div className={styles.rightColumnStickyWrapper}>
         <div ref={setCodeBlockWrapper} className={styles.overflowWrapper}>
-          <CodeBlock highlightedLines={hightlightedLines}>
+          <CodeBlock
+            highlightedLines={hightlightedLines}
+            className={styles.pre}
+          >
             {editorContent}
           </CodeBlock>
         </div>
@@ -153,15 +162,25 @@ const useObserver = (
 
 export const CodeStep = ({ children }) => {
   const { setState } = useContext(CodeContext);
+  const [isActive, setIsActive] = useState(false);
+
   const ref = useObserver((entry) => {
     const preChild = children.find((c) => c.props?.originalType === "pre");
     if (!preChild) {
       return undefined;
     }
     if (entry.isIntersecting) {
-      setState(({ currentEditorContent, ...state }) => ({
+      setIsActive(true);
+      setState((state) => ({
         ...state,
         currentEditorContent: preChild.props.children,
+        isAnyActive: true,
+      }));
+    } else {
+      setIsActive(false);
+      setState((state) => ({
+        ...state,
+        isAnyActive: false,
       }));
     }
   });
@@ -169,7 +188,13 @@ export const CodeStep = ({ children }) => {
   return (
     <div
       ref={ref}
-      className={styles.documentFlow + " " + styles.intersectionStop}
+      className={
+        styles.documentFlow +
+        " " +
+        styles.intersectionStop +
+        " " +
+        (isActive ? styles.isActive : "")
+      }
     >
       {children}
     </div>
@@ -184,24 +209,34 @@ export const CodeHighlight = ({
   children: any;
 }) => {
   const { setState, getState } = useContext(CodeContext);
+  const [isActive, setIsActive] = useState(false);
 
   const ref = useObserver((entry) => {
     if (entry.isIntersecting) {
+      setIsActive(true);
       setState((state) => ({
         ...state,
         lines,
       }));
-    } else if (getState().lines === lines) {
-      // unset if leaving and not entering any other highlight
-      setState((state) => ({
-        ...state,
-        lines: [],
-      }));
+    } else {
+      setIsActive(false);
+      // unset if not entering any other highlight
+      if (getState().lines === lines) {
+        setState((state) => ({
+          ...state,
+          lines: [],
+        }));
+      }
     }
   });
 
   return (
-    <span ref={ref} className={styles.intersectionStopInline}>
+    <span
+      ref={ref}
+      className={
+        styles.intersectionStopInline + " " + (isActive ? styles.isActive : "")
+      }
+    >
       {children}
     </span>
   );
@@ -227,11 +262,22 @@ export default function TextAndCodeSlide({ children }) {
       nodes: [],
       currentEditorContent: null,
       lines: [],
+      isAnyActive: false,
     });
   }, []);
 
+  const isActive = codeContextAPI.useSelector(({ isAnyActive }) => isAnyActive);
+
   return (
-    <div className={styles.documentFlow + " " + styles.doubleColumn}>
+    <div
+      className={
+        styles.documentFlow +
+        " " +
+        styles.doubleColumn +
+        " " +
+        (isActive ? styles.isActive : "")
+      }
+    >
       <CodeContext.Provider value={codeContextAPI}>
         <MDXProvider components={textAndCodeComponents}>{children}</MDXProvider>
       </CodeContext.Provider>

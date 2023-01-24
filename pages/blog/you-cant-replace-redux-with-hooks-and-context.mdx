@@ -1,8 +1,8 @@
 export const metadata = {
 title: "You can’t replace Redux with Hooks and Context",
-date: "2022-12-03",
+date: "2023-01-24",
 socialImage: "/blog/you-cant-replace-redux-with-hooks-and-context/social-image.png",
-description: "Alternatives to manage state and leave React at what’s good at: rendering the UI.",
+description: "Check this alternatives to manage state, and leave React to what it’s good at.",
 thumbnail: "/blog/you-cant-replace-redux-with-hooks-and-context/thumbnail.png",
 };
 
@@ -15,11 +15,11 @@ LeadSlide,
 TextAndCodeSlide,
 CodeStep,
 CodeHighlight,
-TweetSlide,
+ReRenderExample,
 } from '../../components/blog/you-cant-replace-redux-with-hooks-and-context'
 
 export default ({children}) => (
-<Layout metadata={metadata}>
+<Layout {...metadata}>
 <ArticleLayout>{children}</ArticleLayout>
 </Layout>
 );
@@ -28,139 +28,38 @@ export default ({children}) => (
 
 # You can’t replace Redux with Hooks and Context
 
-React’s Context API is a great tool to share state between components without passing props multiple levels down (something known as prop drilling). Yet, it was never intended to be a state management solution by itself. The problem is that the more state you put in Context, the more times each subscribed component will re‑render. The solution sometimes proposed to bypass this problem is to split context, but this is insufficient for most apps.
+React’s Context API is a great tool to share state between components without passing props multiple levels down, but it was never intended to be a state management solution by itself.
 
-Re‑rendering is the biggest performance bottleneck in React, and should be avoided as much as possible. Without the ability to _select_ state, or to subscribe to only certain updates, we can’t really use Context as a _performant_ and _scalable_ solution for state management.
-
-But the same principles that make React re‑render can help us preventing them. In this post, I will explain the different approaches that the most popular state management alternatives use, and **we will even build a basic state-management library from scratch**.
+When using Context as a state management solution at scale, performance problems quickly appear. This is specially true if your app includes complex logic tied to user input, realtime data updates, or calls to multiple endpoints in the background.
 
 </LeadSlide>
 
 <TextSlide>
 
----
+The problem with the Context API is that it causes a re-render at the root level (which is generally where you put all your content providers) every time _any_ part of that state changes.
 
-Unlike frameworks like Vue or Svelte, React does not ship with a Router, a state-management solution, or even a templating engine (JSX can be used, but it’s not mandatory). Even the rendering itself is leveraged to the `react-dom` package. The core React package has a very concrete scope, and it’s not precisely “being a complete state manager solution”.
+Redux, Recoil and other state management libraries include the contept of _selectors_, ways to grab only a part of the whole global state and subscribe the components to “a subset of all the things that can make your state to change”. Reducing re-renders at the root of the tree is your main task if you want to keep the app working smoothly, specially if you want it to feel responsive to user interaction. That’s why it’s so important that a state management solution implements a “selector”.
 
-React’s paradigms and it’s narrow scope allow so much diversity and innovation in the ecosystem, but it is also, contradictorily, what makes it so bad at managing state under any meaningful scale.
+But you really need Redux, then? Well, probably not. We will replace Redux with our own little library—inspired by Zustand—, which we will write together step by step, to give you an idea of what's the minumum thing you need to have a proper state management solution.
 
-One of the paradigms React is buit on is known as “reactive programming” (by the way, it literally inspired its name). Under Reactive Programming, stream are a fundamental concept, and one that will allow us to understand how React reacts (no pun intended) to state changes. This might seem unrelated now, but hang in there, it will be a useful.
+## React’s core principles, or why React is not a proper state management solution
 
-</TextSlide>
+Unlike frameworks like Vue or Svelte, React does not ship with a store, router, or even a templating engine (JSX can be used, but it’s not mandatory). Even the rendering itself is leveraged to the `react‑dom` package. This narrow scope is what enables so much diversity and innovation in the ecosystem, but it’s also what makes React by itself insuficient for certain tasks.
 
-<TextAndCodeSlide>
-<CodeStep>
+React treats its internal state as **streams**, a fundamental concept of **reactive programming** (you know, that programming paradigm that inspired its name): each component is _subscribed to its “state stream”_, and thus, re-renders every time its state changes. This concept is fundamental on how React works, but also defines a boundary on the responsibilities of the library: React was never intended to be a “general purpose” stream library, which is why it doesn’t have built-in APIs to create or subscribe to streams... And that is what we want to build ourselves to have something we can call a “state manager”...
 
-A stream can represent events, data or other asynchronous sources of information. It can be represented with a line running straight from left to right (representing linear time), that contains a series of dots, representing the events over time.
+**But what is a stream anyway?**
+A stream can represent events, data or other asynchronous sources of information. It can be represented with a line running straight from left to right (representing time), that contains a series of dots, representing events.
 
 ```
 
-Reactive programming
---------------------
-
   ┌────────────┐
-  │            │
   │   Stream   ├───◉─────◉──────────◉─────────────◉──────
-  │            │
   └────────────┘
 
 ```
 
-</CodeStep>
-<CodeStep>
-
-React state, which includes the result of `useState`, `useReducer`, and a component's props, can be thought of as a stream of data. Each change in that stream, in turn, triggers a _re‑render_. In other words, UI components are subscribed to their state.
-
-```
-
-  ┌────────────┐
-  │            │
-  │   State    ├───◉─────◉──────────◉─────────────◉──────
-  │            │   │     │          │             │
-  └────────────┘   │     │          │             │
-                   │     │          │             │
-  ┌────────────┐   │     │          │             │
-  │            │   ▼     ▼          ▼             ▼
-  │ Re-renders ├───◉─────◉──────────◉─────────────◉──────
-  │            │
-  └────────────┘
-
-```
-
-The Context API works just like that. Any change in Context triggers a re‑render on all components using that content. Paradoxically, this same mechanism that's at the core of what React is good at, is also what makes it's state management solution insufficient for some circumstances. Because, sometimes, we don't want to re‑render _every_ component every time the value of context changes. Sometimes we want to _select_ to a part of that state, and only re‑render when that part changes.
-
-</CodeStep>
-<CodeStep>
-
-[Redux](https://react-redux.js.org/api/hooks#useselector) solves this with the `useSelector` hook. You can use a single store with a lot of data, but only subscribe your components to a selection of that state. For example, you might only want to track changes in the `name` of a given document.
-
-`useSelector((state) => state.document.name)`
-
-```
-
-  ┌────────────┐
-  │            │
-  │   Store    ├───◉─────◉──────────◉─────────────◉──────
-  │            │   │     │          │             │
-  └────────────┘   │     │          │             │
-                   │     │          │             │
-   <Selector>      │     x          │             x
-                   │                │
-  ┌────────────┐   │                │
-  │            │   ▼                ▼
-  │   State    ├───◉────────────────◉────────────────────
-  │            │   │                │
-  └────────────┘   │                │
-                   │                │
-  ┌────────────┐   │                │
-  │            │   ▼                ▼
-  │ Re-renders ├───◉────────────────◉────────────────────
-  │            │
-  └────────────┘
-
-```
-
-This selector function acts as a filter between the store’s data stream and React’s state stream.
-The function is executed any time state changes, but it only “propagates the update” if there is any change in the selected part of the state.
-
-</CodeStep>
-</TextAndCodeSlide>
-<LeadSlide>
-
----
-
-The ability to select state is key in making state management scalable and performant.
-
----
-
-</LeadSlide>
-<TextSlide>
-
-Other libraries like [Zustand](https://github.com/pmndrs/zustand) implement this same approach, but without a lot of the “extras” that come with Redux. For example, things like time-travel debugging are not available. Also, Zustand doesn't require you to write your store in a reducer, which also makes the implementation simpler.
-
-I mention this library because its implementation is so small, it even fits in [this tweet](https://twitter.com/dai_shi/status/1583082766081531905) (\*cheating a little).
-</TextSlide>
-
-<TweetSlide>
-
-<p lang="en" dir="ltr">Here&#39;s the Zustand code in JS in a tweet.<br/>I think I did this before, but this is slightly a new version.<br/>Not in 140 chars, but in an image. 😅<br/><br/>Source: <a href="https://t.co/SEBiC7bObe">https://unpkg.com/browse/zustand...</a>
-</p>
-<a href="https://t.co/kLcHnMN5je">
-<Image src="https://pbs.twimg.com/media/Ffg5enJUoAAVDjq?format=jpg&name=4096x4096" width={1808} height={2218} alt="tweet's image" />
-</a>
-&mdash; Daishi Kato (@dai_shi) <a href="https://twitter.com/dai_shi/status/1583082766081531905">October 20, 2022</a>
-
-</TweetSlide>
-
-<TextSlide>
-
-Perhaps you can already understand that implementation, in any case, let me review the basics before digging into libraries like Recoil, that are slightly more complex.
-
-## Building a simple state management library
-
-So far, by convention, I’ve represented **streams** as a series of dots on a line. How can we translate that into code? Turns out it is something you have used already: event listeners. That’s right: to create a stream, you simply need an "object" that dispatches events over time. It's that simple.
-
-Take for example a DOM node that can be clicked: It will dispatch "click" events over time, that any other stream can _subscribe_ to, or _listen_ to. If we checked every button click to update a counter, we could represent that with a graphic like this:
+You have probably already worked with streams before, even if you didn’t give them that name. For example, if you ever worked with something similar to “updating a counter every time a button is clicked”, we’re talking about two connected streams:
 
 ```
   ┌──────────┐
@@ -174,7 +73,31 @@ Take for example a DOM node that can be clicked: It will dispatch "click" events
   └──────────┘
 ```
 
-We will create a Store that will emit events every time its updated, and allow React to “listen” to those events through a hook, conventionally named `useSelector`.
+**React state** (the result of `useState`, `useReducer`, and a component’s props), can be thought of as a stream of data. Each change in that stream, in turn, triggers a re‑render.
+In other words, **UI components are subscribed to their state**; they _are_ the representation of that state over time. (You might have heard this before expressed as `UI = fn(state)`, “UI is a function of state”.)
+
+```
+
+  ┌────────────┐
+  │   State    ├───◉─────◉──────────◉─────────────◉──────
+  └────────────┘   │     │          │             │
+                   │     │          │             │
+  ┌────────────┐   ▼     ▼          ▼             ▼
+  │ Re‑renders ├───◉─────◉──────────◉─────────────◉──────
+  └────────────┘
+
+```
+
+React just works like that: any change in state triggers a re-render. And the Context API is no exception: any change in Context triggers a re‑render on all components using that content. But when you have state in a store, you generally have that context at the very root level of the app, and you _never_ want to re-render the whole app.
+
+[Redux](https://react‑redux.js.org/api/hooks#useselector) solves this problem with the `useSelector` hook, allowing you to subscribe your component to changes in only a part of the state.
+
+```js
+const isAdmin = useSelector((state) => state.user?.isAdmin);
+```
+
+This selector function acts as a filter between the store’s data stream and React’s state stream.
+The function is executed any time state changes, but it only “propagates the update” if there is any change in the selected part of the state.
 
 ```
   ┌─────────────────┐
@@ -186,17 +109,42 @@ We will create a Store that will emit events every time its updated, and allow R
   ┌─────────────────┐   ▼                ▼
   │  React’s State  ├───◉────────────────◉────────────────
   └─────────────────┘
+
 ```
+
+</TextSlide>
+<LeadSlide>
+
+Without the ability to select state, the Context API cannot be a scalable and performant state-management solution.
+With a selector, we have control over the amount of times the app re-renders, instead of re-renders having control over the (bad) performance of the app.
+
+</LeadSlide>
+<TextSlide>
 
 ---
 
-### Part 1: Creating the store’s state stream
+Up next, we will build a small library to implement this basic approach to state management, that is the backbone of all state management libraries. We will do it in 30 lines of code (give or take), without adding anything extra besides that which is extremely necessary.
+
+
+## Building a simple state manager
+
+To break out of the React state stream and start optimizing for less re-renders, we need to create our custom stream (which we’ll call “Store stream” or “Store state stream”), and synchronize it with the React state stream.
+
+### Part 1: Creating the Store state stream
+
+So far, by convention, I’ve represented **streams** as a series of dots on a line. How can we translate that into code? Turns out it is something you have used already: event listeners. That’s right: to create a stream, you simply need an "object" that dispatches events over time. It's that simple.
+
+To start implementing this, let’s create a function to instantiate the store, that will define a `state` variable and a set of registered event listeners.
 
 </TextSlide>
 <TextAndCodeSlide>
 <CodeStep>
 
-To start implementing this, let’s create a function to instantiate the store, that will define a `state` variable and a set of registered event listeners.
+<CodeHighlight lines={[0,1,2,3,4,5]}>
+
+Our function looks like this:
+
+</CodeHighlight>
 
 ```js
 const createStore = (initialState) => {
@@ -209,9 +157,14 @@ const createStore = (initialState) => {
 
 </CodeStep>
 <CodeStep>
-<CodeHighlight lines={[4,5,6,7,8,9,10]}>
+<CodeHighlight lines={[4,5,6,7,8,9]}>
 
-Afterwards, let’s add a `setState` function. It works similarly to React's `useState` hook, allowing us to pass a function to set state based on the previous state, or just a value, to override all state.
+Then, let’s add an `subscribe` function that pushes a new listener into our `listeners` set.
+
+</CodeHighlight>
+<CodeHighlight lines={[6,7,8]}>
+
+Conveniently, we will return the function to unregister the listener. This means we don't have to define a separate method for this. Also, this will go along nicely with React hooks such as `useEffect` and `useSyncExternalStore` (but more on that later).
 
 </CodeHighlight>
 
@@ -220,18 +173,25 @@ const createStore = (initialState) => {
   let state = initialState;
   const listeners = new Set();
 
-  const setState = (newState) => {
-    if (typeof newState === "function") {
-      state = newState(state);
-    } else {
-      state = newState;
-    }
+  const subscribe = (listener) => {
+    listeners.add(listener);
+    return () => {
+      listeners.remove(listener);
+    };
   };
 
   // ...
 };
 ```
 
+</CodeStep>
+<CodeStep>
+
+<CodeHighlight lines={[7,8,9,10,11,12,13]}>
+
+Afterwards, let’s add a `setState` function. It works similarly to React's `useState` hook, allowing us to pass a function to set state based on the previous state, or pass just a value to override all state.
+
+</CodeHighlight>
 <CodeHighlight lines={[6]}>
 
 In other words, we can call the function like this:
@@ -245,51 +205,32 @@ In other words, we can call the function like this:
 
 </CodeHighlight>
 
-This store can change its state, but no one can’t subscribe to updates, so it is not a proper stream yet.
-
-</CodeStep>
-<CodeStep>
-<CodeHighlight lines={[4,5,6,7,8,9]}>
-
-Let’s add an `addListener` function that pushes a new function into our `listeners` set.
-
-</CodeHighlight>
-<CodeHighlight lines={[6,7,8]}>
-
-Conveniently, we will return the function to unregister the listener. This means we don't have to define a separate method for this. Also, this will go along nicely with React hooks such as `useEffect` and `useSyncExternalStore` (but more on that later).
-
-</CodeHighlight>
-<CodeHighlight lines={[4,5,6,7,8,9]}>
-
-This is kind of API is often refered to as _the subscribe pattern_, or as an _event bus_.
-
-</CodeHighlight>
-
 ```js
 const createStore = (initialState) => {
   let state = initialState;
   const listeners = new Set();
-
-  const addListener = (listener) => {
-    listeners.add(listener);
-    return () => {
-      listeners.remove(listener);
-    };
+  const subscribe = (listener) => {
+    // ...
   };
 
   const setState = (newState) => {
-    // ...
+    if (typeof newState === "function") {
+      state = newState(state);
+    } else {
+      state = newState;
+    }
   };
 
   // ...
 };
 ```
 
-</CodeStep><CodeStep>
+</CodeStep>
+<CodeStep>
 
 <CodeHighlight lines={[7,13]}>
 
-Now we should make the `setState` function call the registered listeners when state is updated. Listeners will be called every time state changes, receiving the new value of state.
+And finally, let’s call all our listeners every time state is updated. This is the step that turns this into a proper stream: now we can actually subscribe to the value of state over time.
 
 </CodeHighlight>
 
@@ -297,7 +238,7 @@ Now we should make the `setState` function call the registered listeners when st
 const createStore = (initialState) => {
   let state = initialState;
   const listeners = new Set();
-  const addListener = (listener) => {
+  const subscribe = (listener) => {
     // ...
   };
 
@@ -314,10 +255,11 @@ const createStore = (initialState) => {
 };
 ```
 
-</CodeStep><CodeStep>
+</CodeStep>
+<CodeStep>
 <CodeHighlight lines={[10]}>
 
-Finally, we'll just create a function to return the current state. This will be handy later.
+Almost there! One last thing: let’s create a function to return the current state. This will be handy later.
 
 </CodeHighlight>
 
@@ -325,7 +267,7 @@ Finally, we'll just create a function to return the current state. This will be 
 const createStore = (initialState) => {
   let state = initialState;
   const listeners = new Set();
-  const addListener = (listener) => {
+  const subscribe = (listener) => {
     // ...
   };
   const setState = (newState) => {
@@ -340,18 +282,21 @@ const createStore = (initialState) => {
 
 </CodeStep><CodeStep>
 
-Our finished function looks like this:
+To put the cherry on top 🍒, we just need to return `subscribe`, `setState` and `getState`, and _voilà_.
+All together, our finished function looks like this:
 
 ```js
 const createStore = (initialState) => {
   let state = initialState;
   const listeners = new Set();
-  const addListener = (listener) => {
+
+  const subscribe = (listener) => {
     listeners.add(listener);
     return () => {
       listeners.remove(listener);
     };
   };
+
   const setState = (newState) => {
     if (typeof newState === "function") {
       state = newState(state);
@@ -360,40 +305,415 @@ const createStore = (initialState) => {
     }
     listeners.forEach((listener) => listener(state));
   };
+
   const getState = () => state;
 
-  return { addListener, setState, getState };
+  return { subscribe, setState, getState };
 };
 ```
 
 </CodeStep>
+</TextAndCodeSlide>
+<TextSlide>
 
-This is all we need for our stream! ✨ And it fits in ~20 lines of code.
-Now we just need a way to "hook it" into the React State stream.
+This is all we need for our stream! ✨ And it fits in 20 lines of code (not counting empty lines).
+Now we just need a way to “hook it” into the React State stream.
 
-<CodeStep>
+### Part 2: Instantiating the store inside a React app
 
-### Part 2: The `useSelector` hook
+We have our `createStore` function that can instantiate new stores, so now let’s create the global store and connect it to React.
 
-To “hook” our store into React, we will create the `useSelector` function, with a structure like this:
+If you are developing a SPA and are not planning on running integration tests in parallel, you can simply instantiate your store as a global module, creating a file with a content like this:
 
 ```js
-const useSelector = (
-  selectorFn = (state) => state,
-  isEqualFn = (a, b) => a === b
-) => {
+export default createStore(initialState);
+```
+
+For SSR and for running integration tests, this can cause issues, so you probably want to instantiate this store inside a React Context.
+
+<details><summary>Why is this a problem for SSR and integration testing?</summary>
+
+In node, modules are global, so the instance of the store will be shared across all running instances of your app.
+Inside an app that is rendered in the server, this means that some of your users could do actions that affect all other users connected to the same server. And in integration tests, this means that the execution of one test can make another one fail.
+
+</details>
+
+<details><summary>How to make this work?</summary>
+
+To fix this issue, you can just create the store inside a Context Provider. You can provide the value from a ref, which never changes and never causes re-renders.
+
+Your context provider would probably look like this:
+
+```js
+export const StoreContext = createContext(undefined);
+
+export default function StoreProvider({ children }) {
+  const initialValue = {
+    // ...
+  };
+  const store = useRef(() => createStore(initialValue), []);
+  return (
+    <StoreContext.Provider value={store.current}>
+      {children}
+    </StoreContext.Provider>
+  );
+}
+```
+
+</details>
+
+### Part 3: The `useSelector` hook
+
+Let’s start the `useSelector` hook then.
+
+</TextSlide>
+<TextAndCodeSlide>
+<CodeStep>
+<CodeHighlight lines={[0,1,2,3,4,5,6]}>
+
+As a basic scaffolding, we need to read the “store” (either from Context, or from a module, depending on what you did in the previous step). The hook accepts a selector function as argument, which allows it to “filter” state and only subscribe to the part needed.
+
+</CodeHighlight>
+
+```js
+const useSelector = (selectorFn) => {
+  const store = useContext(StoreContext);
+  const selectorResult = selectorFn(store.getState());
+
   // ...
+  return selectorResult;
+};
+```
+
+</CodeStep>
+<CodeStep>
+<CodeHighlight lines={[2,3,4]}>
+
+But of course, `selectorResult` will change over time, and we need React to trigger a re‑render every time that happens. For that, we can just use _useState_ to save the result of the selector function.
+
+</CodeHighlight>
+
+```js
+const useSelector = (selectorFn) => {
+  const store = useContext(StoreContext);
+  const [selectorResult, setSelectorResult] = useState(
+    selectorFn(store.getState())
+  );
+
+  // ...
+  return selectorResult;
+};
+```
+
+</CodeStep>
+<CodeStep>
+<CodeHighlight lines={[6,7,8,9,10]}>
+
+Finally, we just need to sync with changes the Store’s Stream. We can do that combining the `useEffect` hook with the `store.subscribe` function we created earlier.
+
+</CodeHighlight>
+<CodeHighlight lines={[7]}>
+
+We are essentially running the selector function every time the store’s state changes.
+The listener will register when the component mounts or when the selector function changes, and will keep the `selectorResult` value updated.
+
+</CodeHighlight>
+
+```js
+const useSelector = (selectorFn) => {
+  const store = useContext(StoreContext);
+  const [selectorResult, setSelectorResult] = useState(
+    selectorFn(store.getState())
+  );
+
+  useEffect(() => {
+    const listener = (state) => setSelectorResult(selectorFn(state));
+
+    return store.subscribe(listener);
+  }, [selectorFn]);
+
+  return selectorResult;
+};
+```
+
+But if this function executes every time state changes, wouldn’t that cause the component to re-render any time store’s state changes?
+Well, the magic here is provided by React: when we call `setSelectorResult` with _the same value_ as before, React will not re-render the component. In other words, if our selector function is selecting a value from state, even if `setSelectorResult` is called repeatedly, it will only cause a re-render when that value changes.
+
+To check if it should re‑render or not, React uses strict comparison (`===`) to check if the value has changed. If your selector is returning objects or arrays that passed through some transformation (like `.map()`, `.filter()`, etc.), React will consider that your data is changing every time.
+
+</CodeStep>
+<CodeStep>
+<CodeHighlight lines={[0]}>
+
+To allow transformations of state inside selector functions, we will make the hook accept a second argument to check for equality. By default we are using a simple “strict comparison” function, which should be good enough for most cases.
+
+</CodeHighlight>
+
+```js
+const useSelector = (selectorFn, isEqual = (a, b) => a === b) => {
+  const store = useContext(StoreContext);
+  const [selectorResult, setSelectorResult] = useState(/* ... */);
+
+  useEffect(() => {
+    // TODO use the isEqual function before setting state
+    const listener = (state) => setSelectorResult(selectorFn(state));
+
+    return store.subscribe(listener);
+  }, [selectorFn]);
 
   return selectorResult;
 };
 ```
 
 </CodeStep>
+<CodeStep>
+<CodeHighlight lines={[0, 5,6,7,8,9,10,11,12,13,14]}>
 
+Then, let’s call `setSelectorResult` with a function as argument, to compare next and previous state. If the `isEqual` check doesn’t pass, state will be udpated. Otherwise, we will keep using the previous state, effectively skipping the re‑render.
+
+</CodeHighlight>
+
+```js
+const useSelector = (selectorFn, isEqual = (a, b) => a === b) => {
+  const store = useContext(StoreContext);
+  const [selectorResult, setSelectorResult] = useState(/* ... */);
+
+  useEffect(() => {
+    const listener = (state) => {
+      setSelectorResult((previousResult) => {
+        const newResult = selectorFn(state);
+
+        if (isEqual(previousResult, newResult)) {
+          return previousResult;
+        }
+        return newResult;
+      });
+    };
+
+    return store.subscribe(listener);
+  }, [selectorFn]);
+
+  return selectorResult;
+};
+```
+
+</CodeStep>
+<CodeStep>
+
+This approach works just fine, except for some edge cases where it doesn’t. Under some circumstances, it can cause problems with concurrent rendering (the new rendering mode in React 18), and other problems like the “zombie child problem”.
+
+For the React 18 release, the React team and the Redux team [started discussing](https://github.com/reactwg/react-18/discussions/86) some alternatives, and eventually settled on creating the `useSyncExternalStore` hook (previously called `useMutableSource`).
+
+<CodeHighlight lines={[3,4,5,6,7,8,9]}>
+
+With this hook, it’s “sibling” was created, with a beautifully simple and not-at-all intimidating name: `useSyncExternalStoreWithSelector`.
+
+This hook can do just what we implemented before:
+subscribe to changes in a stream, and run a selector function and an equality function. Besides that, it solves problems with concurrent mode, and even better, it also improves the performance over the previous approach, because it doesn’t constantly unregisters and registers the listener function if the selector function is not memoized.
+
+This hook is available in React 18 out-of-the-box, and [you can also use it in React 17 or lower using a “shim” library](https://www.npmjs.com/package/use‑sync‑external‑store). So you should definitely use it, regardless of your React version.
+
+Knowing all this, let’s refactor our code to use this hook. You’ll notice that it makes everything simpler ✨ and cleaner 🧼
+
+</CodeHighlight>
+
+```js
+const useSelector = (selectorFn, isEqual = (a, b) => a === b) => {
+  const store = useContext(StoreContext);
+
+  const selectorResult = useSyncExternalStoreWithSelector(
+    store.subscribe,
+    store.getState,
+    store.getState, // For server‑side rendering
+    selectorFn,
+    isEqual
+  );
+
+  return selectorResult;
+};
+```
+
+</CodeStep>
 </TextAndCodeSlide>
-
 <TextSlide>
 
-For the sake of briefness, I’ll keep this code simple, but it wouldn’t be difficult to implement small features like returning also previous state on the `setState` and the `listener` calls. If you need features like middleware support or typescript definitions, you will probably be better using something like Zustand instead. And if you are following the Flux architecture, you will definitely prefer to reach out to Redux.
+Our basic state management solution is complete, and all in just 30 lines of code.
+
+This approach is neat to introduce a simple state management solution in your app or library without the need of third-party dependencies. It might be a good fit for a library, where you don’t want to include an external dependency. With some tweaks here and there, it could adapt different use cases or have optimizations that make sense for your particular use-case.
+
+But for more complex apps, you might want to reach to an established solution for good documentation, developer tooling, or for better performance. Let’s quickly analyze some alternatives out there...
+
+## The state of state management
+
+### Redux
+
+**Redux** implements a similar pattern than the one shown in this post (single store, access through a `useSelector` hook), but forces developers to use the “reducer” abstraction to interact with the store—meaning you use a _dispatcher_ to run _actions_, and put your logic in a _reducer function_.
+
+This extra abstraction tends to create unnecessary boilerplate, make stateful logic written in the reducer format is harder to reuse, and make code harder to read and follow. It’s common that some stateful logics inside Redux stores end up being implemented more than once.
+
+But besides all that, Redux is a really battle tested solution. It has good documentation, some great devtools, it’s actively maintained, and used in production by teams of all sizes.
+
+```js
+const initialState = {
+  count: 0,
+};
+
+function reducer(state = initialState, action) {
+  switch (action.type) {
+    case "INCREMENT":
+      return {
+        count: state.count + 1,
+      };
+    default:
+      return state;
+  }
+}
+
+const store = Redux.createStore(reducer);
+
+store.dispatch({ type: "INCREMENT" });
+console.log(store.getState()); // { count: 1 }
+```
+
+### Zustand
+
+[Zustand](https://github.com/pmndrs/zustand) implements a very similar approach as the one shown earlier. In fact, this library inspired this whole article.
+
+It’s public API to select state is similar to Redux (single, global store, accessed through selector functions), but it doesn’t force you to write code in the reducer pattern, which can provide a lot more flexibility.
+
+Just like the solution we build ourselves, the code of Zustand is so small it even fits in [this tweet](https://twitter.com/dai_shi/status/1583082766081531905) (\*cheating a little), which also means it’s lightweight (1.1kB minified and gzipped).
+
+The differences between Zustand and our implementation from above are:
+
+1. If you call `store.setState` with an object, the result is _merged_ with the previous state (shallow merge), instead of overwritting all of the previous state.
+2. Stores can receive a `set()` function when being created, which means you can to define actions when initializing the store.
+
+An example initializing a store with actions:
+
+```js
+const counterStore = createStore((set) => ({
+  count: 0,
+  actions: {
+    increase: () => set((state) => ({ count: state.count + 1 })),
+    reset: () => set(() => ({ count: 0 })),
+  },
+}));
+```
+
+Because you don’t need to write code in a reducer, Zustand can be refreshingly simpler. It’s suited for apps of small and medium size, as well as for libraries where bundle size is important.
+
+In tooling and documentation, it might not be as solid a choice as Redux, but it’s quicky gaining popularity and adoption, so I wouldn’t be surprised to see that change quickly.
+
+Further reading:
+
+- [Working with Zustand](https://tkdodo.eu/blog/working-with-zustand)
+
+### Recoil, Jotai and “atomic state” libraries
+
+The approach that Redux and Zustand use is pretty scalable, but there are some cases where it might not be enough. The problem is that the more state we keep and update, the more our selector functions will be called. And another problem is that our store will need to be a big “monolithic” structure that needs to be initialized when we create the app and always updated from the root, whereas we might sometimes prefer to register “modules” on the go.
+
+Recoil developers have found a way to improve performance for apps that have to maintain thousands of objects in the screen at once and update them often, like complex dashboard interfaces, SVG graphic editors, etc.
+
+The basic idea is that you create “atoms” that contain a single value of data (a row in a database, a string, a number, etc.). Each of that atoms is a piece of state you can subscribe to directly. Imagine each one of them as the result of the `createStore` function, holding it’s own state and with a way to synchronize it with React’s state.
+
+```
+  ┌─────────────────┐
+  │      Atom       ├───◉─────◉──────────◉─────────◉─────
+  └─────────────────┘   │     │          │         │
+                        │     │          │         │
+  ┌─────────────────┐   ▼     ▼          ▼         ▼
+  │  React’s State  ├───◉─────◉──────────◉─────────◉──────
+  └─────────────────┘
+```
+
+Since atoms are supposed to be small, you wouldn’t really need to subscribe to _only a part of the atom state_, but instead, you would most likely want a way to select the state of more than one atom at once. So Selectors in this libraries don’t work by letting you _filter_ state, but instead, they let you _agreggate_ atoms.
+Instead of being subscribed to changes in only one State stream, a Selector can subscribe itself to as many atoms as it needs to. This is done with an ergonomic API to easily subscribe to other Atom’s Streams inside Selectors.
+
+```
+  ┌─────────────────┐
+  │      Atom 1     ├───◉────────────────◉───────────────
+  └─────────────────┘   │                │
+                        │                │
+  ┌─────────────────┐   │                │
+  │      Atom 2     ├───│─────◉──────────│─────────◉─────
+  └─────────────────┘   │     │          │         │
+                        │     │          │         │
+       Selector         ◉     ◉          ◉         ◉
+                        │     │          │         │
+                        │     │          │         │
+  ┌─────────────────┐   ▼     ▼          ▼         ▼
+  │  React’s State  ├───◉─────◉──────────◉─────────◉──────
+  └─────────────────┘
+```
+
+An example of a Recoil atom and a selector looks like this:
+
+```js
+// Atoms
+const textState = atom({
+  key: "textState",
+  default: "",
+});
+
+const charCountState = atom({
+  key: "charCountState",
+  default: 0,
+});
+
+// Selector
+const charCountSelector = selector({
+  key: "charCountSelector",
+  get: ({ get }) => {
+    const text = get(textState);
+    return text.length;
+  },
+});
+```
+
+There is nothing stopping you from creating, let’s say, a new Zustand store every time you want to create a new value of state, essentially using Zustand as an “atoms” library. But Recoil, Jotai and others are specifically designed to be used that way, so the developer experience will surely be better when using one of those.
+
+(In fact, the creator of Zustand is working on [zustand-signal](https://www.npmjs.com/package/zustand-signal), a library designed to use atomic state with a good developer experience).
+
+Still, the approach might feel too boiler-plate-ish for a small app, so you might want to invest in using a library like this if you know you’re really going to need it.
+
+Continue reading: [Jotai vs Recoil](https://blog.logrocket.com/jotai-vs-recoil-what-are-the-differences/)
+
+## What about signals?
+
+The new kids on the block in the state manament scene are signal libraries. We have [Preact signals](https://preactjs.com/guide/v10/signals/), [zustand-signal](https://www.npmjs.com/package/zustand-signal), [jotai-signal](https://github.com/jotai-labs/jotai-signal), and probably several other libraries...
+
+Signals are nothing but syntax sugar over atoms. This libraries wrap the `React.createElement()` function to work, sometimes explicitly (asking you to use a `/** @jsx */` comment), or other times implicitly, overwriting the `React.createElement` function (like Preact Signals does 🚩🚩).
+
+It’s just a way to work with atoms but with a syntax in which you don’t have to thing so much when accessing values. Creating a signal is similar to creating a store from our “little library” created before.
+
+```js
+const count = signal(0);
+```
+You normally update a signal’s state by assigning a new value (eg. `count.value++`), which works using Proxies under the hood.
+
+```jsx
+// Read the signal’s value
+count.value; // 1
+
+// Only inside JSX, you can also skip the `.value`
+<div>{count}</div>; // <div>1</div>
+```
+
+In my opinion, changing the JSX pragma means this solution is no good for libraries and could be difficult to configure on some meta-frameworks like Next.js, so I don’t like this solution. But it’s a good thing that we are all trying to improve the developer experience over other solutions.
+
+If you are interested in a more in-depth comparison on the approaches, you can read:
+
+- [Zustand vs Signals](https://medium.com/@kevinschaffter/zustand-vs-signals-e664bff2ce4a)
+
+---
+
+## Conclusion
+
+
+Using the Context API can be useful for creating compound components or for apps of very little scale and few interactions, but to really make something performant at scale, you will want to reach to a different solution.
+
+The state management scene has changed a lot in recent times, but in the end, all solutions are variations on the same core ideas: data streams, subscriptions, and selectors.
+
+Understanding how this works from first principles will give you a better understanding on how to pick third-party solutions, or how to create one yourself.
 
 </TextSlide>
