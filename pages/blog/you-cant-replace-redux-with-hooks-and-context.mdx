@@ -191,13 +191,13 @@ const createStore = (initialState) => {
 Afterwards, let’s add a `setState` function. It works similarly to React's `useState` hook, allowing us to pass a function to set state based on the previous state, or pass just a value to override all state.
 
 </CodeHighlight>
-<CodeHighlight lines={[6]}>
+<CodeHighlight lines={[9]}>
 
 In other words, we can call the function like this:
 `setState(prevState => newState)`
 
 </CodeHighlight>
-<CodeHighlight lines={[8]}>
+<CodeHighlight lines={[11]}>
 
 ...or like this:
 `setState(newState)`
