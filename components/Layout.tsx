@@ -37,6 +37,7 @@ const Layout: React.FC<LayoutProps> = ({
     <div className={styles.wrapper}>
       <Head>
         <title>{title}</title>
+        <meta name="og:title" content={title} />
 
         {description && (
           <>
