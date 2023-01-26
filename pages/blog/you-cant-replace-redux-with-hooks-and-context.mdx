@@ -1,27 +1,26 @@
 export const metadata = {
-title: "You can’t replace Redux with Hooks and Context",
-date: "2023-01-24",
-socialImage: "/blog/you-cant-replace-redux-with-hooks-and-context/social-image.png",
-description: "Check this alternatives to manage state, and leave React to what it’s good at.",
-thumbnail: "/blog/you-cant-replace-redux-with-hooks-and-context/thumbnail.png",
+  title: "You can’t replace Redux with Hooks and Context",
+  date: "2023-01-24",
+  socialImage: "/blog/you-cant-replace-redux-with-hooks-and-context/social-image.png",
+  description: "Creating a simple state management solution from scratch.",
+  thumbnail: "/blog/you-cant-replace-redux-with-hooks-and-context/thumbnail.png",
 };
 
-import Image from "next/image"
 import Layout from "../../components/Layout";
 import {
-Layout as ArticleLayout,
-TextSlide,
-LeadSlide,
-TextAndCodeSlide,
-CodeStep,
-CodeHighlight,
-ReRenderExample,
+  Layout as ArticleLayout,
+  TextSlide,
+  LeadSlide,
+  TextAndCodeSlide,
+  CodeStep,
+  CodeHighlight,
+  ReRenderExample,
 } from '../../components/blog/you-cant-replace-redux-with-hooks-and-context'
 
 export default ({children}) => (
-<Layout {...metadata}>
-<ArticleLayout>{children}</ArticleLayout>
-</Layout>
+  <Layout {...metadata}>
+  <ArticleLayout>{children}</ArticleLayout>
+  </Layout>
 );
 
 <LeadSlide>

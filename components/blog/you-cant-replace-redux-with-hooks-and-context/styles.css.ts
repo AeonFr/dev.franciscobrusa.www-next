@@ -2,9 +2,9 @@ import { style, globalStyle, createVar } from "@vanilla-extract/css";
 
 export const DESKTOP_MEDIA_QUERY = "(min-width: 950px)";
 
-const contentMaxWidth = createVar("36rem");
-const contentMarginLeftDesktop = createVar("10rem");
-const columnGapDesktop = createVar("4rem");
+const contentMaxWidth = createVar("content-max-width");
+const contentMarginLeftDesktop = createVar("content-margin-left-desktop");
+const columnGapDesktop = createVar("column-gap-desktop");
 
 const mediaDesktop = ({ ...styles }) => {
   return {
@@ -25,7 +25,7 @@ const flexChild = {
 export const layoutRoot = style({
   vars: {
     [contentMaxWidth]: "29rem",
-    [contentMarginLeftDesktop]: "5rem",
+    [contentMarginLeftDesktop]: "max(5rem, calc(50vw - 33rem))",
     [columnGapDesktop]: "4rem",
   },
 });

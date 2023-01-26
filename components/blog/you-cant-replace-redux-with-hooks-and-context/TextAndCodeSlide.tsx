@@ -12,7 +12,7 @@ import {
   useState,
 } from "react";
 import { useMediaQuery } from "react-responsive";
-import { debounce } from "lodash-es";
+import debounce from "debounce";
 import CodeBlock from "./CodeBlock";
 import { createState, StateAPI } from "./state";
 
