@@ -39,7 +39,7 @@ export default function Home({ posts }) {
                   className={styles.listItem}
                   lang={post.lang !== "en" ? post.lang : undefined}
                 >
-                  <Link href={`/blog/${post.slug}`}>
+                  <Link href={`/blog/${post.slug}`} legacyBehavior>
                     <div className={styles.linkWrapper}>
                       <a className={styles.link}>{post.title}</a>
                       <p className={styles.excerpt}>

@@ -74,8 +74,8 @@ const Layout: React.FC<LayoutProps> = ({
             fontSize: "1.5rem",
           }}
         />
-        <Link href="/">
-          <a className={styles.logo}>Francisco Brusa</a>
+        <Link href="/" className={styles.logo}>
+          Francisco Brusa
         </Link>
       </header>
 
