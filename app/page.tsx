@@ -1,20 +1,13 @@
-import Head from "next/head";
 import Link from "next/link";
-import Layout from "../components/Layout";
 import Block from "../components/Block";
 import * as styles from "./index.css";
+import { getPostsMetadata } from "../utils/postsMetadata";
 
-export function getStaticProps() {
-  const { getPostsMetadata } = require("../utils/postsMetadata");
-
-  return { props: { posts: getPostsMetadata() } };
-}
-
-export default function Home({ posts }) {
-  return (
-    <Layout>
+export const metadata = {
+  title: 'Blog - Francisco Brusa',
+  /** TODO: 
       <Head>
-        <title>Blog about frontend engineering - Francisco Brusa</title>
+        <title></title>
         <link rel="canonical" href="https://franciscobrusa.dev" />
         <meta property="og:url" content="https://franciscobrusa.dev" />
         <meta
@@ -27,7 +20,14 @@ export default function Home({ posts }) {
           content="Blog about frontend engineering - Francisco Brusa"
         />
       </Head>
+  */
+}
 
+export default function Home() {
+  const posts = getPostsMetadata();
+
+  return (
+    <>
       <Block>
         <nav>
           <ul className={styles.listContainer}>
@@ -65,6 +65,6 @@ export default function Home({ posts }) {
           </ul>
         </nav>
       </Block>
-    </Layout>
+    </>
   );
 }

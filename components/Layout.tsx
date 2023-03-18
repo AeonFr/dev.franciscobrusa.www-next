@@ -5,8 +5,6 @@ import type { PostMetadata } from "../utils/postsMetadata";
 import * as styles from "../styles/layout.css";
 
 import ColorSchemePicker from "../components/layout/ColorSchemePicker";
-import { useColorScheme } from "../hooks/useColorScheme";
-import { useCallback } from "react";
 
 interface LayoutProps {
   title: PostMetadata["title"];
@@ -26,12 +24,6 @@ const Layout: React.FC<LayoutProps> = ({
     window.document.documentElement.setAttribute("lang", lang || "en");
   }, [lang]);
 
-  const [scheme, setScheme] = useColorScheme();
-
-  const handleSchemeChange = useCallback((ev) => {
-    // @ts-expect-error
-    setScheme(ev.target.value);
-  }, []);
 
   return (
     <div className={styles.wrapper}>
@@ -65,8 +57,6 @@ const Layout: React.FC<LayoutProps> = ({
 
       <header className={styles.block}>
         <ColorSchemePicker
-          scheme={scheme}
-          handleSchemeChange={handleSchemeChange}
           style={{
             position: "absolute",
             top: 0,

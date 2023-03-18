@@ -3,15 +3,16 @@ const withMDX = require("@next/mdx")({
 });
 const { createVanillaExtractPlugin } = require("@vanilla-extract/next-plugin");
 const withVanillaExtract = createVanillaExtractPlugin();
-const {
-  getGlobalCssLoader,
-} = require("next/dist/build/webpack/config/blocks/css/loaders");
 
 const baseURL = "https://franciscobrusa.dev";
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    appDir: true,
+  },
   swcMinify: true,
-  pageExtensions: ["js", "jsx", "mdx"],
+  pageExtensions: ["js", "jsx", "mdx", "tsx"],
   env: {
     baseURL,
   },
@@ -19,39 +20,6 @@ const nextConfig = {
     domains: ["pbs.twimg.com"],
     loader: 'akamai',
     path: '',
-  },
-  webpack(config, options) {
-    const { dev, isServer } = options;
-
-    const cssRules = config.module.rules.find(
-      (rule) =>
-        Array.isArray(rule.oneOf) &&
-        rule.oneOf.some(
-          ({ test }) =>
-            typeof test === "object" &&
-            typeof test.test === "function" &&
-            test.test("filename.css")
-        )
-    ).oneOf;
-
-    cssRules.unshift({
-      test: /(?<!\.vanilla)\.css$/,
-      sideEffects: true,
-      use: getGlobalCssLoader(
-        {
-          assetPrefix: options.config.assetPrefix,
-          isClient: !isServer,
-          isServer,
-          isDevelopment: dev,
-          future: {},
-          experimental: {},
-        },
-        [],
-        []
-      ),
-    });
-
-    return config;
   },
 };
 

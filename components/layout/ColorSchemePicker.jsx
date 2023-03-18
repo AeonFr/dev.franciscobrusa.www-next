@@ -1,11 +1,13 @@
+"use client";
+
 import { useEffect, useMemo } from "react";
+import { useColorScheme } from "../../hooks/useColorScheme";
 import * as styles from "../../styles/color-scheme-picker.css";
 
 export default function ColorSchemePicker({
-  scheme,
-  handleSchemeChange,
   ...props
 }) {
+  const [scheme, handleSchemeChange] = useColorScheme();
   const htmlClasses = useMemo(() => {
     return scheme === "dark"
       ? "theme-snazzy scheme-dark"
