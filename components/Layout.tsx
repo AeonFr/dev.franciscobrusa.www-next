@@ -40,7 +40,7 @@ const Layout: React.FC<LayoutProps> = ({
       <Head>
         <title>{title}</title>
         <meta name="og:title" content={title} />
-        {cannonical && <link rel="cannonical" content={cannonical} />}
+        {cannonical && <link rel="cannonical" href={cannonical} />}
 
         {description && (
           <>
