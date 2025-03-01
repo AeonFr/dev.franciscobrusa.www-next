@@ -21,6 +21,7 @@ const Layout: React.FC<LayoutProps> = ({
   lang,
   socialImage,
   description,
+  cannonical,
 }) => {
   useEffect(() => {
     window.document.documentElement.setAttribute("lang", lang || "en");
@@ -38,6 +39,7 @@ const Layout: React.FC<LayoutProps> = ({
       <Head>
         <title>{title}</title>
         <meta name="og:title" content={title} />
+        {cannonical && <link rel="cannonical" content={cannonical} />}
 
         {description && (
           <>

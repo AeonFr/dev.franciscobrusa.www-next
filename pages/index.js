@@ -15,7 +15,7 @@ export default function Home({ posts }) {
     <Layout>
       <Head>
         <title>Blog about frontend engineering - Francisco Brusa</title>
-        <link rel="canonical" href="https://franciscobrusa.dev" />
+        <link rel="canonical" href="https://www.francanobr.com" />
         <meta property="og:url" content="https://franciscobrusa.dev" />
         <meta
           property="og:site_name"
