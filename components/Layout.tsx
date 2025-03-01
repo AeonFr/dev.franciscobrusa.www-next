@@ -13,6 +13,7 @@ interface LayoutProps {
   lang: PostMetadata["lang"];
   socialImage: PostMetadata["socialImage"];
   description: PostMetadata["description"];
+  cannonical?: PostMetadata["cannonical"];
 }
 
 const Layout: React.FC<LayoutProps> = ({
